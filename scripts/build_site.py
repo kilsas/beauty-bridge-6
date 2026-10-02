@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import os
 import csv
 import json
 import statistics
@@ -70,6 +71,22 @@ def product_image(pid: str, meta: dict | None) -> dict | None:
     return {"src": f"data:{MIME[path.suffix.lower()]};base64,{data}",
             "credit": meta.get("credit", ""), "license": meta.get("license", ""),
             "url": meta.get("source_url", "")}
+
+
+def site_config() -> dict:
+    """Review storage settings: web/config.json, overridden by environment variables
+    (SUPABASE_URL, SUPABASE_ANON_KEY, REVIEWS_API_URL) so CI can inject them."""
+    path = ROOT / "web" / "config.json"
+    cfg = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    rc = dict(cfg.get("reviews") or {})
+    if os.environ.get("SUPABASE_URL") and os.environ.get("SUPABASE_ANON_KEY"):
+        rc = {"backend": "supabase", "supabaseUrl": os.environ["SUPABASE_URL"],
+              "supabaseAnonKey": os.environ["SUPABASE_ANON_KEY"]}
+    elif os.environ.get("REVIEWS_API_URL"):
+        rc = {"backend": "api", "apiUrl": os.environ["REVIEWS_API_URL"]}
+    # only the public settings a browser needs; never put secret keys here
+    allowed = {"backend", "supabaseUrl", "supabaseAnonKey", "apiUrl"}
+    return {"reviews": {k: v for k, v in rc.items() if k in allowed}}
 
 
 def read_csv(path: Path) -> list[dict]:
@@ -238,7 +255,10 @@ def main(argv=None) -> int:
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     i18n = (ROOT / "web" / "i18n.js").read_text(encoding="utf-8")
-    html = template.replace("/*__I18N__*/", i18n).replace("/*__DATA__*/null", payload)
+    config = site_config()
+    html = (template.replace("/*__I18N__*/", i18n)
+            .replace("/*__CONFIG__*/{}", json.dumps(config, ensure_ascii=False))
+            .replace("/*__DATA__*/null", payload))
     out.write_text(html, encoding="utf-8")
     print(f"wrote {out} ({out.stat().st_size / 1024:.0f} KB)")
     return 0

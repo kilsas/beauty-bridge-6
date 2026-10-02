@@ -129,6 +129,20 @@ the price table also keeps each original local price. Rates are in
 `beautybridge/config.py` (`FX_TO_USD`, read from Investing.com on
 2026-09-30); update them and their note before analysis.
 
+## Publishing publicly
+
+`docs/deploy.md` (Korean) walks through GitHub Pages plus a review store.
+`.github/workflows/pages.yml` rebuilds and deploys the site on every push.
+The site picks its review storage automatically:
+
+1. inside claude.ai: the artifact's own shared database;
+2. otherwise Supabase, when `SUPABASE_URL` and `SUPABASE_ANON_KEY` are set
+   (anonymous sign-in, row-level security in `supabase/setup.sql`, realtime);
+3. otherwise your own API server, when `REVIEWS_API_URL` is set
+   (`GET /reviews` returns one-way reviewer keys, never raw ids).
+
+With none configured, everything except posting reviews still works.
+
 ## Live reviews (how rankings work now)
 
 Rankings are built from reviews posted on the site itself, the same model a

@@ -1,0 +1,11 @@
+{
+  "_comment": "Copy to web/config.json and fill ONE backend. The Supabase anon key is public by design (row-level security protects the data). Never put a service_role key here.",
+  "reviews": {
+    "backend": "supabase",
+    "supabaseUrl": "https://YOUR-PROJECT.supabase.co",
+    "supabaseAnonKey": "YOUR-ANON-PUBLIC-KEY"
+  },
+  "_alternative": {
+    "reviews": { "backend": "api", "apiUrl": "https://your-api.example.com" }
+  }
+}

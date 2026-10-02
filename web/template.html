@@ -324,6 +324,8 @@ footer button { text-decoration: underline; text-underline-offset: 2px; }
 
 <script>
 const D = /*__DATA__*/null;
+/* Deployment settings (web/config.json or build-time environment): which review storage to use. */
+const CFG = /*__CONFIG__*/{};
 /*__I18N__*/
 
 /* ---------------- state + routing ---------------- */
@@ -894,7 +896,7 @@ function reviewsBody(p) {
   let form = "";
   if (LIVE.status === "nodb") form = `<p class="note">${t("noDb")}</p>`;
   else if (LIVE.status === "loading") form = `<p class="note">…</p>`;
-  else if (LIVE.canWrite === false || !LIVE.uid) form = `<p class="note">${t("noWrite")}</p>`;
+  else if (LIVE.canWrite === false || !LIVE.uid || !BACKEND.save) form = `<p class="note">${t("noWrite")}</p>`;
   else {
     const d = S.draft;
     form = `<div class="card rform" id="rform"><h3>${mine ? t("myReview") : t("writeReview")}</h3>
@@ -910,21 +912,24 @@ function reviewsBody(p) {
   const items = list.map((r) => `<div class="rev"><div class="rev-h">${starRow(r.rating, 13)}<span class="note">${r.reviewer_id === LIVE.uid ? t("myReview") : t("anon")} · ${[r.skin_type && skinName(r.skin_type), r.age_band && t("ageName")[r.age_band], r.market && fmt(t("reviewedIn"), { m: mktName(r.market) })].filter(Boolean).join(" · ")} · ${dateFmt(r.created_at.slice(0, 10))}</span></div>${r.text ? `<p>${esc(r.text)}</p>` : ""}</div>`).join("");
   return `<p class="note"><span class="livedot"></span>${t("live")} · ${t("liveNote")}</p>${summary}${form}${items ? `<div class="revs">${items}</div>` : ""}`;
 }
+/* The active review storage. Each backend sets LIVE.uid, calls setReviews() and provides save(). */
+const BACKEND = { kind: "", save: null };
+function setReviews(list) { LIVE.list = list; LIVE.status = "ready"; recompute(); render(); }
 async function saveReview(del = false) {
-  if (!LIVE.db || !LIVE.uid || LIVE.saving) return;
-  const pid = S.pid, d = S.draft, items = myItems();
-  if (del) delete items[pid];
-  else {
+  if (!BACKEND.save || !LIVE.uid || LIVE.saving) return;
+  const pid = S.pid, d = S.draft;
+  let review = null;
+  if (!del) {
     if (!(d.rating >= 1 && d.rating <= 5)) return;
-    items[pid] = { rating: d.rating, skin_type: d.skin_type, age_band: d.age_band, market: d.market, text: String(d.text || "").slice(0, D.reviewPrior.maxText), created_at: new Date().toISOString() };
+    review = { rating: d.rating, skin_type: d.skin_type, age_band: d.age_band, market: d.market, text: String(d.text || "").slice(0, D.reviewPrior.maxText), created_at: new Date().toISOString() };
   }
   LIVE.saving = true; LIVE.msg = ""; render();
   try {
-    await LIVE.db.doc("reviews/" + LIVE.uid).set({ items });
+    await BACKEND.save(pid, review);
     LIVE.msg = del ? t("deleted") : t("saved");
     if (del) S.draft = null;
   } catch (e) {
-    if (e && e.code === "invalid_argument") { LIVE.canWrite = false; LIVE.msg = t("noWrite"); }
+    if (e && (e.code === "invalid_argument" || e.forbidden)) { LIVE.canWrite = false; LIVE.msg = t("noWrite"); }
     else LIVE.msg = t("saveFail");
   }
   LIVE.saving = false; render();
@@ -940,19 +945,23 @@ function cleanReview(pid, r, uid) {
     market: ["KR", "US", "JP", "CN"].includes(r.market) ? r.market : null,
     text: typeof r.text === "string" ? r.text.slice(0, D.reviewPrior.maxText) : "" };
 }
-async function initLive() {
-  const cl = typeof window !== "undefined" ? window.claude : null;
-  if (!cl || typeof cl.use !== "function") { LIVE.status = "nodb"; render(); return; }
+/* 1) claude.ai viewer: the page's own shared database. One document per reviewer. */
+async function initClaude(cl) {
   let db = null;
   try { db = await cl.use("db"); } catch (e) { db = null; }
-  if (!db) { LIVE.status = "nodb"; render(); return; }
-  LIVE.db = db;
+  if (!db) return false;
   try {
     const user = await cl.use("user");
     LIVE.uid = user ? await user.id() : null;
     const c = user && typeof user.can === "function" ? await user.can("data.write") : null;
     LIVE.canWrite = c === false ? false : c === true ? true : null;
   } catch (e) { LIVE.uid = null; }
+  BACKEND.kind = "claude";
+  BACKEND.save = async (pid, review) => {
+    const items = myItems();
+    if (review) items[pid] = review; else delete items[pid];
+    await db.doc("reviews/" + LIVE.uid).set({ items });
+  };
   db.collection("reviews").onSnapshot((snap) => {
     const out = [];
     for (const doc of snap.docs) {
@@ -960,9 +969,101 @@ async function initLive() {
       if (!items || typeof items !== "object") continue;
       for (const [pid, r] of Object.entries(items)) { const c = cleanReview(pid, r, doc.id); if (c) out.push(c); }
     }
-    LIVE.list = out; LIVE.status = "ready"; recompute();
-    render();
+    setReviews(out);
   }, () => { LIVE.status = LIVE.list.length ? "ready" : "nodb"; render(); });
+  return true;
+}
+
+/* 2) Supabase (for GitHub Pages or any static host): anonymous sign-in, row-level security, realtime. */
+const SUPABASE_JS = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js";
+function loadScript(src) {
+  return new Promise((ok, fail) => { const el = document.createElement("script"); el.src = src; el.onload = ok; el.onerror = fail; document.head.appendChild(el); });
+}
+async function initSupabase(rc) {
+  try {
+    if (!window.supabase) await loadScript(SUPABASE_JS);
+    const client = window.supabase.createClient(rc.supabaseUrl, rc.supabaseAnonKey);
+    let session = (await client.auth.getSession()).data.session;
+    if (!session) {
+      const r = await client.auth.signInAnonymously();
+      if (r.error) throw r.error;
+      session = r.data.session;
+    }
+    LIVE.uid = session.user.id; LIVE.canWrite = true;
+    const cols = "reviewer_id,product_id,rating,skin_type,age_band,market,text,created_at";
+    const fetchAll = async () => {
+      const out = [];
+      for (let from = 0; ; from += 1000) {
+        const { data, error } = await client.from("reviews").select(cols).range(from, from + 999);
+        if (error) throw error;
+        for (const r of data) { const c = cleanReview(r.product_id, r, r.reviewer_id); if (c) out.push(c); }
+        if (data.length < 1000) break;
+      }
+      setReviews(out);
+    };
+    await fetchAll();
+    let pending = null;
+    const refresh = () => { clearTimeout(pending); pending = setTimeout(() => fetchAll().catch(() => {}), 400); };
+    client.channel("reviews-live").on("postgres_changes", { event: "*", schema: "public", table: "reviews" }, refresh).subscribe();
+    setInterval(refresh, 60000);
+    BACKEND.kind = "supabase";
+    BACKEND.save = async (pid, review) => {
+      const q = review
+        ? client.from("reviews").upsert({ reviewer_id: LIVE.uid, product_id: pid, ...review }, { onConflict: "reviewer_id,product_id" })
+        : client.from("reviews").delete().eq("reviewer_id", LIVE.uid).eq("product_id", pid);
+      const { error } = await q;
+      if (error) throw { forbidden: error.code === "42501", error };
+      await fetchAll();
+    };
+    return true;
+  } catch (e) {
+    console.warn("review storage (Supabase) unavailable", e);
+    return false;
+  }
+}
+
+/* 3) Your own Beauty Bridge API server (beautybridge/api.py): polling, reviewer ids kept private. */
+async function sha16(text) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, 16);
+}
+async function initApi(rc) {
+  try {
+    const base = rc.apiUrl.replace(/\/+$/, "");
+    let rid = null;
+    try { rid = localStorage.getItem("bb-reviewer"); } catch (e) {}
+    if (!rid) { rid = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now()); try { localStorage.setItem("bb-reviewer", rid); } catch (e) {} }
+    LIVE.uid = await sha16(rid); LIVE.canWrite = true;
+    const fetchAll = async () => {
+      const res = await fetch(base + "/reviews");
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const rows = await res.json();
+      setReviews(rows.map((r) => cleanReview(r.product_id, r, r.reviewer_key)).filter(Boolean));
+    };
+    await fetchAll();
+    setInterval(() => fetchAll().catch(() => {}), 20000);
+    BACKEND.kind = "api";
+    BACKEND.save = async (pid, review) => {
+      const res = review
+        ? await fetch(base + "/reviews", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ reviewer_id: rid, product_id: pid, ...review }) })
+        : await fetch(`${base}/reviews/${encodeURIComponent(rid)}/${encodeURIComponent(pid)}`, { method: "DELETE" });
+      if (!res.ok) throw { forbidden: res.status === 403 };
+      await fetchAll();
+    };
+    return true;
+  } catch (e) {
+    console.warn("review storage (API) unavailable", e);
+    return false;
+  }
+}
+
+async function initLive() {
+  const cl = typeof window !== "undefined" ? window.claude : null;
+  if (cl && typeof cl.use === "function" && await initClaude(cl)) return;
+  const rc = CFG.reviews || {};
+  if (rc.backend === "supabase" && rc.supabaseUrl && rc.supabaseAnonKey && await initSupabase(rc)) return;
+  if (rc.backend === "api" && rc.apiUrl && await initApi(rc)) return;
+  LIVE.status = "nodb"; render();
 }
 
 function vGoals() {

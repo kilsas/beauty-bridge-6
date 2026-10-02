@@ -27,6 +27,13 @@ MAX_TEXT = 300
 TREND_WINDOW_DAYS = 7
 
 
+def reviewer_key(reviewer_id: str) -> str:
+    """Public, one-way key for a reviewer (first 16 hex chars of SHA-256).
+    The website computes the same value to recognise its own reviews."""
+    import hashlib
+    return hashlib.sha256(reviewer_id.encode("utf-8")).hexdigest()[:16]
+
+
 class ReviewError(ValueError):
     pass
 

@@ -76,6 +76,18 @@ def post_review(body: ReviewIn):
     return r.to_dict()
 
 
+@app.get("/reviews")
+def all_reviews():
+    """Every current review, for the website. Reviewer ids are replaced by a
+    one-way key so visitors can't act as someone else."""
+    out = []
+    for r in rv.latest_per_reviewer(store.all()):
+        d = r.to_dict()
+        d["reviewer_key"] = rv.reviewer_key(d.pop("reviewer_id"))
+        out.append(d)
+    return out
+
+
 @app.delete("/reviews/{reviewer_id}/{product_id}", status_code=204)
 def delete_review(reviewer_id: str, product_id: str):
     store.delete(reviewer_id, product_id)
