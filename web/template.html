@@ -1,0 +1,1182 @@
+<title>Beauty Bridge</title>
+<meta name="description" content="Explainable cross-market beauty rankings and recommendations">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Outfit:wght@500;600;700&display=swap">
+<style>
+/* Layout: a mobile-first shopping app column (max 720px) centred on a soft grey
+   ground. Sticky header with main tabs and ranking sub-tabs; content is stacked
+   sections of ranked product rows. Top three ranks sit in raised cards with medals. */
+:root {
+  --ground: #f3f3f6;
+  --bg: #ffffff;
+  --ink: #16151a;
+  --ink-2: #47454f;
+  --muted: #8d8b95;
+  --line: #ededf1;
+  --thumb: #f5f5f7;
+  --accent: #8e2b63;
+  --accent-ink: #ffffff;
+  --accent-soft: #f8eaf2;
+  --chip: #f2f2f5;
+  --dark-chip: #2a2930;
+  --dark-chip-ink: #ffffff;
+  --up: #e5484d;
+  --down: #3e7bfa;
+  --good: #1f8a5b;
+  --star: #f5a524;
+  --gold: #f2c14e;
+  --silver: #b9bdc6;
+  --bronze: #c48b5c;
+  --shadow: 0 1px 2px rgb(20 18 30 / 0.04), 0 4px 16px rgb(20 18 30 / 0.06);
+  --sans: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --num: "Outfit", "Noto Sans KR", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0c0b0e; --bg: #141317; --ink: #f2f1f5; --ink-2: #c8c6cf; --muted: #8d8b95;
+    --line: #26242c; --thumb: #1f1d24; --accent: #e28cbc; --accent-ink: #1a1019; --accent-soft: #3a2231;
+    --chip: #211f26; --dark-chip: #f2f1f5; --dark-chip-ink: #141317; --up: #ff6b6f; --down: #6f9dff;
+    --good: #57c796; --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 16px rgb(0 0 0 / 0.35); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0c0b0e; --bg: #141317; --ink: #f2f1f5; --ink-2: #c8c6cf; --muted: #8d8b95;
+  --line: #26242c; --thumb: #1f1d24; --accent: #e28cbc; --accent-ink: #1a1019; --accent-soft: #3a2231;
+  --chip: #211f26; --dark-chip: #f2f1f5; --dark-chip-ink: #141317; --up: #ff6b6f; --down: #6f9dff;
+  --good: #57c796; --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 16px rgb(0 0 0 / 0.35); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--ground); color: var(--ink); font: 15px/1.5 var(--sans); -webkit-font-smoothing: antialiased; word-break: keep-all; overflow-wrap: anywhere; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: inherit; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.app { max-width: 720px; margin: 0 auto; background: var(--bg); min-height: 100vh; box-shadow: 0 0 0 1px var(--line); }
+
+/* header */
+.hdr { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+.hdr-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px 6px; }
+.logo { display: flex; align-items: center; gap: 7px; font: 600 19px/1 var(--num); letter-spacing: -0.03em; white-space: nowrap; flex: none; }
+.logo svg { width: 24px; height: 24px; }
+@media (max-width: 370px) { .logo span { display: none; } }
+.tools { display: flex; align-items: center; gap: 2px; flex: none; }
+.icon-btn { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 10px; }
+.icon-btn:hover { background: var(--chip); }
+.icon-btn svg { width: 22px; height: 22px; stroke: var(--ink); fill: none; stroke-width: 1.8; }
+.mkt { position: relative; display: flex; align-items: center; gap: 4px; padding: 6px 8px; border-radius: 10px; font-size: 14px; font-weight: 500; }
+.mkt:hover { background: var(--chip); }
+.mkt svg { width: 18px; height: 18px; stroke: var(--ink); fill: none; stroke-width: 1.7; }
+.mkt select { field-sizing: content; max-width: 96px; appearance: none; -webkit-appearance: none; background: transparent; border: 0; font: 500 14px var(--sans); color: var(--ink); padding-right: 14px; cursor: pointer; }
+.mkt::after { content: ""; position: absolute; right: 9px; top: 50%; border: 4px solid transparent; border-top-color: var(--ink); transform: translateY(-2px); pointer-events: none; }
+.lang { font: 600 12px var(--num); letter-spacing: 0.04em; padding: 6px 8px; border-radius: 8px; color: var(--muted); }
+.lang:hover { background: var(--chip); color: var(--ink); }
+.tabs { display: flex; gap: 22px; padding: 6px 16px 0; overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button { padding: 8px 0 10px; font-size: 16px; font-weight: 500; color: var(--ink-2); white-space: nowrap; position: relative; }
+.tabs button[aria-current="page"] { color: var(--ink); font-weight: 700; }
+.sub { display: flex; gap: 22px; padding: 4px 16px 0; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); }
+.sub::-webkit-scrollbar { display: none; }
+.sub button { padding: 10px 0 12px; font-size: 15px; color: var(--muted); white-space: nowrap; position: relative; }
+.sub button[aria-current="true"] { color: var(--ink); font-weight: 700; }
+.sub button[aria-current="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--ink); border-radius: 2px; }
+.hdr.flat { border-bottom: 1px solid var(--line); }
+
+main { display: grid; gap: 0; }
+main > *, .sec > *, .card > *, .two > *, .cards > *, .plist > * { min-width: 0; }
+.app { overflow-x: clip; }
+.sec { padding: 26px 16px; display: grid; gap: 14px; }
+.sec + .sec { border-top: 8px solid var(--ground); }
+.sec-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sec-h h2 { font-size: 18px; font-weight: 700; margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
+.sec-h h2 em { font-style: normal; color: var(--accent); }
+.sec-h .go { width: 28px; height: 28px; display: grid; place-items: center; }
+.sec-h .go svg, .chev { width: 18px; height: 18px; stroke: var(--ink); fill: none; stroke-width: 2; }
+.eyebrow { font-size: 12px; color: var(--muted); }
+.updated { font-size: 12px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+h1 { margin: 0; font-size: 24px; line-height: 1.3; letter-spacing: -0.02em; text-wrap: balance; }
+
+/* chips */
+.chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; padding: 7px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); font-size: 14px; color: var(--ink-2); white-space: nowrap; }
+.chip[aria-pressed="true"] { background: var(--dark-chip); border-color: var(--dark-chip); color: var(--dark-chip-ink); font-weight: 700; }
+.chip.drop { background: var(--dark-chip); border-color: var(--dark-chip); color: var(--dark-chip-ink); font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+.chip.drop::after { content: ""; border: 4.5px solid transparent; border-top-color: currentColor; transform: translateY(2px); }
+.tag { display: inline-block; font-size: 12px; padding: 3px 8px; border-radius: 6px; background: var(--chip); color: var(--ink-2); }
+
+/* product rows */
+.thumb { background: var(--thumb); border-radius: 10px; display: grid; place-items: center; flex: none; overflow: hidden; }
+.thumb svg { width: 86%; height: 86%; }
+.prow { display: grid; grid-template-columns: 34px 64px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; text-align: left; width: 100%; }
+.prow .thumb { width: 64px; height: 64px; }
+.prow.norank { grid-template-columns: 64px minmax(0, 1fr) auto; }
+.rk { display: grid; justify-items: center; gap: 2px; }
+.rk b { font: 600 18px/1 var(--num); font-variant-numeric: tabular-nums; }
+.chg { font: 600 11px/1 var(--num); display: inline-flex; align-items: center; gap: 1px; }
+.chg.up { color: var(--up); } .chg.down { color: var(--down); } .chg.new { color: var(--accent); font-size: 10px; letter-spacing: .04em; }
+.medal { width: 26px; height: 32px; }
+.pinfo { min-width: 0; display: grid; gap: 3px; }
+.pname { font-size: 14px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pname .br { color: var(--muted); margin-right: 4px; }
+.rate { font-size: 13px; color: var(--ink-2); display: flex; align-items: center; gap: 3px; font-variant-numeric: tabular-nums; }
+.rate svg { width: 13px; height: 13px; fill: var(--star); }
+.rate span { color: var(--muted); }
+.metric { text-align: right; font-variant-numeric: tabular-nums; }
+.metric b { font: 600 18px/1 var(--num); color: var(--accent); }
+.metric small { display: block; font-size: 11px; color: var(--muted); margin-top: 3px; }
+.metric .save { color: var(--good); font-size: 11px; font-weight: 700; display: block; margin-top: 3px; }
+.plist .prow + .prow { border-top: 1px solid var(--line); }
+.cards { display: grid; gap: 12px; }
+.cards .prow { background: var(--bg); border-radius: 12px; box-shadow: var(--shadow); padding: 14px 16px 14px 8px; border: 1px solid var(--line); }
+.rows .prow { padding-left: 8px; padding-right: 8px; }
+
+/* mini paged grid (home) */
+.mini { display: grid; grid-template-rows: repeat(3, auto); grid-auto-flow: column; grid-auto-columns: minmax(min(84%, 300px), 1fr); column-gap: 18px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.mini::-webkit-scrollbar { display: none; }
+.mini .prow { scroll-snap-align: start; grid-template-columns: 30px 56px minmax(0, 1fr); padding: 8px 0; }
+.mini .prow .thumb { width: 56px; height: 56px; }
+.more { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 12px; font-size: 14px; color: var(--ink-2); display: flex; justify-content: center; align-items: center; gap: 4px; }
+.more:hover { background: var(--chip); }
+.more .chev { width: 14px; height: 14px; }
+
+/* banner */
+.banner { position: relative; margin: 8px 16px 0; }
+.btrack { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; overflow-x: auto; scroll-snap-type: x mandatory; border-radius: 14px; scrollbar-width: none; }
+.btrack::-webkit-scrollbar { display: none; }
+.slide { scroll-snap-align: start; min-height: 190px; padding: 22px 20px; display: grid; grid-template-columns: minmax(0, 1fr) 104px; gap: 8px; align-items: end; text-align: left; color: #1a1420; }
+.slide .k { font-size: 12px; font-weight: 700; opacity: .7; margin-bottom: 8px; display: block; }
+.slide .h { font-size: clamp(19px, 4.6vw, 24px); font-weight: 700; line-height: 1.3; letter-spacing: -0.02em; display: block; text-wrap: balance; }
+.slide .s { font-size: 13px; opacity: .75; margin-top: 10px; display: block; }
+.slide svg { width: 104px; height: 104px; }
+.bcount { position: absolute; right: 14px; bottom: 14px; font: 600 11px var(--num); background: rgb(255 255 255 / .75); color: #1a1420; padding: 3px 8px; border-radius: 999px; }
+.searchpill { margin: 14px 16px 0; display: flex; box-sizing: border-box; align-items: center; justify-content: space-between; background: var(--chip); border-radius: 12px; padding: 12px 14px; color: var(--muted); font-size: 14px; width: calc(100% - 32px); }
+.searchpill svg { width: 20px; height: 20px; stroke: var(--ink); fill: none; stroke-width: 1.8; }
+
+/* rising carousel (home) */
+.hscroll { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(150px, 42%); gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.hscroll::-webkit-scrollbar { display: none; }
+.pcard { scroll-snap-align: start; display: grid; gap: 8px; text-align: left; }
+.pcard .thumb { aspect-ratio: 1; width: 100%; max-width: 100%; position: relative; }
+.pcard .num { position: absolute; left: 10px; top: 8px; font: 700 22px var(--num); }
+.pcard .chg { position: absolute; right: 10px; top: 12px; }
+
+/* dupe pairs */
+.pair { display: grid; grid-template-columns: minmax(0, 1fr) 36px minmax(0, 1fr); align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 14px; padding: 14px; text-align: left; width: 100%; }
+.pair .side { display: grid; gap: 6px; min-width: 0; }
+.pair .thumb { width: 100%; aspect-ratio: 1.3; max-width: 100%; }
+.pair .arrow { text-align: center; font: 700 15px var(--num); color: var(--accent); }
+.pair .arrow small { display: block; font: 500 10px var(--sans); color: var(--muted); }
+
+/* brand blocks */
+.brand { display: grid; gap: 4px; }
+.brand-h { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+.brand-h b { font: 600 18px var(--num); width: 22px; }
+.blogo { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; font: 700 11px var(--num); color: #fff; }
+.brand-h .n { font-weight: 700; }
+.brand-h .n span { color: var(--muted); font-weight: 500; margin-left: 4px; }
+
+/* product page */
+.phero { display: grid; gap: 16px; padding: 18px 16px 22px; }
+.phero .thumb { width: 100%; max-width: 100%; aspect-ratio: 1.8; max-height: 280px; border-radius: 16px; }
+.phero .thumb svg { width: 62%; height: 62%; }
+.ptitle { display: grid; gap: 6px; }
+.ptitle .br { color: var(--muted); font-size: 14px; }
+.ptitle h1 { font-size: 22px; }
+.ptitle .en { color: var(--muted); font-size: 13px; }
+.price { font: 700 20px var(--num); font-variant-numeric: tabular-nums; }
+.price small { font: 500 13px var(--sans); color: var(--muted); margin-left: 6px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.profile { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+@media (max-width: 560px) { .profile { grid-template-columns: 1fr; } }
+.scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; margin-top: 8px; }
+.scale div { height: 26px; border-radius: 5px; background: var(--chip); font-size: 11px; line-height: 26px; text-align: center; color: var(--muted); white-space: nowrap; overflow: hidden; }
+.scale div.on { background: var(--ink); color: var(--bg); font-weight: 700; }
+.ints { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; align-items: center; font-size: 13px; margin-top: 8px; }
+.ints .d { display: inline-flex; gap: 4px; }
+.ints i { width: 22px; height: 6px; border-radius: 3px; background: var(--chip); display: inline-block; }
+.ints i.f { background: var(--accent); }
+.lbl { font-size: 13px; font-weight: 700; }
+.ptabs { position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--hdr-h, 100px)); z-index: 5; background: var(--bg); display: flex; gap: 22px; padding: 0 16px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.ptabs::-webkit-scrollbar { display: none; }
+.ptabs button { padding: 12px 0; font-size: 15px; color: var(--muted); white-space: nowrap; position: relative; }
+.ptabs button[aria-current="true"] { color: var(--ink); font-weight: 700; }
+.ptabs button[aria-current="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--ink); }
+.why { display: grid; gap: 14px; padding: 4px 8px 16px 50px; }
+@media (max-width: 480px) { .why { padding-left: 8px; } }
+.bars { display: grid; grid-template-columns: 5.6em minmax(50px, 1fr) 4.6em; gap: 6px 10px; align-items: center; font-size: 12px; }
+.bars .t { height: 6px; border-radius: 3px; background: var(--chip); overflow: hidden; }
+.bars .t span { display: block; height: 100%; background: var(--accent); }
+.bars .p { text-align: right; font: 500 12px var(--num); font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.bars .r { grid-column: 2 / 4; color: var(--muted); margin-top: -3px; }
+.fuse { font-size: 12px; color: var(--muted); line-height: 1.7; }
+.fuse b { color: var(--ink); font-weight: 500; font-family: var(--num); }
+details.res > summary { list-style: none; cursor: pointer; }
+details.res > summary::-webkit-details-marker { display: none; }
+details.res + details.res { border-top: 1px solid var(--line); }
+.whybtn { font-size: 11px; color: var(--muted); display: inline-flex; gap: 2px; align-items: center; }
+details[open] .whybtn .chev { transform: rotate(180deg); }
+.whybtn .chev { width: 12px; height: 12px; stroke: var(--muted); }
+
+.stats3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { background: var(--chip); border-radius: 12px; padding: 12px; }
+.stat span { font-size: 12px; color: var(--muted); }
+.stat b { display: block; font: 700 20px var(--num); font-variant-numeric: tabular-nums; margin-top: 2px; }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font-size: 12px; color: var(--muted); font-weight: 500; white-space: nowrap; background: var(--thumb); }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.best td { font-weight: 700; }
+.av-high { color: var(--good); } .av-medium { color: var(--ink-2); } .av-low { color: var(--up); }
+.note { font-size: 12px; color: var(--muted); }
+.empty { padding: 28px 16px; text-align: center; color: var(--muted); font-size: 14px; background: var(--thumb); border-radius: 12px; }
+.card { border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 10px; min-width: 0; }
+.card h3 { margin: 0; font-size: 16px; }
+.two { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.goalcard { text-align: left; }
+.goalcard .thumbs { display: flex; gap: 6px; }
+.goalcard .thumbs .thumb { width: 44px; height: 44px; }
+.rules { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* insight */
+svg.chart { width: 100%; height: auto; display: block; }
+svg.chart text { fill: var(--muted); font: 11px var(--num); }
+svg.chart text.v { fill: var(--ink); font-weight: 600; }
+svg.chart line { stroke: var(--line); }
+.tl { display: grid; }
+.ev { display: grid; grid-template-columns: 5.6em minmax(0, 1fr); gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.ev:last-child { border-bottom: 0; }
+.ev time { font: 500 13px var(--num); color: var(--muted); font-variant-numeric: tabular-nums; }
+.co { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 5px; margin-right: 6px; }
+.co.sephora_korea { background: var(--chip); color: var(--ink-2); }
+.co.cj_olive_young { background: var(--accent-soft); color: var(--accent); }
+.src { font-size: 12px; color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
+.prose p { margin: 0 0 10px; color: var(--ink-2); font-size: 14px; line-height: 1.7; }
+.warn { font-size: 12px; color: var(--up); }
+
+/* search */
+.sbox { display: flex; align-items: center; gap: 8px; background: var(--chip); border-radius: 12px; padding: 0 6px 0 14px; }
+.sbox input { flex: 1; min-width: 0; border: 0; background: transparent; font: 16px var(--sans); color: var(--ink); padding: 13px 0; outline: none; }
+.sbox button { width: 40px; height: 40px; display: grid; place-items: center; }
+.sbox svg { width: 20px; height: 20px; stroke: var(--ink); fill: none; stroke-width: 1.8; }
+
+/* bottom sheet */
+.scrim { position: fixed; inset: 0; background: rgb(10 8 14 / .45); z-index: 50; }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 51; max-width: 720px; margin: 0 auto; background: var(--bg); border-radius: 20px 20px 0 0; max-height: 80vh; overflow-y: auto; padding: 10px 24px calc(24px + env(safe-area-inset-bottom, 0px)); }
+.handle { width: 40px; height: 4px; border-radius: 2px; background: var(--line); margin: 0 auto 14px; }
+.acc { border-bottom: 1px solid var(--line); }
+.acc > button { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 16px 0; font-size: 16px; }
+.acc > button .chev { transition: transform .2s; }
+.acc > button[aria-expanded="true"] .chev { transform: rotate(180deg); }
+.acc .chips { flex-wrap: wrap; padding-bottom: 16px; }
+footer { padding: 24px 16px 40px; font-size: 12px; color: var(--muted); line-height: 1.7; border-top: 8px solid var(--ground); display: grid; gap: 8px; }
+footer button { text-decoration: underline; text-underline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+.thumb.photo { background: #fff; }
+.thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.langsel { position: relative; display: flex; align-items: center; padding: 6px 4px 6px 8px; border-radius: 8px; }
+.langsel:hover { background: var(--chip); }
+.langsel select { field-sizing: content; max-width: 72px; appearance: none; -webkit-appearance: none; background: transparent; border: 0; font: 600 12px var(--sans); color: var(--muted); padding-right: 12px; cursor: pointer; }
+.langsel::after { content: ""; position: absolute; right: 5px; top: 50%; border: 3.5px solid transparent; border-top-color: var(--muted); transform: translateY(-1px); pointer-events: none; }
+.areas { display: flex; gap: 8px; }
+.area { flex: 1; padding: 10px 6px; border-radius: 12px; background: var(--chip); font-size: 14px; font-weight: 500; color: var(--ink-2); text-align: center; }
+.area[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 700; box-shadow: inset 0 0 0 1.5px var(--accent); }
+.credit { font-size: 11px; color: var(--muted); }
+.sigb { justify-self: start; font-size: 11px; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 5px; padding: 2px 6px; line-height: 1.4; }
+.evid { gap: 8px; }
+.evrow { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 13px; }
+.livedot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--up); margin-right: 6px; vertical-align: 1px; box-shadow: 0 0 0 3px color-mix(in srgb, var(--up) 20%, transparent); }
+@media (prefers-reduced-motion: no-preference) { .livedot { animation: pulse 2s ease-in-out infinite; } @keyframes pulse { 50% { opacity: .35; } } }
+.stars { display: inline-flex; gap: 2px; vertical-align: -2px; }
+.stars i { width: var(--s); height: var(--s); background: var(--line); clip-path: polygon(50% 3%, 62% 36%, 97% 37%, 69% 58%, 79% 92%, 50% 72%, 21% 92%, 31% 58%, 3% 37%, 38% 36%); }
+.stars i.f { background: var(--star); }
+.stars i.h { background: linear-gradient(90deg, var(--star) 50%, var(--line) 50%); }
+.rsum { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 20px; align-items: center; }
+.rsum > div:first-child { display: grid; justify-items: center; gap: 4px; }
+.rsum b { font: 700 34px/1 var(--num); }
+.dist { display: grid; grid-template-columns: 1em minmax(60px, 1fr) 2.5em; gap: 5px 8px; align-items: center; font-size: 12px; }
+.dist .t { height: 6px; border-radius: 3px; background: var(--chip); overflow: hidden; }
+.dist .t span { display: block; height: 100%; background: var(--star); }
+.dist .p { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+.rform textarea { width: 100%; font: 15px var(--sans); color: var(--ink); background: var(--chip); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; resize: vertical; }
+.starpick { display: flex; gap: 6px; margin-top: 6px; }
+.starpick button { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 8px; }
+.starpick button:hover { background: var(--chip); }
+.starpick i { width: 28px; height: 28px; background: var(--line); clip-path: polygon(50% 3%, 62% 36%, 97% 37%, 69% 58%, 79% 92%, 50% 72%, 21% 92%, 31% 58%, 3% 37%, 38% 36%); }
+.starpick i.f { background: var(--star); }
+.rbtns { display: flex; gap: 8px; align-items: center; }
+.btn-primary { background: var(--dark-chip); color: var(--dark-chip-ink); border-radius: 10px; padding: 11px 22px; font-weight: 700; }
+.btn-primary[disabled] { opacity: .4; cursor: not-allowed; }
+.revs { display: grid; }
+.rev { padding: 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 6px; }
+.rev p { margin: 0; font-size: 14px; color: var(--ink-2); white-space: pre-wrap; }
+.rev-h { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+@media (max-width: 400px) { .mkt select { max-width: 64px; } }
+</style>
+
+<div class="app">
+  <header class="hdr" id="hdr"></header>
+  <main id="main"></main>
+  <footer id="foot"></footer>
+</div>
+<div id="sheet"></div>
+
+<script>
+const D = /*__DATA__*/null;
+/*__I18N__*/
+
+/* ---------------- state + routing ---------------- */
+const S = { view: "home", rtab: "market", lmkt: "KR", cat: "", skin: "dry", goal: "aegyo_sal", area: "eye", pid: "P001", ptab: "similar",
+  origin: "", q: "", market: "KR", lang: "ko", hcat: "", hskin: "dry", harea: "eye", hgoal: "aegyo_sal", gskin: "", sheet: false, open: {},
+  age: "20s", draft: null };
+/* Live first-party reviews (db capability). One document per reviewer: reviews/<uid> = {items: {productId: review}} */
+const LIVE = { status: "loading", db: null, uid: null, canWrite: null, list: [], saving: false, msg: "" };
+try {
+  const saved = JSON.parse(localStorage.getItem("bb3") || "{}");
+  if (saved.market !== undefined && saved.market in MKT_TX.en) S.market = saved.market;
+  if (saved.lang in LANGS) S.lang = saved.lang;
+} catch (e) {}
+const persist = () => { try { localStorage.setItem("bb3", JSON.stringify({ market: S.market, lang: S.lang })); } catch (e) {} };
+const MARKETS = ["", "KR", "US", "JP", "CN"];
+const areaOf = (g) => D.goals[g].meta.area;
+
+function toHash() {
+  if (S.view === "product") return "product-" + S.pid;
+  if (S.view === "goals") return "goal-" + S.goal;
+  if (S.view === "ranking") return "ranking-" + S.rtab;
+  return S.view === "home" ? "" : S.view;
+}
+function fromHash() {
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (h.startsWith("product-") && D.products[h.slice(8)]) { S.view = "product"; S.pid = h.slice(8); }
+  else if (h.startsWith("goal-") && D.goals[h.slice(5)]) { S.view = "goals"; S.goal = h.slice(5); S.area = areaOf(S.goal); }
+  else if (h.startsWith("ranking-") && ["market", "rising", "category", "skin", "age", "goal", "brand"].includes(h.slice(8))) { S.view = "ranking"; S.rtab = h.slice(8); }
+  else if (["ranking", "insight", "method", "search", "goals"].includes(h)) S.view = h;
+  else S.view = "home";
+}
+function go(view, extra = {}) {
+  Object.assign(S, { view }, extra);
+  const h = toHash();
+  if (location.hash.slice(1) !== h) { try { history.pushState(null, "", h ? "#" + h : location.pathname + location.search); } catch (e) {} }
+  render(); window.scrollTo(0, 0);
+}
+window.addEventListener("popstate", () => { fromHash(); render(); });
+
+/* ---------------- i18n helpers ---------------- */
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const nice = (s) => String(s ?? "").replace(/_/g, " ");
+const fmt = (str, o) => str.replace(/\{(\w+)\}/g, (_, k) => o[k] ?? "");
+const t = (k) => T[S.lang][k] ?? T.en[k] ?? k;
+const isEn = () => S.lang === "en";
+const tx = (map, key) => key == null ? "" : isEn() ? nice(key) : (TR[S.lang][map][key] || nice(key));
+for (const [id, p] of Object.entries(D.products)) p.id = id;
+const P = (id) => D.products[id];
+const mktName = (m) => MKT_TX[S.lang][m];
+const catName = (c) => tx("cat", c);
+const grpName = (g) => tx("grp", g);
+const skinName = (s) => tx("skin", s);
+const areaName = (a) => AREA_TX[S.lang][a];
+const brandName = (p) => S.lang === "ko" ? p.bko : p.brand;
+const prodName = (p) => S.lang === "ko" ? p.ko : p.name;
+function goalName(g) {
+  const m = D.goals[g].meta;
+  if (S.lang === "ko") return m.ko;
+  if (S.lang === "en") return m.name;
+  return GOAL_TX[g]?.[S.lang]?.[0] || m.name;
+}
+function goalDesc(g) {
+  const m = D.goals[g].meta;
+  if (S.lang === "en") return m.desc;
+  if (S.lang === "ko") return GOAL_TX[g]?.ko || m.desc;
+  return GOAL_TX[g]?.[S.lang]?.[1] || m.desc;
+}
+const fmtNum = (n) => Number(n).toLocaleString("en-US");
+/* Prices follow the language: 한국어 → 원, English → $, 日本語 → 円, 中文 → 元 (rates in D.config.fxNote). */
+const DISP = { ko: "KRW", en: "USD", ja: "JPY", zh: "CNY" };
+function fmtIn(v, cur) {
+  if (cur === "KRW") return S.lang === "ko" ? fmtNum(Math.round(v / 10) * 10) + "원" : "₩" + fmtNum(Math.round(v / 10) * 10);
+  if (cur === "JPY") return "¥" + fmtNum(Math.round(v));
+  if (cur === "CNY") return "¥" + fmtNum(Math.round(v));
+  return "$" + Number(v).toFixed(2);
+}
+/* an amount already in USD (savings, converted prices) shown in the display currency */
+function dp(vUsd) {
+  if (vUsd == null || isNaN(vUsd)) return "–";
+  const c = DISP[S.lang];
+  return fmtIn(vUsd / D.config.fx[c], c);
+}
+/* a price in its own currency shown in the display currency; "≈" marks a conversion */
+function dpFrom(v, cur) {
+  if (v == null) return "–";
+  const c = DISP[S.lang];
+  return cur === c ? fmtIn(v, c) : "≈" + fmtIn(v * D.config.fx[cur] / D.config.fx[c], c);
+}
+/* the original price with its currency code, for the price table */
+const money = (v, cur) => v == null ? "–" : `${cur} ${cur === "USD" || cur === "EUR" ? Number(v).toFixed(2) : fmtNum(Math.round(v))}`;
+const usd = dp;
+function listing(p) {
+  const m = S.market || p.origin;
+  return p.list.find((l) => l.m === m) || p.list.find((l) => l.m === p.origin) || null;
+}
+function localPrice(p) {
+  const l = S.market ? p.list.find((x) => x.m === S.market && x.price != null) : null;
+  return l ? dpFrom(l.price, l.cur) : dpFrom(p.price, p.cur);
+}
+const dateFmt = (d) => d ? d.replace(/-/g, ".") : "";
+const available = (p) => !S.market || p.list.some((l) => l.m === S.market && l.av !== "none");
+const avName = (a) => ({ high: t("avHigh"), medium: t("avMedium"), low: t("avLow"), none: "–" }[a] || a);
+function bigWon(v) {
+  if (v === "" || v == null) return "–";
+  const x = +v, L = S.lang;
+  const tr = Math.abs(x) >= 1e12;
+  if (L === "en") return tr ? `₩${(x / 1e12).toFixed(2)}tn` : `₩${(x / 1e9).toFixed(1)}bn`;
+  const u = { ko: ["조", "억"], zh: ["万亿", "亿"], ja: ["兆", "億"] }[L];
+  return tr ? `${(x / 1e12).toFixed(2)}${u[0]}` : `${fmtNum(Math.round(x / 1e8))}${u[1]}`;
+}
+
+/* ---------------- icons ---------------- */
+const I = {
+  search: `<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>`,
+  globe: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18"/></svg>`,
+  chev: `<svg class="chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>`,
+  right: `<svg class="chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>`,
+  star: `<svg viewBox="0 0 24 24"><path d="m12 2.8 2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.3l-5.6 2.9 1.1-6.3-4.6-4.4 6.3-.9z"/></svg>`,
+  logo: `<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="11" cy="16" r="8.5" fill="none" stroke="var(--accent)" stroke-width="3"/><circle cx="21" cy="16" r="8.5" fill="none" stroke="var(--ink)" stroke-width="3"/></svg>`,
+};
+function medal(n) {
+  const col = ["var(--gold)", "var(--silver)", "var(--bronze)"][n - 1];
+  return `<svg class="medal" viewBox="0 0 26 32" aria-label="${n}"><path d="M7 0h12v9l-6 3-6-3z" fill="${col}" opacity=".75"/><circle cx="13" cy="19" r="10" fill="${col}"/><text x="13" y="23" text-anchor="middle" font-family="Outfit, sans-serif" font-size="11" font-weight="700" fill="#fff">${n}</text></svg>`;
+}
+function change(chg, st) {
+  if (st === "new") return `<span class="chg new">NEW</span>`;
+  if (!chg) return "";
+  return chg > 0 ? `<span class="chg up">▲${chg}</span>` : `<span class="chg down">▼${-chg}</span>`;
+}
+
+/* ---------------- product pictures ---------------- */
+const SHADE = { nude: "#d9a88c", rose: "#d98a95", pink: "#f0a3b6", coral: "#f08a6e", red: "#c23b3b", berry: "#8e3057", brown: "#9a6a52", champagne: "#e6cfa8", gold: "#d8b25a", clear: "#e7ecf1" };
+function kindOf(p) {
+  const c = p.cat, x = p.tex;
+  if (c === "loose_powder") return "jar";
+  if (c === "pressed_powder" || c === "cushion") return "compact";
+  if (c === "foundation") return "pump";
+  if (c === "mascara") return "mascara";
+  if (c === "eyeliner") return x === "pencil" ? "pencil" : "pen";
+  if (c === "brow") return x === "pencil" ? "pencil" : x === "gel" ? "mascara" : "jar";
+  if (c === "lip_liner") return "pencil";
+  if (c === "concealer" || c === "lip_tint" || c === "lip_gloss" || c === "lip_plumper") return x === "cream" ? "jar" : "wand";
+  if (c === "primer" || c === "sunscreen" || c === "cleanser") return x === "liquid" ? "tall" : "tube";
+  if (c === "setting_spray") return "spray";
+  if (c === "lipstick") return x === "liquid" ? "wand" : "bullet";
+  if (c === "lip_balm") return x === "balm" ? "tube" : "stick";
+  if (c === "toner") return "tall";
+  if (c === "serum") return "dropper";
+  if (c === "moisturizer") return x === "gel" ? "tube" : "jar";
+  if (c === "eyeshadow") return x === "liquid" ? "wand" : x === "cream" ? "jar" : "palette";
+  if (x === "liquid") return "dropper";
+  if (x === "stick") return "stick";
+  if (x === "cream") return "jar";
+  return "compact";
+}
+function thumbSvg(p) {
+  const B = p.bcol, Sd = SHADE[p.shade] || (p.grp === "face_base" ? "#e9cdb5" : "#dfe8ef");
+  const G = "#eef1f4", L = "#d6d3dc", W = "#fbfaf9";
+  const ini = esc(p.brand.split(" ").map((w) => w[0]).join("").slice(0, 2));
+  const lab = (x, y, w) => `<text x="${x}" y="${y}" text-anchor="middle" font-family="Outfit, sans-serif" font-size="${w}" font-weight="600" fill="${B}">${ini}</text>`;
+  const shapes = {
+    jar: `<rect x="26" y="30" width="48" height="16" rx="4" fill="${B}"/><rect x="28" y="46" width="44" height="34" rx="6" fill="${W}" stroke="${L}"/><rect x="28" y="58" width="44" height="9" fill="${Sd}"/>${lab(50, 76, 7)}`,
+    compact: `<circle cx="50" cy="52" r="32" fill="${B}"/><circle cx="50" cy="52" r="23" fill="${Sd}"/><circle cx="41" cy="43" r="7" fill="#fff" opacity=".28"/>`,
+    palette: `<rect x="16" y="28" width="68" height="46" rx="6" fill="${B}"/>${[[31, 44], [50, 44], [69, 44], [40, 60], [60, 60]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="8" fill="${Sd}" opacity="${1 - i * 0.14}"/>`).join("")}`,
+    pump: `<rect x="40" y="16" width="24" height="7" rx="2" fill="${B}"/><rect x="60" y="17" width="10" height="3" rx="1" fill="${B}"/><rect x="44" y="23" width="12" height="11" fill="${B}"/><rect x="32" y="34" width="36" height="50" rx="7" fill="${W}" stroke="${L}"/><rect x="35" y="46" width="30" height="35" rx="5" fill="${Sd}"/>${lab(50, 68, 8)}`,
+    dropper: `<rect x="44" y="12" width="12" height="20" rx="6" fill="${B}"/><rect x="40" y="31" width="20" height="10" fill="${B}"/><rect x="33" y="41" width="34" height="45" rx="7" fill="${G}" stroke="${L}"/><rect x="35" y="55" width="30" height="29" rx="5" fill="${Sd}" opacity=".7"/><rect x="38" y="60" width="24" height="12" fill="#fff" opacity=".9"/>${lab(50, 69, 7)}`,
+    tall: `<rect x="41" y="12" width="18" height="14" rx="2" fill="${B}"/><rect x="36" y="26" width="28" height="62" rx="7" fill="${G}" stroke="${L}"/><rect x="38" y="48" width="24" height="22" fill="#fff"/>${lab(50, 62, 8)}`,
+    tube: `<rect x="34" y="14" width="32" height="6" fill="#e3dfda"/><path d="M34 20h32l-4 54H38z" fill="${W}" stroke="${L}"/><rect x="37" y="36" width="26" height="5" fill="${Sd}"/>${lab(50, 56, 8)}<rect x="39" y="74" width="22" height="13" rx="2" fill="${B}"/>`,
+    wand: `<rect x="42" y="10" width="16" height="36" rx="3" fill="${B}"/><rect x="42" y="46" width="16" height="42" rx="3" fill="${G}" stroke="${L}"/><rect x="44" y="50" width="12" height="34" rx="2" fill="${Sd}"/>`,
+    bullet: `<path d="M42 44V26l16-7v25z" fill="${Sd}"/><rect x="40" y="44" width="20" height="10" fill="#d8c39a"/><rect x="38" y="54" width="24" height="34" rx="2" fill="${B}"/>`,
+    stick: `<rect x="37" y="16" width="26" height="72" rx="7" fill="${B}"/><rect x="37" y="16" width="26" height="20" rx="7" fill="${Sd}"/><rect x="37" y="34" width="26" height="3" fill="#fff" opacity=".35"/>`,
+    spray: `<rect x="43" y="20" width="14" height="14" fill="${B}"/><rect x="57" y="24" width="10" height="4" rx="1" fill="${B}"/><rect x="33" y="34" width="34" height="52" rx="10" fill="${G}" stroke="${L}"/><rect x="37" y="52" width="26" height="16" fill="#fff"/>${lab(50, 63, 8)}`,
+    mascara: `<rect x="42" y="8" width="16" height="44" rx="3" fill="${B}"/><rect x="41" y="52" width="18" height="3" fill="#d8c39a"/><rect x="41" y="55" width="18" height="34" rx="4" fill="${B}" opacity=".82"/>${lab(50, 32, 6)}`,
+    pen: `<rect x="45" y="10" width="10" height="32" rx="2" fill="${B}"/><rect x="45" y="42" width="10" height="38" rx="2" fill="#2b2a33"/><path d="M46.5 80h7L50 90z" fill="${Sd}"/>`,
+    pencil: `<rect x="45" y="10" width="10" height="64" rx="2" fill="${B}"/><rect x="45" y="18" width="10" height="3" fill="#fff" opacity=".4"/><path d="M45 74h10l-5 12z" fill="#e6cfa8"/><path d="M48 82h4l-2 5z" fill="${Sd}"/>`,
+  };
+  return `<svg viewBox="0 0 100 100" aria-hidden="true">${shapes[kindOf(p)]}</svg>`;
+}
+const pic = (p) => p.img ? `<img src="${p.img.src}" alt="${esc(p.brand + " " + p.name)}" loading="lazy">` : thumbSvg(p);
+const thumb = (p) => `<span class="thumb${p.img ? " photo" : ""}">${pic(p)}</span>`;
+
+/* ---------------- market signals (sourced awards / bestseller reports) ---------------- */
+const sigMarket = () => S.market || S.lmkt;
+function sigLabel(g) {
+  const cat = SIG_CAT[S.lang][g.cat] || catName(g.cat);
+  return `${SIG_SRC[g.src]?.[S.lang] || g.src} · ${cat}${g.rank ? " " + RANK_FMT[S.lang](g.rank) : ""}`;
+}
+const topSig = (p, m = sigMarket()) => (p.sig && p.sig[m] || [])[0];
+function sigBadge(p) { const g = topSig(p); return g ? `<span class="sigb">${esc(sigLabel(g))}</span>` : ""; }
+function leadersIn(m, cat) {
+  return Object.keys(D.products).filter((id) => P(id).sig && P(id).sig[m] && (!cat || P(id).cat === cat || P(id).grp === cat))
+    .sort((a, b) => P(b).sig[m][0].s - P(a).sig[m][0].s || a.localeCompare(b));
+}
+const countryChips = () => `<div class="chips">${["KR", "US", "JP", "CN"].map((m) => `<button class="chip" data-lmkt="${m}" aria-pressed="${S.lmkt === m}">${mktName(m)}</button>`).join("")}</div>`;
+
+/* ---------------- rows ---------------- */
+function rateLine(p) {
+  const st = liveStats()[p.id];
+  if (st) return `<span class="rate">${I.star}${st.mean.toFixed(2)} <span>(${fmtNum(st.n)})</span></span>`;
+  const l = listing(p);
+  if (!l || l.rating == null) return "";
+  return `<span class="rate">${I.star}${Number(l.rating).toFixed(2)} <span>(${fmtNum(l.reviews ?? 0)})</span></span>`;
+}
+const nameLine = (p) => `<span class="pname"><span class="br">${esc(brandName(p))}</span>${esc(prodName(p))}</span>`;
+function prow(id, n, { chg, st, metric = "", mini = false } = {}) {
+  const p = P(id);
+  const rank = n == null ? "" : n <= 3 && !mini ? `<span class="rk">${medal(n)}${change(chg, st)}</span>` : n <= 3 ? `<span class="rk">${medal(n)}</span>` : `<span class="rk"><b>${n}</b>${change(chg, st)}</span>`;
+  return `<button class="prow${n == null ? " norank" : ""}" data-product="${id}">${rank}${thumb(p)}<span class="pinfo">${nameLine(p)}${rateLine(p)}${sigBadge(p)}</span>${mini ? "" : `<span class="metric">${metric}</span>`}</button>`;
+}
+function rankedList(ids, opts = {}) {
+  if (!ids.length) return `<div class="empty">${t("noResult")}</div>`;
+  const top = ids.slice(0, 3), rest = ids.slice(3, opts.limit || 20);
+  const o = (id, i) => prow(id, i + 1, { ...(opts.extra ? opts.extra(id) : {}), metric: opts.metric ? opts.metric(id) : "" });
+  return `<div class="cards">${top.map(o).join("")}</div>${rest.length ? `<div class="plist rows">${rest.map((id, i) => o(id, i + 3)).join("")}</div>` : ""}`;
+}
+function miniList(ids) {
+  if (!ids.length) return `<div class="empty">${t("noResult")}</div>`;
+  return `<div class="mini">${ids.slice(0, 6).map((id, i) => prow(id, i + 1, { mini: true })).join("")}</div>`;
+}
+
+/* ---------------- live review math (mirrors beautybridge/reviews.py) ---------------- */
+const _cache = {};
+function bayes(list) {
+  const out = {};
+  if (!list.length) return out;
+  const W = D.reviewPrior.weight, m = list.reduce((a, r) => a + r.rating, 0) / list.length;
+  for (const r of list) (out[r.product_id] ||= { n: 0, sum: 0 }), out[r.product_id].n++, out[r.product_id].sum += r.rating;
+  for (const [id, o] of Object.entries(out)) { o.mean = o.sum / o.n; o.score = (W * m + o.sum) / (W + o.n); }
+  return out;
+}
+function segStats(key, pred) {
+  if (!_cache[key]) _cache[key] = bayes(pred ? LIVE.list.filter(pred) : LIVE.list);
+  return _cache[key];
+}
+const liveStats = () => segStats("all");
+function recompute() { for (const k of Object.keys(_cache)) delete _cache[k]; }
+/* Rank candidate ids by review score within a reviewer segment; fall back to label fit when nobody has reviewed yet. */
+function liveRank(ids, key, pred) {
+  const st = segStats(key, pred);
+  const reviewed = ids.filter((id) => st[id]).sort((a, b) => st[b].score - st[a].score || st[b].n - st[a].n || a.localeCompare(b));
+  if (reviewed.length) return { ids: reviewed, live: true, n: reviewed.reduce((a, id) => a + st[id].n, 0) };
+  const fit = (id) => (P(id).fits[0] || [0, 0])[1];
+  return { ids: ids.slice().sort((a, b) => fit(b) - fit(a) || a.localeCompare(b)), live: false, n: 0 };
+}
+function liveTrending() {
+  const now = Date.now(), win = D.reviewPrior.window * 864e5;
+  const rec = {}, prev = {};
+  for (const r of LIVE.list) {
+    const age = now - Date.parse(r.created_at);
+    if (!(age >= 0)) continue;
+    if (age < win) rec[r.product_id] = (rec[r.product_id] || 0) + 1;
+    else if (age < 2 * win) prev[r.product_id] = (prev[r.product_id] || 0) + 1;
+  }
+  return Object.keys(rec).map((id) => ({ id, recent: rec[id], prev: prev[id] || 0, growth: rec[id] - (prev[id] || 0) }))
+    .sort((a, b) => b.growth - a.growth || b.recent - a.recent || a.id.localeCompare(b.id));
+}
+const basisNote = (r) => r.live ? `<span class="note"><span class="livedot"></span>${t("live")} · ${fmt(t("rankBasis"), { n: r.n })}</span>` : `<p class="note">${t("noReviewsRank")}</p>`;
+
+/* ---------------- ranking data ---------------- */
+const pop = (id) => { const st = liveStats()[id]; return st ? (st.score - 1) / 4 : (P(id).pop[S.market] ?? 0); };
+const byPop = (ids) => ids.filter((id) => available(P(id))).sort((a, b) => pop(b) - pop(a) || a.localeCompare(b));
+const catIds = (cat) => Object.keys(D.products).filter((id) => !cat || P(id).cat === cat || P(id).grp === cat);
+// skin type only matters for products that sit on the skin
+const skinIds = (s) => Object.keys(D.products).filter((id) => P(id).skin.includes(s) && (P(id).grp === "face_base" || P(id).grp === "skincare"));
+function trendRows() {
+  const m = S.market && D.trends[S.market] ? S.market : (D.trends.KR ? "KR" : Object.keys(D.trends)[0]);
+  return { m, rows: D.trends[m] || [] };
+}
+function risingLive() { return liveTrending().filter((r) => available(P(r.id))); }
+function risingIds() {
+  const { rows } = trendRows();
+  return rows.slice().sort((a, b) => ((b.st === "new" ? 99 : b.chg ?? 0) - (a.st === "new" ? 99 : a.chg ?? 0)) || a.rank - b.rank);
+}
+const goalIds = (g) => (D.goals[g].r[S.market] || []).map((r) => r.id);
+const goalPct = (g, id) => ((D.goals[g].r[S.market] || []).find((x) => x.id === id) || {}).pct;
+const goalsIn = (a) => Object.keys(D.goals).filter((g) => areaOf(g) === a);
+function brandRanking() {
+  const by = {};
+  for (const id of Object.keys(D.products)) { if (!available(P(id))) continue; (by[P(id).brand] ||= []).push(id); }
+  return Object.entries(by).map(([b, ids]) => {
+    const sorted = ids.sort((x, y) => pop(y) - pop(x));
+    return { b, ids: sorted, score: sorted.slice(0, 3).reduce((s, id) => s + pop(id), 0) / 3 };
+  }).sort((a, b) => b.score - a.score);
+}
+const catLabel = (c) => !c ? t("allCats") : (D.codebook.groups[c] ? grpName(c) : catName(c));
+const areaTabs = (attr, cur) => `<div class="areas">${D.areas.map((a) => `<button class="area" ${attr}="${a.area}" aria-pressed="${cur === a.area}">${areaName(a.area)}</button>`).join("")}</div>`;
+const goalChips = (attr, area, cur) => `<div class="chips">${goalsIn(area).map((g) => `<button class="chip" ${attr}="${g}" aria-pressed="${cur === g}">${esc(goalName(g))}</button>`).join("")}</div>`;
+
+/* ---------------- header ---------------- */
+function header() {
+  const tabs = [["home", t("home")], ["ranking", t("ranking")], ["goals", t("goals")], ["insight", t("insight")]];
+  const cur = ["product", "search", "method"].includes(S.view) ? "" : S.view;
+  const subs = [["market", t("marketRank")], ["rising", t("rising")], ["category", t("byCat")], ["skin", t("bySkin")], ["age", t("byAge")], ["goal", t("byGoal")], ["brand", t("byBrand")]];
+  const hdr = document.getElementById("hdr");
+  hdr.className = "hdr" + (S.view === "ranking" || S.view === "goals" ? "" : " flat");
+  let sub = "";
+  if (S.view === "ranking") sub = `<nav class="sub" aria-label="${t("ranking")}">${subs.map(([k, l]) => `<button data-rtab="${k}" aria-current="${S.rtab === k}">${l}</button>`).join("")}</nav>`;
+  if (S.view === "goals") sub = `<nav class="sub" aria-label="${t("goals")}">${D.areas.map((a) => `<button data-garea="${a.area}" aria-current="${S.area === a.area}">${areaName(a.area)}</button>`).join("")}</nav>`;
+  hdr.innerHTML = `<div class="hdr-top">
+      <button class="logo" data-go="home" aria-label="Beauty Bridge home">${I.logo}<span>beauty bridge</span></button>
+      <div class="tools">
+        <button class="icon-btn" data-go="search" aria-label="${t("search")}">${I.search}</button>
+        <label class="mkt">${I.globe}<select id="mkt" aria-label="Market">${MARKETS.map((m) => `<option value="${m}" ${m === S.market ? "selected" : ""}>${m ? mktName(m) : t("all")}</option>`).join("")}</select></label>
+        <label class="langsel"><select id="lang" aria-label="Language">${Object.entries(LANGS).map(([k, v]) => `<option value="${k}" ${k === S.lang ? "selected" : ""}>${v}</option>`).join("")}</select></label>
+      </div></div>
+    <nav class="tabs" aria-label="Main">${tabs.map(([k, l]) => `<button data-go="${k}" ${cur === k ? 'aria-current="page"' : ""}>${l}</button>`).join("")}</nav>${sub}`;
+  document.documentElement.style.setProperty("--hdr-h", hdr.offsetHeight + "px");
+}
+
+/* ---------------- views ---------------- */
+const secHead = (title, go) => `<div class="sec-h"><h2>${title}</h2>${go ? `<button class="go" ${go} aria-label="${t("seeAll")}">${I.right}</button>` : ""}</div>`;
+function vHome() {
+  const f0 = D.featured[0], p1 = P(f0);
+  const r1 = D.similar[f0][""].find((x) => P(x.id).origin !== p1.origin) || D.similar[f0][""][0];
+  const aegyo = goalIds("aegyo_sal")[0] || "P032";
+  const chart = `<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="16" y="54" width="14" height="28" rx="2" fill="#b9bdc6"/><rect x="36" y="42" width="14" height="40" rx="2" fill="#b9bdc6"/><rect x="56" y="30" width="14" height="52" rx="2" fill="#8e2b63"/><rect x="76" y="18" width="14" height="64" rx="2" fill="#8e2b63"/></svg>`;
+  const slides = [
+    { bg: "linear-gradient(135deg,#f6dfe9,#e9d8f4)", k: t("banner1K"), h: fmt(t("banner1H"), { p: esc(prodName(p1)), n: r1.pct, o: mktName(P(r1.id).origin) || P(r1.id).origin }), s: t("banner1S"), a: `data-product="${f0}" data-tab="similar"`, img: pic(P(r1.id)) },
+    { bg: "linear-gradient(135deg,#fde6d8,#f8d9e2)", k: t("banner2K"), h: t("banner2H"), s: t("banner2S"), a: `data-goal="aegyo_sal"`, img: pic(P(aegyo)) },
+    { bg: "linear-gradient(135deg,#dfe9f6,#e6e0f5)", k: t("insightK"), h: t("insightH"), s: t("banner3S"), a: `data-go="insight"`, img: chart },
+  ];
+  const { m: rm } = trendRows();
+  const rising = risingIds().slice(0, 8);
+  const brands = brandRanking().slice(0, 2);
+  const pairs = D.featured.map((ref) => ({ ref, r: (D.similar[ref][S.market] || []).find((x) => P(x.id).origin !== P(ref).origin) || (D.similar[ref][S.market] || [])[0] })).filter((x) => x.r);
+  const risingList = D.trends[rm] || [];
+  return `
+    <div class="banner"><div class="btrack" id="btrack">${slides.map((s) => `<button class="slide" style="background:${s.bg}" ${s.a}><span><span class="k">${s.k}</span><span class="h">${s.h}</span><span class="s">${s.s} ›</span></span>${s.img}</button>`).join("")}</div>
+      <span class="bcount" id="bcount">1/${slides.length}</span></div>
+    <button class="searchpill" data-go="search"><span>${t("searchPh")}</span>${I.search}</button>
+
+    <section class="sec">
+      <div><span class="eyebrow">${fmt(t("leadersSub"), { m: mktName(sigMarket()) })}</span>${secHead(fmt(t("leadersH"), { m: `<em>${mktName(sigMarket())}</em>` }), `data-go="ranking" data-rtab="market"`)}</div>
+      ${S.market ? "" : countryChips()}
+      ${(() => { const ids = leadersIn(sigMarket()); return ids.length ? `<div class="hscroll">${ids.slice(0, 10).map((id, i) => { const p = P(id); return `<button class="pcard" data-product="${id}"><span class="thumb${p.img ? " photo" : ""}">${pic(p)}<span class="num">${i + 1}</span></span>${nameLine(p)}${sigBadge(p)}</button>`; }).join("")}</div>` : `<div class="empty">${t("noSignals")}</div>`; })()}
+    </section>
+
+    <section class="sec">
+      ${homeRising(rising, rm)}
+    </section>
+
+    <section class="sec">
+      ${secHead(t("catRank"), `data-go="ranking" data-rtab="category"`)}
+      <div><button class="chip drop" data-sheet="home">${esc(catLabel(S.hcat))}</button></div>
+      ${(() => { const r = liveRank(catIds(S.hcat).filter((id) => available(P(id))), "all"); return basisNote(r) + miniList(r.ids); })()}
+      <button class="more" data-go="ranking" data-rtab="category" data-cat="${S.hcat}">${S.hcat ? esc(catLabel(S.hcat)) : t("catWord")} ${t("seeAll")} ${I.right}</button>
+    </section>
+
+    <section class="sec">
+      ${secHead(t("goalRank"), `data-goal="${S.hgoal}"`)}
+      ${areaTabs("data-harea", S.harea)}
+      ${goalChips("data-hgoal", S.harea, S.hgoal)}
+      ${miniList(goalIds(S.hgoal))}
+      <button class="more" data-goal="${S.hgoal}">${esc(goalName(S.hgoal))} ${t("seeAll")} ${I.right}</button>
+    </section>
+
+    <section class="sec">
+      ${secHead(t("skinRank"), `data-go="ranking" data-rtab="skin"`)}
+      <div class="chips">${D.codebook.skin.map((s) => `<button class="chip" data-hskin="${s}" aria-pressed="${S.hskin === s}">${skinName(s)}</button>`).join("")}</div>
+      ${(() => { const r = liveRank(skinIds(S.hskin).filter((id) => available(P(id))), "skin:" + S.hskin, (x) => x.skin_type === S.hskin); return basisNote(r) + miniList(r.ids); })()}
+      <button class="more" data-go="ranking" data-rtab="skin" data-skin="${S.hskin}">${skinName(S.hskin)} ${t("seeAll")} ${I.right}</button>
+    </section>
+
+    <section class="sec">
+      ${secHead(t("dupes"))}
+      <div style="display:grid;gap:10px">${pairs.map(({ ref, r }) => { const a = P(ref), b = P(r.id); return `<button class="pair" data-product="${ref}" data-tab="similar">
+        <span class="side">${thumb(a)}${nameLine(a)}<span class="note">${mktName(a.origin)} · ${usd(a.usd)}</span></span>
+        <span class="arrow">${r.pct}%<small>${t("match")}</small></span>
+        <span class="side">${thumb(b)}${nameLine(b)}<span class="note">${mktName(b.origin)} · ${usd(r.usd)}${r.save > 0 ? ` · <b style="color:var(--good)">${usd(r.save)} ${t("save")}</b>` : ""}</span></span></button>`; }).join("")}</div>
+    </section>
+
+    <section class="sec">
+      ${secHead(t("brandRank"), `data-go="ranking" data-rtab="brand"`)}
+      <div class="two">${brands.map((b, i) => brandBlock(b, i + 1, 3)).join("")}</div>
+    </section>
+
+    <section class="sec">
+      <button class="card" data-go="insight" style="text-align:left">
+        <span class="eyebrow">${t("insightK")}</span><h3>${t("insightH")}</h3><span class="note">${t("insightS")} ›</span></button>
+    </section>`;
+}
+function homeRising(chart, rm) {
+  const live = risingLive().slice(0, 8);
+  const head = (sub) => `<div><span class="eyebrow">${sub}</span>${secHead(`<em>${t("rising")}</em> ${t("risingRank")}`, `data-go="ranking" data-rtab="rising"`)}</div>`;
+  if (live.length) return head(`<span class="livedot"></span>${t("live")} · ${fmt(t("recentN"), { n: live.reduce((a, r) => a + r.recent, 0) })}`) +
+    `<div class="hscroll">${live.map((r, i) => { const p = P(r.id); return `<button class="pcard" data-product="${r.id}"><span class="thumb${p.img ? " photo" : ""}">${pic(p)}<span class="num">${i + 1}</span>${r.growth > 0 ? `<span class="chg up">▲${r.growth}</span>` : ""}</span>${nameLine(p)}${rateLine(p)}</button>`; }).join("")}</div>`;
+  if (chart.length) return head(`${dateFmt(D.chartDates[1])} · ${mktName(rm)} · ${t("demo")}`) +
+    `<div class="hscroll">${chart.map((r) => { const p = P(r.id); return `<button class="pcard" data-product="${r.id}"><span class="thumb${p.img ? " photo" : ""}">${pic(p)}<span class="num">${r.rank}</span>${change(r.chg, r.st)}</span>${nameLine(p)}${rateLine(p)}</button>`; }).join("")}</div>`;
+  return head(`<span class="livedot"></span>${t("live")}`) + `<button class="card" data-product="${D.featured[0]}" data-tab="reviews" style="text-align:left"><h3>${t("noRising")}</h3><span class="note">${t("firstCta")} ›</span></button>`;
+}
+function brandBlock(b, n, k) {
+  const p0 = P(b.ids[0]);
+  const sub = S.lang === "ko" ? `<span>(${esc(p0.brand)})</span>` : "";
+  return `<div class="brand"><div class="brand-h"><b>${n}</b><span class="blogo" style="background:${p0.bcol}">${esc(p0.brand.split(" ").map((w) => w[0]).join(""))}</span><span class="n">${esc(brandName(p0))}${sub}</span></div>
+    <div class="plist">${b.ids.slice(0, k).map((id) => prow(id, null, {})).join("")}</div></div>`;
+}
+
+function vRanking() {
+  const date = D.chartDates[1] ? `<div class="updated">${dateFmt(D.chartDates[1])} ${t("updated")}</div>` : "";
+  const avail = (ids) => ids.filter((id) => available(P(id)));
+  // segment metric: that segment's own average and count (the row's stars show the overall rating)
+  const stars = (id, key, pred, label) => { const st = segStats(key, pred)[id]; return st && label ? `<b>${st.mean.toFixed(1)}</b><small>${label} · ${fmt(t("reviewsN"), { n: st.n })}</small>` : `<small>${catName(P(id).cat)}</small>`; };
+  let filt = "", body = "", basis = "";
+  if (S.rtab === "market") {
+    const m = sigMarket();
+    filt = S.market ? "" : `<div><span class="lbl">${t("pickCountry")}</span>${countryChips()}</div>` + `<div><button class="chip drop" data-sheet="rank">${esc(catLabel(S.cat))}</button></div>`;
+    if (S.market) filt = `<div><button class="chip drop" data-sheet="rank">${esc(catLabel(S.cat))}</button></div>`;
+    basis = `<div><h2 style="font-size:18px;margin:0">${fmt(t("leadersH"), { m: mktName(m) })}</h2><p class="note" style="margin:4px 0 0">${t("marketBasis")}</p></div>`;
+    const ids = leadersIn(m, S.cat);
+    body = ids.length ? rankedList(ids, { limit: 40, metric: (id) => { const g = topSig(P(id), m); return g.rank && g.level === "product" ? `<b>${RANK_FMT[S.lang](g.rank)}</b>` : ""; } }) : `<div class="empty">${t("noSignals")}</div>`;
+  } else if (S.rtab === "rising") {
+    const live = risingLive();
+    if (live.length) {
+      basis = `<span class="note"><span class="livedot"></span>${t("live")} · ${fmt(t("recentN"), { n: live.reduce((a, r) => a + r.recent, 0) })}</span>`;
+      const find = (id) => live.find((x) => x.id === id);
+      body = rankedList(live.map((r) => r.id), { limit: 30, extra: (id) => ({ chg: find(id).growth > 0 ? find(id).growth : 0 }), metric: (id) => `<small>${fmt(t("recentN"), { n: find(id).recent })}</small>` });
+    } else if (Object.keys(D.trends).length) {
+      const { m, rows } = trendRows();
+      const find = (id) => rows.find((x) => x.id === id);
+      basis = `<span class="note">${t("demo")}${S.market && S.market !== m ? " · " + t("chartMissing") : ""}</span>`;
+      body = rankedList(risingIds().map((r) => r.id), { limit: 30, extra: (id) => ({ chg: find(id).chg, st: find(id).st }), metric: (id) => `<small>${t("now")} #${find(id).rank}</small>` });
+    } else {
+      body = `<div class="empty">${t("noRising")}<br><br><button class="more" data-product="${D.featured[0]}" data-tab="reviews">${t("firstCta")} ${I.right}</button></div>`;
+    }
+  } else if (S.rtab === "category") {
+    filt = `<div><button class="chip drop" data-sheet="rank">${esc(catLabel(S.cat))}</button></div>`;
+    const r = liveRank(avail(catIds(S.cat)), "all");
+    basis = basisNote(r); body = rankedList(r.ids, { metric: (id) => stars(id, "all") });
+  } else if (S.rtab === "skin") {
+    filt = `<div class="chips">${D.codebook.skin.map((x) => `<button class="chip" data-skin="${x}" aria-pressed="${S.skin === x}">${skinName(x)}</button>`).join("")}</div>`;
+    const key = "skin:" + S.skin, pred = (x) => x.skin_type === S.skin;
+    const r = liveRank(avail(Object.keys(D.products)).filter((id) => segStats(key, pred)[id] || skinIds(S.skin).includes(id)), key, pred);
+    basis = basisNote(r); body = rankedList(r.ids, { metric: (id) => stars(id, key, pred, skinName(S.skin)) });
+  } else if (S.rtab === "age") {
+    filt = `<div class="chips">${D.reviewPrior.ages.map((a) => `<button class="chip" data-age="${a}" aria-pressed="${S.age === a}">${t("ageName")[a]}</button>`).join("")}</div>`;
+    const key = "age:" + S.age, pred = (x) => x.age_band === S.age;
+    const r = liveRank(avail(Object.keys(D.products)), key, pred);
+    basis = basisNote(r); body = rankedList(r.ids, { metric: (id) => stars(id, key, pred, t("ageName")[S.age]) });
+  } else if (S.rtab === "goal") {
+    filt = areaTabs("data-rarea", S.area) + goalChips("data-rgoal", S.area, S.goal);
+    body = rankedList(goalIds(S.goal), { metric: (id) => `<b>${goalPct(S.goal, id)}%</b><small>${t("fit")}</small>` });
+  } else {
+    const bs = brandRanking();
+    basis = LIVE.list.length ? `<span class="note"><span class="livedot"></span>${t("live")}</span>` : "";
+    body = bs.length ? `<div style="display:grid;gap:22px">${bs.map((b, i) => brandBlock(b, i + 1, 3)).join("")}</div>` : `<div class="empty">${t("noResult")}</div>`;
+  }
+  const where = S.market ? `<span class="note">${fmt(t("soldIn"), { m: mktName(S.market) })}</span>` : "<span></span>";
+  return `<section class="sec" style="padding-top:16px">${filt}<div class="sec-h">${where}${date}</div>${basis}${body}</section>`;
+}
+
+function reasonLocal(attr, ref, c) {
+  const ph = PHR[S.lang];
+  const same = (map, a, b) => a == null || b == null ? "–" : a === b ? fmt(ph.both, { x: tx(map, a) }) : `${tx(map, a)} · ${tx(map, b)}`;
+  if (attr === "category") return ref.cat === c.cat ? fmt(ph.sameCat, { x: catName(c.cat) }) : `${catName(ref.cat)} · ${catName(c.cat)}`;
+  if (attr === "finish") return same("finish", ref.finish, c.finish);
+  if (attr === "coverage") return same("coverage", ref.cov, c.cov);
+  if (attr === "texture") return same("texture", ref.tex, c.tex);
+  if (attr === "skin_type") { const s = ref.skin.filter((x) => c.skin.includes(x)); return s.length ? ph.common + s.map(skinName).join(ph.sep) : ph.skinDiff; }
+  if (attr === "price") return fmt(ph.price, { a: usd(ref.usd), b: usd(c.usd) });
+  if (attr === "function") {
+    const ks = D.codebook.intensity;
+    const big = (k) => ref.int[k] != null && c.int[k] != null && Math.abs(ref.int[k] - c.int[k]) >= 2;
+    const shared = ks.filter((k) => ref.int[k] > 0 && c.int[k] > 0 && !big(k)).map((k) => tx("feat", k));
+    const diff = ks.filter(big).map((k) => tx("feat", k));
+    return (shared.length ? ph.common + shared.join(ph.sep) : ph.noCommon) + (diff.length ? ph.diff + diff.join(ph.sep) : "");
+  }
+  return "";
+}
+function ruleParts(rule) {
+  const isIn = rule.includes(" in ");
+  const [f, rhs] = isIn ? rule.split(" in ") : rule.split(" ≈ ");
+  const vals = isIn ? rhs.replace(/[\[\]']/g, "").split(",").map((s) => s.trim()) : [rhs];
+  return { f, vals };
+}
+const trVal = (v) => isEn() ? nice(v) : (TR[S.lang].level[v] || TR[S.lang].finish[v] || TR[S.lang].coverage[v] || TR[S.lang].shade[v] || TR[S.lang].tone[v] || nice(v));
+function goalReason(value, rule) {
+  const { vals } = ruleParts(rule);
+  if (isEn()) return `${nice(value)} · wants ${vals.map(nice).join(", ")}`;
+  return fmt(PHR[S.lang].goal, { v: trVal(value), t: vals.map(trVal).join("·") });
+}
+function ruleLabel(rule) {
+  const { f, vals } = ruleParts(rule);
+  return `${tx("feat", f)} ${vals.map(trVal).join("·")}`;
+}
+function resultRows(list, kind, ref) {
+  if (!list || !list.length) return `<div class="empty">${t("noResult")}</div>`;
+  return list.map((r, i) => {
+    const p = P(r.id), key = kind + r.id, open = S.open[key];
+    const bars = r.x.map((x) => {
+      const [a, pts, max] = x;
+      const label = kind === "goal" ? tx("feat", a) : tx("attr", a);
+      const why = kind === "goal" ? goalReason(x[3], x[4]) : isEn() ? nice(x[3]) : reasonLocal(a, ref, p);
+      return `<span>${esc(label)}</span><span class="t"><span style="width:${max ? (100 * pts / max).toFixed(0) : 0}%"></span></span><span class="p">${pts.toFixed(1)}/${max.toFixed(0)}</span><span class="r">${esc(why)}</span>`;
+    }).join("");
+    const fuse = Object.entries(r.w).map(([k, w]) => `${tx("comp", k)} <b>${(r.c[k] ?? 0).toFixed(2)}</b>×${Math.round(w * 100)}%`).join(" + ");
+    return `<details class="res" data-key="${key}" ${open ? "open" : ""}><summary class="prow">
+        <span class="rk">${i < 3 ? medal(i + 1) : `<b>${i + 1}</b>`}</span>${thumb(p)}
+        <span class="pinfo">${nameLine(p)}${rateLine(p)}<span class="whybtn">${t("why")} ${I.chev}</span></span>
+        <span class="metric"><b>${r.pct}%</b><small>${kind === "goal" ? t("fit") : t("match")} · ${t("overall")} ${Math.round(r.f * 100)}</small>${r.save > 0 ? `<span class="save">${usd(r.save)} ${t("save")}</span>` : ""}</span></summary>
+      <div class="why"><div class="bars">${bars}</div>
+        <div class="fuse">${t("finalScore")} ${r.f.toFixed(3)} = ${fuse}${r.ev < 0.6 ? ` · ${t("lowConf")}` : ""}</div>
+        <div><button class="more" data-product="${r.id}" style="padding:9px">${esc(prodName(p))} ${I.right}</button></div></div></details>`;
+  }).join("");
+}
+
+function vProduct() {
+  const p = P(S.pid);
+  const nRev = (liveStats()[S.pid] || {}).n || 0;
+  const tabs = [["similar", t("similar")], ["cheaper", t("cheaper")], ["reviews", `${t("reviews")}${nRev ? " " + nRev : ""}`], ["prices", t("prices")], ["fits", t("fits")]];
+  const tagv = [catName(p.cat), p.tex && tx("texture", p.tex) !== catName(p.cat) && tx("texture", p.tex), p.cov && fmt(t("coverageOf"), { v: tx("coverage", p.cov) }), p.shade && tx("shade", p.shade), p.tone && tx("tone", p.tone), p.skin.length && (p.skin.length === 5 ? t("allSkin") : p.skin.map(skinName).join(" · "))].filter(Boolean);
+  let body = "";
+  if (S.ptab === "similar" || S.ptab === "cheaper") {
+    const list = (D[S.ptab][S.pid][S.market] || []).filter((r) => !S.origin || P(r.id).origin === S.origin).slice(0, 8);
+    body = `<div class="chips"><span class="eyebrow" style="align-self:center;margin-right:4px">${t("madeIn")}</span>${MARKETS.map((o) => `<button class="chip" data-origin="${o}" aria-pressed="${S.origin === o}">${o ? mktName(o) : t("all")}</button>`).join("")}</div>
+      <div class="note">${S.ptab === "cheaper" ? t("cheapNote") : t("simNote")}${S.market ? " · " + fmt(t("soldIn"), { m: mktName(S.market) }) : ""}</div>
+      <div>${resultRows(list, "sim", p)}</div>`;
+  } else if (S.ptab === "reviews") {
+    body = reviewsBody(p);
+  } else if (S.ptab === "prices") {
+    const Lst = p.list.slice().sort((a, b) => (a.usd ?? 1e9) - (b.usd ?? 1e9));
+    const u = Lst.map((l) => l.usd).filter((v) => v != null);
+    const med = u.length ? (u.length % 2 ? u[(u.length - 1) / 2] : (u[u.length / 2 - 1] + u[u.length / 2]) / 2) : null;
+    body = !Lst.length ? `<div class="empty">${t("noResult")}</div>` : `<div class="stats3"><div class="stat"><span>${t("lowest")}</span><b>${usd(u[0])}</b></div><div class="stat"><span>${t("median")}</span><b>${usd(med)}</b></div><div class="stat"><span>${t("highest")}</span><b>${usd(u[u.length - 1])}</b></div></div>
+      <div class="tbl"><table><thead><tr><th>${t("market")}</th><th>${t("avail")}</th><th class="n">${t("local")}</th><th class="n">${DISP[S.lang]}</th><th class="n">${t("ship")}</th><th class="n">${t("rating")}</th></tr></thead><tbody>
+      ${Lst.map((l, i) => `<tr class="${i === 0 && l.usd != null ? "best" : ""}"><td>${mktName(l.m)}</td><td class="av-${l.av}">${avName(l.av)}${l.est ? ` <span class="note">(${t("estimate")})</span>` : ""}</td><td class="n">${l.price != null ? money(l.price, l.cur) : "–"}</td><td class="n">${usd(l.usd)}</td><td class="n">${l.ship != null ? l.ship + t("days") : "–"}</td><td class="n">${l.rating != null ? `★ ${l.rating} (${fmtNum(l.reviews)})` : "–"}</td></tr>`).join("")}</tbody></table></div>
+      <p class="note">${t("observed")} ${dateFmt(Lst[0].at)} · ${t("fxNote")} · ${D.mode === "real" ? t("labelsNote") : t("demo")}</p>`;
+  } else {
+    body = p.fits.length ? `<div class="plist">${p.fits.map(([g, s]) => `<button class="prow" data-goal="${g}" style="grid-template-columns:minmax(0,1fr) auto"><span class="pinfo"><span class="note">${areaName(areaOf(g))}</span><span class="pname" style="font-weight:700">${esc(goalName(g))}</span><span class="note">${esc(goalDesc(g))}</span></span><span class="metric"><b>${s}%</b><small>${t("fit")}</small></span></button>`).join("")}</div>` : `<div class="empty">${t("noResult")}</div>`;
+  }
+  const l = listing(p);
+  const alt = S.lang === "ko" ? `${esc(p.brand)} ${esc(p.name)}` : S.lang === "en" ? `${esc(p.bko)} ${esc(p.ko)}` : "";
+  const credit = p.img ? `${t("photo")}: ${esc(p.img.credit)}${p.img.license ? " · " + esc(p.img.license) : ""}` : t("illus");
+  return `<section class="phero">
+      <span class="thumb${p.img ? " photo" : ""}">${pic(p)}</span><span class="credit">${credit}</span>
+      <div class="ptitle"><span class="br">${esc(brandName(p))} · ${t("madeIn")} ${mktName(p.origin)}</span>
+        <h1>${esc(prodName(p))}</h1>${alt ? `<span class="en">${alt}</span>` : ""}
+        ${rateLine(p)}
+        <div class="price">${D.mode === "real" ? `<span class="note" style="font:500 12px var(--sans);margin-right:6px">${t("refPrice")}</span>` : ""}${localPrice(p)}<small>${(() => { const lm = S.market ? p.list.find((x) => x.m === S.market && x.price != null) : null; return lm ? `${money(lm.price, lm.cur)} · ${mktName(S.market)}` : `${money(p.price, p.cur)}`; })()}</small></div></div>
+      <div class="tags">${tagv.map((x) => `<span class="tag">${esc(x)}</span>`).join("")}</div>
+      ${D.mode === "real" ? `<p class="note" style="margin:0">${t("labelsNote")}</p>` : ""}
+      ${p.sig && Object.keys(p.sig).length ? `<div class="card evid"><span class="lbl">${t("evidence")}</span>${Object.entries(p.sig).map(([m, rows]) => rows.map((g) => `<div class="evrow"><span class="tag">${mktName(m)}</span><span>${esc(sigLabel(g))}</span><a class="src" href="${esc(g.url)}" target="_blank" rel="noopener">${t("source")} · ${esc(g.date)}</a></div>`).join("")).join("")}</div>` : ""}
+      <div class="profile">
+        ${p.finish ? `<div><span class="lbl">${t("finish")}</span><div class="scale">${D.codebook.finish.map((k) => `<div class="${k === p.finish ? "on" : ""}">${tx("finish", k)}</div>`).join("")}</div></div>` : ""}
+        <div><span class="lbl">${t("func")}</span><div class="ints">${D.codebook.intensity.filter((k) => p.int[k] != null).map((k) => `<span>${tx("feat", k)}</span><span class="d" aria-label="${p.int[k]}/3">${[1, 2, 3].map((i) => `<i class="${i <= p.int[k] ? "f" : ""}"></i>`).join("")}</span>`).join("")}</div></div>
+      </div></section>
+    <nav class="ptabs">${tabs.map(([k, lb]) => `<button data-ptab="${k}" aria-current="${S.ptab === k}">${lb}</button>`).join("")}</nav>
+    <section class="sec">${body}</section>`;
+}
+
+function myItems() {
+  const out = {};
+  for (const r of LIVE.list) if (r.reviewer_id === LIVE.uid) out[r.product_id] = { rating: r.rating, skin_type: r.skin_type || null, age_band: r.age_band || null, market: r.market || null, text: r.text || "", created_at: r.created_at };
+  return out;
+}
+function draftFor(pid) {
+  const mine = myItems()[pid];
+  return mine ? { ...mine } : { rating: 0, skin_type: null, age_band: null, market: S.market || P(pid).origin, text: "" };
+}
+const starRow = (v, size = 16) => `<span class="stars" style="--s:${size}px" aria-label="${v.toFixed(1)}/5">${[1, 2, 3, 4, 5].map((i) => `<i class="${v >= i - 0.25 ? "f" : v >= i - 0.75 ? "h" : ""}"></i>`).join("")}</span>`;
+function reviewsBody(p) {
+  const st = liveStats()[p.id];
+  const mine = LIVE.uid ? myItems()[p.id] : null;
+  if (!S.draft || S.draft.pid !== p.id) S.draft = { pid: p.id, ...draftFor(p.id) };
+  const dist = [5, 4, 3, 2, 1].map((k) => [k, LIVE.list.filter((r) => r.product_id === p.id && r.rating === k).length]);
+  const summary = st ? `<div class="rsum"><div><b>${st.mean.toFixed(2)}</b>${starRow(st.mean, 18)}<span class="note">${fmt(t("reviewsN"), { n: st.n })}</span></div>
+      <div class="dist">${dist.map(([k, c]) => `<span>${k}</span><span class="t"><span style="width:${st.n ? (100 * c / st.n).toFixed(0) : 0}%"></span></span><span class="p">${c}</span>`).join("")}</div></div>`
+    : `<div class="empty">${t("noReviews")}</div>`;
+  let form = "";
+  if (LIVE.status === "nodb") form = `<p class="note">${t("noDb")}</p>`;
+  else if (LIVE.status === "loading") form = `<p class="note">…</p>`;
+  else if (LIVE.canWrite === false || !LIVE.uid) form = `<p class="note">${t("noWrite")}</p>`;
+  else {
+    const d = S.draft;
+    form = `<div class="card rform" id="rform"><h3>${mine ? t("myReview") : t("writeReview")}</h3>
+      <div><span class="lbl">${t("yourRating")}</span><div class="starpick" role="radiogroup" aria-label="${t("yourRating")}">${[1, 2, 3, 4, 5].map((i) => `<button type="button" data-rstar="${i}" role="radio" aria-checked="${d.rating === i}" aria-label="${i}"><i class="${d.rating >= i ? "f" : ""}"></i></button>`).join("")}</div></div>
+      <div><span class="lbl">${t("skinQ")}</span><div class="chips" style="margin-top:6px">${D.codebook.skin.map((x) => `<button type="button" class="chip" data-rskin="${x}" aria-pressed="${d.skin_type === x}">${skinName(x)}</button>`).join("")}</div></div>
+      <div><span class="lbl">${t("ageQ")}</span><div class="chips" style="margin-top:6px">${D.reviewPrior.ages.map((a) => `<button type="button" class="chip" data-rage="${a}" aria-pressed="${d.age_band === a}">${t("ageName")[a]}</button>`).join("")}</div></div>
+      <div><span class="lbl">${t("marketQ")}</span><div class="chips" style="margin-top:6px">${["KR", "US", "JP", "CN"].map((m) => `<button type="button" class="chip" data-rmkt="${m}" aria-pressed="${d.market === m}">${mktName(m)}</button>`).join("")}</div></div>
+      <textarea id="rtext" maxlength="${D.reviewPrior.maxText}" rows="3" placeholder="${esc(t("textPh"))}">${esc(d.text)}</textarea>
+      <div class="rbtns"><button class="btn-primary" data-rsubmit="1" ${!d.rating || LIVE.saving ? "disabled" : ""}>${LIVE.saving ? t("saving") : mine ? t("update") : t("submit")}</button>${mine ? `<button class="more" data-rdelete="1" style="width:auto;padding:10px 16px">${t("del")}</button>` : ""}</div>
+      ${LIVE.msg ? `<p class="note" role="status">${esc(LIVE.msg)}</p>` : ""}</div>`;
+  }
+  const list = LIVE.list.filter((r) => r.product_id === p.id).sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 30);
+  const items = list.map((r) => `<div class="rev"><div class="rev-h">${starRow(r.rating, 13)}<span class="note">${r.reviewer_id === LIVE.uid ? t("myReview") : t("anon")} · ${[r.skin_type && skinName(r.skin_type), r.age_band && t("ageName")[r.age_band], r.market && fmt(t("reviewedIn"), { m: mktName(r.market) })].filter(Boolean).join(" · ")} · ${dateFmt(r.created_at.slice(0, 10))}</span></div>${r.text ? `<p>${esc(r.text)}</p>` : ""}</div>`).join("");
+  return `<p class="note"><span class="livedot"></span>${t("live")} · ${t("liveNote")}</p>${summary}${form}${items ? `<div class="revs">${items}</div>` : ""}`;
+}
+async function saveReview(del = false) {
+  if (!LIVE.db || !LIVE.uid || LIVE.saving) return;
+  const pid = S.pid, d = S.draft, items = myItems();
+  if (del) delete items[pid];
+  else {
+    if (!(d.rating >= 1 && d.rating <= 5)) return;
+    items[pid] = { rating: d.rating, skin_type: d.skin_type, age_band: d.age_band, market: d.market, text: String(d.text || "").slice(0, D.reviewPrior.maxText), created_at: new Date().toISOString() };
+  }
+  LIVE.saving = true; LIVE.msg = ""; render();
+  try {
+    await LIVE.db.doc("reviews/" + LIVE.uid).set({ items });
+    LIVE.msg = del ? t("deleted") : t("saved");
+    if (del) S.draft = null;
+  } catch (e) {
+    if (e && e.code === "invalid_argument") { LIVE.canWrite = false; LIVE.msg = t("noWrite"); }
+    else LIVE.msg = t("saveFail");
+  }
+  LIVE.saving = false; render();
+}
+function cleanReview(pid, r, uid) {
+  if (!D.products[pid] || !r || typeof r !== "object") return null;
+  const rating = Number(r.rating);
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) return null;
+  const created = typeof r.created_at === "string" && !isNaN(Date.parse(r.created_at)) ? r.created_at : "1970-01-01T00:00:00Z";
+  return { reviewer_id: uid, product_id: pid, rating, created_at: created,
+    skin_type: D.codebook.skin.includes(r.skin_type) ? r.skin_type : null,
+    age_band: D.reviewPrior.ages.includes(r.age_band) ? r.age_band : null,
+    market: ["KR", "US", "JP", "CN"].includes(r.market) ? r.market : null,
+    text: typeof r.text === "string" ? r.text.slice(0, D.reviewPrior.maxText) : "" };
+}
+async function initLive() {
+  const cl = typeof window !== "undefined" ? window.claude : null;
+  if (!cl || typeof cl.use !== "function") { LIVE.status = "nodb"; render(); return; }
+  let db = null;
+  try { db = await cl.use("db"); } catch (e) { db = null; }
+  if (!db) { LIVE.status = "nodb"; render(); return; }
+  LIVE.db = db;
+  try {
+    const user = await cl.use("user");
+    LIVE.uid = user ? await user.id() : null;
+    const c = user && typeof user.can === "function" ? await user.can("data.write") : null;
+    LIVE.canWrite = c === false ? false : c === true ? true : null;
+  } catch (e) { LIVE.uid = null; }
+  db.collection("reviews").onSnapshot((snap) => {
+    const out = [];
+    for (const doc of snap.docs) {
+      const items = (doc.data() || {}).items;
+      if (!items || typeof items !== "object") continue;
+      for (const [pid, r] of Object.entries(items)) { const c = cleanReview(pid, r, doc.id); if (c) out.push(c); }
+    }
+    LIVE.list = out; LIVE.status = "ready"; recompute();
+    render();
+  }, () => { LIVE.status = LIVE.list.length ? "ready" : "nodb"; render(); });
+}
+
+function vGoals() {
+  if (areaOf(S.goal) !== S.area) S.goal = goalsIn(S.area)[0];
+  const g = S.goal, meta = D.goals[g].meta;
+  const list = (D.goals[g].r[S.market] || []).filter((r) => !S.gskin || !P(r.id).skin.length || P(r.id).skin.includes(S.gskin)).slice(0, 10);
+  const skinUseful = meta.area === "skin";
+  return `<section class="sec" style="padding-top:16px">
+      ${goalChips("data-goal", S.area, g)}
+      <div><span class="eyebrow">${areaName(meta.area)} · ${meta.cats.map(catName).join(" · ")}</span><h1>${esc(goalName(g))}</h1><p class="note" style="font-size:14px;margin:6px 0 0">${esc(goalDesc(g))}</p></div>
+      <div><span class="lbl">${t("rulesTitle")}</span><div class="rules" style="margin-top:8px">${meta.rules.map((r) => `<span class="tag">${esc(ruleLabel(r))}</span>`).join("")}</div></div>
+      ${skinUseful ? `<div class="chips"><span class="eyebrow" style="align-self:center;margin-right:4px">${t("skinType")}</span>${["", ...D.codebook.skin].map((s) => `<button class="chip" data-gskin="${s}" aria-pressed="${S.gskin === s}">${s ? skinName(s) : t("all")}</button>`).join("")}</div>` : ""}
+    </section>
+    <section class="sec"><div>${resultRows(list, "goal")}</div></section>`;
+}
+
+/* ---------------- search (mirrors beautybridge/search.py) ---------------- */
+function norm(s) { return String(s || "").normalize("NFKC").toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, " ").replace(/\s+/g, " ").trim(); }
+const CJK = /[぀-ヿ㐀-鿿가-힣]/;
+const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function consume(text, phrase) {
+  const p = norm(phrase); if (!p) return [false, text];
+  const re = CJK.test(p) ? new RegExp(reEsc(p) + "[\\p{L}\\p{N}]*", "gu") : new RegExp("(?<![\\p{L}\\p{N}])" + reEsc(p) + "(?![\\p{L}\\p{N}])", "gu");
+  const out = text.replace(re, " "); return [out !== text, out];
+}
+function parseQuery(q) {
+  const r = { intent: "search", goal: null, category: null, origin: null, market: null, text: "" };
+  let s = " " + norm(q) + " ", hit;
+  const goalPhrases = (gid) => [D.goals[gid].meta.name, D.goals[gid].meta.ko, gid.replace(/_/g, " "), ...D.goals[gid].meta.al, GOAL_TX[gid]?.zh?.[0], GOAL_TX[gid]?.ja?.[0]].filter(Boolean);
+  for (const gid of Object.keys(D.goals)) for (const ph of goalPhrases(gid)) { [hit, s] = consume(s, ph); if (hit) r.goal = gid; }
+  for (const [m, phs] of Object.entries(D.query.market)) for (const ph of phs) { [hit, s] = consume(s, ph); if (hit) r.market = m; }
+  for (const [o, phs] of Object.entries(D.query.origin)) for (const ph of phs) { [hit, s] = consume(s, ph); if (hit) r.origin = o; }
+  for (const intent of ["cheaper", "similar"]) for (const ph of D.query.intent[intent]) { [hit, s] = consume(s, ph); if (hit && (r.intent === "search" || intent === "cheaper")) r.intent = intent; }
+  const cats = Object.entries(D.query.category).flatMap(([c, phs]) => phs.map((ph) => [ph, c])).sort((a, b) => b[0].length - a[0].length);
+  for (const [ph, c] of cats) { [hit, s] = consume(s, ph); if (hit && !r.category) r.category = c; }
+  const stop = new Set(["a", "an", "the", "to", "for", "something", "product", "제품", "추천", "me", "i", "want", "推荐", "おすすめ"]);
+  r.text = s.split(" ").filter((w) => w && !stop.has(w)).join(" ");
+  if (r.goal && r.intent === "search") r.intent = "goal";
+  return r;
+}
+function findProducts(text, f = {}) {
+  const n = norm(text); if (!n) return [];
+  const toks = n.split(" "), out = [];
+  for (const [id, p] of Object.entries(D.products)) {
+    if (f.category && p.cat !== f.category) continue;
+    if (f.origin && p.origin !== f.origin) continue;
+    const hay = norm([p.brand, p.bko, p.name, p.ko, ...(p.al || [])].join(" ")), words = hay.split(" ");
+    const sc = hay.includes(n) ? 2 : toks.filter((tk) => words.some((w) => w.startsWith(tk) || (tk.length > 3 && w.startsWith(tk.slice(0, -1))))).length / toks.length;
+    if (sc >= 0.5) out.push([sc, id]);
+  }
+  return out.sort((a, b) => b[0] - a[0] || a[1].localeCompare(b[1])).map((x) => x[1]);
+}
+const EXAMPLES = {
+  ko: ["저렴한 한국 파우더 bake set 비슷한", "애교살 추천", "립 맥시마이저", "중국 쿠션"],
+  en: ["cheap korean powder like bake set", "aegyo-sal", "lip plumper", "chinese cushion"],
+  zh: ["韩国 散粉 平替 bake set", "卧蚕", "丰唇", "中国 气垫"],
+  ja: ["韓国 パウダー プチプラ bake set", "涙袋", "リッププランパー", "中国 クッション"],
+};
+function vSearch() {
+  const q = S.q.trim();
+  let body = "";
+  if (!q) body = `<p class="note">${t("openSearch")}</p>`;
+  else {
+    const pq = parseQuery(q);
+    const wantsRef = pq.intent === "cheaper" || pq.intent === "similar";
+    const f = wantsRef ? { category: pq.category } : { category: pq.category, origin: pq.origin };
+    let hits = pq.text ? findProducts(pq.text, f) : [];
+    if (!hits.length && pq.text) hits = findProducts(pq.text);
+    if (!pq.text && !pq.goal && (pq.category || pq.origin)) hits = Object.keys(D.products).filter((id) => (!pq.category || P(id).cat === pq.category) && (!pq.origin || P(id).origin === pq.origin));
+    const und = [pq.intent === "cheaper" && t("cheaper"), pq.intent === "similar" && t("similar"), pq.goal && goalName(pq.goal), pq.category && catName(pq.category), pq.origin && `${t("madeIn")} ${mktName(pq.origin)}`, pq.market && mktName(pq.market), pq.text && `“${pq.text}”`].filter(Boolean);
+    body += `<div><span class="lbl">${t("understood")}</span><div class="rules" style="margin-top:8px">${und.map((u) => `<span class="tag">${esc(u)}</span>`).join("")}</div></div>`;
+    if (pq.market && pq.market !== S.market) body += `<button class="more" data-setmarket="${pq.market}">${fmt(t("switchMkt"), { m: mktName(pq.market) })}</button>`;
+    if (pq.goal) body += `<button class="card" data-goal="${pq.goal}" style="text-align:left"><span class="eyebrow">${areaName(areaOf(pq.goal))}</span><h3>${esc(goalName(pq.goal))}</h3><span class="note">${esc(goalDesc(pq.goal))} ${t("goalLink")} ›</span></button>`;
+    if (wantsRef && hits[0]) body += `<div class="card"><span class="eyebrow">${t("refProduct")}</span>${prow(hits[0], null, {})}<button class="more" data-product="${hits[0]}" data-tab="${pq.intent}" data-orig="${pq.origin || ""}" style="background:var(--dark-chip);color:var(--dark-chip-ink);border:0;font-weight:700">${pq.intent === "cheaper" ? t("showCheaper") : t("showSimilar")}${pq.origin ? ` · ${mktName(pq.origin)}` : ""}</button></div>`;
+    body += hits.length ? `<div><span class="lbl">${hits.length} ${t("products")}</span><div class="plist">${hits.slice(0, 12).map((id) => prow(id, null, {})).join("")}</div></div>` : (!pq.goal ? `<div class="empty">${t("noMatch")}</div>` : "");
+  }
+  return `<section class="sec" style="padding-top:14px">
+      <form class="sbox" id="sform" role="search"><input id="sq" type="search" value="${esc(S.q)}" autocomplete="off" placeholder="${t("searchPh")}" aria-label="${t("search")}"><button type="submit" aria-label="${t("search")}">${I.search}</button></form>
+      <div class="chips">${EXAMPLES[S.lang].map((x) => `<button class="chip" data-q="${esc(x)}">${esc(x)}</button>`).join("")}</div>
+      ${body}</section>`;
+}
+
+/* ---------------- insight ---------------- */
+function barChart({ labels, values, max, ticks, fmtv, neg = false, color }) {
+  const W = 340, H = 200, L = 50, R = 10, Tp = 16, B = 26, ph = H - Tp - B, pw = W - L - R;
+  const slot = pw / values.length, bw = Math.min(40, slot * 0.56);
+  const y = (v) => neg ? Tp + (Math.abs(v) / max) * ph : Tp + ph - (v / max) * ph, zero = neg ? Tp : Tp + ph;
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img">`;
+  for (const tk of ticks) { const yy = y(tk); s += `<line x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}"/><text x="${L - 6}" y="${yy + 4}" text-anchor="end">${fmtv(tk)}</text>`; }
+  values.forEach((v, i) => {
+    const cx = L + slot * i + slot / 2;
+    if (v != null) { const top = Math.min(y(v), zero), h = Math.abs(y(v) - zero); s += `<rect x="${cx - bw / 2}" y="${top}" width="${bw}" height="${h}" rx="4" fill="${color}"/><text class="v" x="${cx}" y="${neg ? top + h + 13 : top - 5}" text-anchor="middle">${fmtv(v)}</text>`; }
+    s += `<text x="${cx}" y="${H - 7}" text-anchor="middle">${labels[i]}</text>`;
+  });
+  return s + `</svg>`;
+}
+function vInsight() {
+  const X = PROSE[S.lang], F = D.market.financials, E = D.market.events, Fa = D.market.facts;
+  const co = (c) => F.filter((r) => r.company === c).sort((a, b) => a.fiscal_year - b.fiscal_year);
+  const sep = co("sephora_korea"), oy = co("cj_olive_young");
+  const u = { ko: ["억", "조"], zh: ["亿", "万亿"], ja: ["億", "兆"], en: ["", ""] }[S.lang];
+  const lossFmt = (v) => isEn() ? `₩${(v / 10).toFixed(1)}bn` : `${Math.round(v)}${u[0]}`;
+  const revFmt = (v) => isEn() ? `₩${v % 1 ? v.toFixed(1) : v}tn` : `${v % 1 ? v.toFixed(1) : v}${u[1]}`;
+  const sepC = barChart({ labels: sep.map((r) => r.fiscal_year), values: sep.map((r) => r.operating_profit_krw ? +r.operating_profit_krw / 1e8 : null), max: 200, ticks: [0, -100, -200], fmtv: lossFmt, neg: true, color: "var(--up)" });
+  const oyC = barChart({ labels: oy.map((r) => r.fiscal_year), values: oy.map((r) => r.revenue_krw ? +r.revenue_krw / 1e12 : null), max: 6, ticks: [0, 2, 4, 6], fmtv: revFmt, color: "var(--accent)" });
+  const host = (url) => { try { return new URL(url).hostname.replace(/^(www|m|view|biz)\./, ""); } catch (e) { return "source"; } };
+  const d = (e) => e.date_precision === "year" ? e.event_date.slice(0, 4) : e.date_precision === "month" ? e.event_date.slice(0, 7).replace("-", ".") : dateFmt(e.event_date);
+  const factName = (f) => S.lang === "ko" ? f.metric_ko : isEn() ? f.metric : FACT_TX[f.metric]?.[S.lang] || f.metric;
+  const factVal = (f) => S.lang === "ko" ? f.value_ko : isEn() ? f.value : VALUE_TX[f.value]?.[S.lang] || f.value;
+  const evName = (e) => S.lang === "ko" ? e.event_ko : isEn() ? e.event : EVENT_TX[e.event]?.[S.lang] || e.event;
+  const factRows = (c) => Fa.filter((f) => f.company === c).map((f) => `<tr><td>${esc(factName(f))}</td><td class="n">${esc(factVal(f))}</td><td class="n"><a class="src" href="${esc(f.source_url)}" target="_blank" rel="noopener">${esc(f.as_of)}</a></td></tr>`).join("");
+  return `<section class="sec" style="padding-top:18px">
+      <span class="eyebrow">${t("insightK")}</span><h1>${X.iTitle}</h1>
+      <div class="prose"><p>${X.iLead}</p></div><p class="warn">${X.iWarn}</p></section>
+    <section class="sec"><div class="two">
+      <div class="card"><h3>${X.sepT}</h3>${sepC}<p class="note">${X.sepN}</p></div>
+      <div class="card"><h3>${X.oyT}</h3>${oyC}<p class="note">${X.oyN}</p></div>
+    </div></section>
+    <section class="sec"><div class="two">
+      <div><h3 style="margin:0 0 10px">${X.names.sephora_korea}</h3><div class="tbl"><table><tbody>${factRows("sephora_korea")}</tbody></table></div></div>
+      <div><h3 style="margin:0 0 10px">${X.names.cj_olive_young}</h3><div class="tbl"><table><tbody>${factRows("cj_olive_young")}</tbody></table></div></div>
+    </div></section>
+    <section class="sec">${secHead(X.tl)}<div class="tl">${E.slice().sort((a, b) => a.event_date.localeCompare(b.event_date)).map((e) => `<div class="ev"><time>${d(e)}</time><span><span class="co ${e.company}">${X.names[e.company]}</span>${esc(evName(e))} <a class="src" href="${esc(e.source_url)}" target="_blank" rel="noopener">${host(e.source_url)}</a></span></div>`).join("")}</div></section>
+    <section class="sec">${secHead(X.fin)}<div class="tbl"><table><thead><tr><th>${X.co}</th><th class="n">${X.yr}</th><th class="n">${X.rev}</th><th class="n">${X.op}</th><th class="n">${X.ni}</th><th class="n">${X.st}</th><th>${X.src}</th></tr></thead><tbody>
+      ${F.map((r) => `<tr><td>${X.names[r.company]}</td><td class="n">${r.fiscal_year}</td><td class="n">${bigWon(r.revenue_krw)}</td><td class="n">${bigWon(r.operating_profit_krw)}</td><td class="n">${bigWon(r.net_income_krw)}</td><td class="n">${r.store_count ? fmtNum(r.store_count) : "–"}</td><td><a class="src" href="${esc(r.source_url)}" target="_blank" rel="noopener">${esc(r.source_document)}</a>${r.notes ? `<div class="note">${esc(r.notes)}</div>` : ""}</td></tr>`).join("")}</tbody></table></div></section>
+    <section class="sec prose">${secHead(X.link)}<p>${X.p1}</p><p>${X.p2}</p>
+      <button class="more" data-go="method">${t("methodLink")} ${I.right}</button></section>`;
+}
+
+function vMethod() {
+  const X = PROSE[S.lang], W = D.config.weights, M = D.config.modes;
+  return `<section class="sec" style="padding-top:18px"><span class="eyebrow">${t("method")}</span><h1>${X.mTitle}</h1><div class="prose"><p>${X.mLead}</p></div></section>
+    <section class="sec">${secHead(X.mW)}
+      <div class="bars" style="font-size:13px">${Object.entries(W).map(([k, w]) => `<span>${tx("attr", k)}</span><span class="t"><span style="width:${(w / 0.25 * 100).toFixed(0)}%"></span></span><span class="p">${Math.round(w * 100)}%</span>`).join("")}</div>
+      <p class="note">${X.mWN}</p></section>
+    <section class="sec">${secHead(X.mM)}<div class="tbl"><table><tbody>${Object.entries(M).map(([m, w]) => `<tr><td>${X.modes[m] || m}</td><td>${Object.entries(w).map(([k, v]) => `${tx("comp", k)} ${Math.round(v * 100)}%`).join(" · ")}</td></tr>`).join("")}</tbody></table></div>
+      <p class="note">${X.mMN}</p></section>
+    <section class="sec prose">${secHead(X.mD)}<p>${X.mDN}</p></section>
+    <section class="sec prose">${secHead(X.mH)}<p><b>H1</b> ${X.h1}</p><p><b>H2</b> ${X.h2}</p><p><b>H3</b> ${X.h3}</p></section>`;
+}
+
+/* ---------------- category sheet ---------------- */
+function renderSheet() {
+  const el = document.getElementById("sheet");
+  if (!S.sheet) { el.innerHTML = ""; return; }
+  const cur = S.sheet === "home" ? S.hcat : S.cat;
+  const openG = S.sheetOpen ?? Object.entries(D.codebook.groups).find(([g, cs]) => g === cur || cs.includes(cur))?.[0];
+  el.innerHTML = `<div class="scrim" data-close="1"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="${t("allCats")}"><div class="handle"></div>
+    <div class="acc"><button aria-expanded="true" style="font-weight:700">${t("all")}</button><div class="chips"><button class="chip" data-pickcat="" aria-pressed="${!cur}">${t("allCats")}</button></div></div>
+    ${Object.entries(D.codebook.groups).map(([g, cs]) => `<div class="acc"><button data-accg="${g}" aria-expanded="${openG === g}">${grpName(g)} ${I.chev}</button>
+      ${openG === g ? `<div class="chips"><button class="chip" data-pickcat="${g}" aria-pressed="${cur === g}">${grpName(g)} · ${t("all")}</button>${cs.map((c) => `<button class="chip" data-pickcat="${c}" aria-pressed="${cur === c}">${catName(c)}</button>`).join("")}</div>` : ""}</div>`).join("")}
+  </div>`;
+}
+
+/* ---------------- render + events ---------------- */
+const VIEWS = { home: vHome, ranking: vRanking, goals: vGoals, insight: vInsight, method: vMethod, product: vProduct, search: vSearch };
+function render() {
+  const ae = document.activeElement, keep = ae && ae.id ? { id: ae.id, a: ae.selectionStart, b: ae.selectionEnd } : null;
+  header();
+  document.getElementById("main").innerHTML = VIEWS[S.view]();
+  document.getElementById("foot").innerHTML = `<span>${D.mode === "real" ? t("realFooter1") : t("footer1")}</span><span>${t("footer2")}</span><span><button data-go="method">${t("methodLink")}</button> · ${D.mode === "real" ? t("labelsNote") : t("demo")}</span>`;
+  renderSheet();
+  document.documentElement.lang = S.lang;
+  const track = document.getElementById("btrack");
+  if (track) track.addEventListener("scroll", () => { const i = Math.round(track.scrollLeft / track.clientWidth); document.getElementById("bcount").textContent = `${i + 1}/${track.children.length}`; }, { passive: true });
+  const names = { product: prodName(P(S.pid)), goals: goalName(S.goal), ranking: t("ranking"), insight: t("insight"), method: t("method"), search: t("search") };
+  document.title = names[S.view] ? `${names[S.view]} · Beauty Bridge` : "Beauty Bridge";
+  if (keep && keep.id === "rtext") { const el = document.getElementById("rtext"); if (el) { el.focus(); try { el.setSelectionRange(keep.a, keep.b); } catch (e) {} } }
+  persist();
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("button, [data-close]"); if (!b) return;
+  const d = b.dataset;
+  if (d.close) { S.sheet = false; S.sheetOpen = undefined; renderSheet(); return; }
+  if (d.pickcat !== undefined) { if (S.sheet === "home") S.hcat = d.pickcat; else S.cat = d.pickcat; S.sheet = false; S.sheetOpen = undefined; render(); return; }
+  if (d.accg) { S.sheetOpen = S.sheetOpen === d.accg ? "" : d.accg; renderSheet(); return; }
+  if (d.sheet) { S.sheet = d.sheet; S.sheetOpen = undefined; renderSheet(); return; }
+  if (d.product) { LIVE.msg = ""; go("product", { pid: d.product, ptab: d.tab || "similar", origin: d.orig || "", draft: null }); return; }
+  if (d.goal) { go("goals", { goal: d.goal, area: areaOf(d.goal), gskin: "" }); return; }
+  if (d.go) { const extra = {}; if (d.rtab) extra.rtab = d.rtab; if (d.cat !== undefined) extra.cat = d.cat; if (d.skin) extra.skin = d.skin; if (d.go === "ranking" && d.rtab === "goal") extra.area = areaOf(S.goal); go(d.go, extra); return; }
+  if (d.rtab) { S.rtab = d.rtab; go("ranking"); return; }
+  if (d.garea) { go("goals", { area: d.garea, goal: goalsIn(d.garea)[0], gskin: "" }); return; }
+  if (d.ptab) { S.ptab = d.ptab; LIVE.msg = ""; render(); return; }
+  if (d.rstar) { S.draft.rating = +d.rstar; render(); return; }
+  if (d.rskin) { S.draft.skin_type = S.draft.skin_type === d.rskin ? null : d.rskin; render(); return; }
+  if (d.rage) { S.draft.age_band = S.draft.age_band === d.rage ? null : d.rage; render(); return; }
+  if (d.rmkt) { S.draft.market = d.rmkt; render(); return; }
+  if (d.rsubmit) { saveReview(false); return; }
+  if (d.rdelete) { saveReview(true); return; }
+  if (d.age) { S.age = d.age; render(); return; }
+  if (d.lmkt) { S.lmkt = d.lmkt; render(); return; }
+  if (d.origin !== undefined) { S.origin = d.origin; render(); return; }
+  if (d.skin) { S.skin = d.skin; render(); return; }
+  if (d.gskin !== undefined) { S.gskin = d.gskin; render(); return; }
+  if (d.rarea) { S.area = d.rarea; S.goal = goalsIn(d.rarea)[0]; render(); return; }
+  if (d.rgoal) { S.goal = d.rgoal; render(); return; }
+  if (d.harea) { S.harea = d.harea; S.hgoal = goalsIn(d.harea)[0]; render(); return; }
+  if (d.hskin) { S.hskin = d.hskin; render(); return; }
+  if (d.hgoal) { S.hgoal = d.hgoal; render(); return; }
+  if (d.q) { go("search", { q: d.q }); return; }
+  if (d.setmarket) { S.market = d.setmarket; render(); return; }
+});
+document.addEventListener("toggle", (e) => { const el = e.target; if (el.matches && el.matches("details.res")) S.open[el.dataset.key] = el.open; }, true);
+document.addEventListener("input", (e) => { if (e.target.id === "rtext" && S.draft) S.draft.text = e.target.value; });
+document.addEventListener("submit", (e) => { if (e.target.id !== "sform") return; e.preventDefault(); go("search", { q: document.getElementById("sq").value }); });
+document.addEventListener("change", (e) => {
+  if (e.target.id === "mkt") { S.market = e.target.value; render(); }
+  if (e.target.id === "lang") { S.lang = e.target.value; render(); }
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && S.sheet) { S.sheet = false; renderSheet(); } });
+
+if (!D.products[S.pid]) S.pid = D.featured[0];
+fromHash();
+if (S.view !== "goals") S.area = areaOf(S.goal);
+render();
+initLive();
+</script>

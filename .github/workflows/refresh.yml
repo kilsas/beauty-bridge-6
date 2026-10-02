@@ -1,0 +1,35 @@
+# Daily data refresh: import feeds, rebuild the database and website, run the
+# tests, commit the result and publish the site to GitHub Pages.
+# Enable Pages (Settings -> Pages -> Source: GitHub Actions) before the first run.
+name: refresh
+on:
+  schedule:
+    - cron: "0 18 * * *"   # 03:00 in Korea every day
+  workflow_dispatch: {}
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      # Optional: fetch feeds from your licensed sources here, e.g. a script that
+      # calls a partner API with a key stored in repository secrets:
+      # - run: python scripts/fetch_partner_feed.py --out data/feeds/partner.csv
+      #   env: { PARTNER_API_KEY: "${{ secrets.PARTNER_API_KEY }}" }
+      - run: python scripts/refresh_data.py --data data/real
+      - run: python -m unittest discover tests
+      - name: Commit refreshed data
+        run: |
+          git config user.name "refresh-bot"
+          git config user.email "refresh-bot@users.noreply.github.com"
+          git add data web
+          git diff --cached --quiet || git commit -m "Data refresh $(date -u +%F)"
+          git push
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: web }
+      - uses: actions/deploy-pages@v4

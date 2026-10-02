@@ -1,0 +1,40 @@
+product_id,market,source,category,rank,level,date,source_url,note
+R025,KR,oy2025,cushion,1,product,2025-11-28,https://www.meconomynews.com/news/articleView.html?idxno=124033,3rd consecutive year
+R026,KR,oy2025,lip_makeup,3,product,2025-11-28,https://www.meconomynews.com/news/articleView.html?idxno=124033,4th consecutive year
+R027,KR,oy2025,rising_star,,product,2025-11-28,https://www.meconomynews.com/news/articleView.html?idxno=124033,
+R028,KR,oy2025,md_pick,,product,2025-11-28,https://www.meconomynews.com/news/articleView.html?idxno=124033,
+R023,KR,oy2025,serum,1,product,2025-11-28,https://fashionbiz.co.kr/article/221827,5th consecutive year of awards
+R029,KR,oy2025,lip_care,1,product,2025-11-28,https://fashionbiz.co.kr/article/221827,
+J015,JP,cosme2025,overall,3,product,2025-11-19,https://www.cosme.net/bestcosme/archive/2025/grand/,
+J016,JP,cosme2025,overall,6,product,2025-11-19,https://www.cosme.net/bestcosme/archive/2025/grand/,
+J017,JP,cosme2025,overall,7,product,2025-11-19,https://www.cosme.net/bestcosme/archive/2025/grand/,
+J013,JP,cosme2025,cushion,1,product,2025-11-19,https://www.cosme.net/bestcosme/articles/2025_brand-matome2/,
+J025,JP,cosme2025,cushion,3,product,2025-11-19,https://www.cosme.net/bestcosme/articles/2025_brand-matome2/,
+J014,JP,cosme2025,liquid_foundation,1,product,2025-11-19,https://www.cosme.net/bestcosme/articles/2025_brand-matome2/,
+J021,JP,cosme2025,primer,1,product,2025-11-19,https://www.cosme.net/bestcosme/articles/2025_brand-matome2/,
+J018,JP,cosme2025,liquid_rouge,1,product,2025-11-19,https://www.cosme.net/bestcosme/articles/2025_brand-matome2/,
+J019,JP,cosme2025,plump_lip,2,product,2025-11-19,https://www.cosme.net/bestcosme/articles/2025_brand-matome2/,
+J020,JP,cosme2025,eyeliner,1,product,2025-11-19,https://www.cosme.net/bestcosme/articles/2025_brand-matome2/,
+J022,JP,cosme2025,multi_palette,1,product,2025-11-19,https://www.cosme.net/bestcosme/articles/2025_brand-matome2/,
+J023,JP,cosme2025,under_eye,2,product,2025-11-19,https://www.cosme.net/bestcosme/archive/2025/,
+J024,JP,cosme2025,mascara,1,product,2025-11-19,https://www.cosme.net/bestcosme/archive/2025/,
+U007,US,allure2025,readers_choice,,product,2025,https://www.ulta.com/discover/allure-beauty-award-winners,
+U012,US,allure2025,readers_choice,,product,2025,https://www.ulta.com/discover/allure-beauty-award-winners,
+U005,US,allure2025,readers_choice,,product,2025,https://www.ulta.com/discover/allure-beauty-award-winners,award given to the mini size
+U018,US,allure2025,readers_choice,,product,2025,https://www.ulta.com/discover/allure-beauty-award-winners,
+U023,US,allure2025,readers_choice,,product,2025,https://www.ulta.com/discover/allure-beauty-award-winners,
+U024,US,allure2025,readers_choice,,product,2025,https://www.ulta.com/discover/allure-beauty-award-winners,
+U025,US,circana2024,top_mass_launch,1,product,2025-02-16,https://www.gcimagazine.com/brands-products/color-cosmetics/news/22933515/makeup-2025-skin-care-indulgent-fun-2024-sales,"top mass makeup launch by dollar sales, 2024"
+U026,US,circana2024,top_prestige_launch,1,product,2025-02-16,https://www.gcimagazine.com/brands-products/color-cosmetics/news/22933515/makeup-2025-skin-care-indulgent-fun-2024-sales,"top prestige makeup launch by dollar sales, 2024"
+U012,US,circana2024,mass_brand,1,brand,2025-02-16,https://www.gcimagazine.com/brands-products/color-cosmetics/news/22933515/makeup-2025-skin-care-indulgent-fun-2024-sales,"Maybelline: #1 mass makeup brand by dollar sales, 2024"
+U025,US,circana2024,mass_brand,2,brand,2025-02-16,https://www.gcimagazine.com/brands-products/color-cosmetics/news/22933515/makeup-2025-skin-care-indulgent-fun-2024-sales,"e.l.f.: #2 mass makeup brand by dollar sales, 2024"
+C007,CN,tmall2025,bestseller,,product,2026-02-03,https://www.jiemian.com/article/13968626.html,MAOGEPING in Tmall makeup top 10
+C008,CN,tmall2025,bestseller,,product,2026-02-03,https://www.jiemian.com/article/13968626.html,MAOGEPING in Tmall makeup top 10
+C009,CN,tmall2025,bestseller,,product,2026-02-03,https://www.jiemian.com/article/13968626.html,Caitang in Tmall makeup top 10
+C001,CN,tmall2025,bestseller,,product,2026-02-03,https://www.jiemian.com/article/13968626.html,Florasis #12 on Tmall makeup
+C010,CN,tmall2025,bestseller,,product,2026-02-03,https://www.jiemian.com/article/13968626.html,Florasis #12 on Tmall makeup
+U005,CN,tmall2025,brand_rank,3,brand,2026-02-03,https://www.jiemian.com/article/13968626.html,"NARS: #3 makeup brand on Tmall, 2025"
+U021,CN,tmall2025,brand_rank,3,brand,2026-02-03,https://www.jiemian.com/article/13968626.html,"NARS: #3 makeup brand on Tmall, 2025"
+J013,CN,tmall2025,brand_rank,3,brand,2026-02-03,https://www.jiemian.com/article/13968626.html,"NARS: #3 makeup brand on Tmall, 2025"
+F001,CN,tmall2025,brand_rank,4,brand,2026-02-03,https://www.jiemian.com/article/13968626.html,"Dior: #4 makeup brand on Tmall, 2025"
+F002,CN,tmall2025,brand_rank,4,brand,2026-02-03,https://www.jiemian.com/article/13968626.html,"Dior: #4 makeup brand on Tmall, 2025"

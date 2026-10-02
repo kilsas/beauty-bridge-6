@@ -1,0 +1,1146 @@
+{
+  "_comment": "Beauty goal definitions. Each criterion is either {type: level, feature, target 0..1} (distance to target) or {type: one_of, feature, values} (1 if the product's value is listed, else 0). Intensity targets are on the normalized 0..1 scale: 0=none, 0.33=slight, 0.67=clear, 1=primary. Finish: matte 0, soft_matte .25, satin .5, dewy .75, glossy 1. Coverage: sheer 0, light .33, medium .67, full 1. Weights are renormalized over criteria the product actually has labels for. These are author-defined hypotheses, to be validated in the user study. Goals are grouped by area: skin, eye, lip, contour.",
+  "areas": [
+    {
+      "area": "skin",
+      "name": "Skin",
+      "name_ko": "피부"
+    },
+    {
+      "area": "eye",
+      "name": "Eyes",
+      "name_ko": "눈"
+    },
+    {
+      "area": "lip",
+      "name": "Lips",
+      "name_ko": "입술"
+    },
+    {
+      "area": "contour",
+      "name": "Contour",
+      "name_ko": "컨투어"
+    }
+  ],
+  "goals": [
+    {
+      "goal_id": "glass_skin",
+      "area": "skin",
+      "name": "Glass skin",
+      "name_ko": "물광 피부",
+      "aliases": [
+        "물광",
+        "유리알",
+        "glass skin",
+        "dewy glow"
+      ],
+      "description": "Hydrated, reflective, see-through skin finish.",
+      "eligible_categories": [
+        "cushion",
+        "foundation",
+        "primer",
+        "highlighter",
+        "serum",
+        "moisturizer",
+        "toner",
+        "sunscreen"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "glow",
+          "target": 1.0,
+          "weight": 0.3
+        },
+        {
+          "type": "level",
+          "feature": "hydration",
+          "target": 1.0,
+          "weight": 0.25
+        },
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.75,
+          "weight": 0.2
+        },
+        {
+          "type": "level",
+          "feature": "coverage",
+          "target": 0.0,
+          "weight": 0.15
+        },
+        {
+          "type": "level",
+          "feature": "oil_control",
+          "target": 0.0,
+          "weight": 0.1
+        }
+      ]
+    },
+    {
+      "goal_id": "matte_skin",
+      "area": "skin",
+      "name": "Matte skin",
+      "name_ko": "매트 피부",
+      "aliases": [
+        "보송",
+        "매트 피부",
+        "matte"
+      ],
+      "description": "Shine-free, velvety base that stays matte through the day.",
+      "eligible_categories": [
+        "loose_powder",
+        "pressed_powder",
+        "foundation",
+        "cushion",
+        "primer",
+        "setting_spray"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.0,
+          "weight": 0.35
+        },
+        {
+          "type": "level",
+          "feature": "oil_control",
+          "target": 1.0,
+          "weight": 0.35
+        },
+        {
+          "type": "level",
+          "feature": "longevity",
+          "target": 1.0,
+          "weight": 0.2
+        },
+        {
+          "type": "level",
+          "feature": "glow",
+          "target": 0.0,
+          "weight": 0.1
+        }
+      ]
+    },
+    {
+      "goal_id": "natural_base",
+      "area": "skin",
+      "name": "Natural base",
+      "name_ko": "자연스러운 베이스",
+      "aliases": [
+        "베이스",
+        "쌩얼",
+        "natural base",
+        "no makeup"
+      ],
+      "description": "Evens tone while still looking like skin.",
+      "eligible_categories": [
+        "foundation",
+        "cushion",
+        "primer"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "coverage",
+          "target": 0.33,
+          "weight": 0.25
+        },
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.5,
+          "weight": 0.25
+        },
+        {
+          "type": "level",
+          "feature": "hydration",
+          "target": 0.67,
+          "weight": 0.2
+        },
+        {
+          "type": "level",
+          "feature": "longevity",
+          "target": 0.67,
+          "weight": 0.15
+        },
+        {
+          "type": "level",
+          "feature": "blurring",
+          "target": 0.33,
+          "weight": 0.15
+        }
+      ]
+    },
+    {
+      "goal_id": "full_coverage",
+      "area": "skin",
+      "name": "Full coverage",
+      "name_ko": "커버력 베이스",
+      "aliases": [
+        "커버",
+        "풀커버",
+        "full coverage"
+      ],
+      "description": "Hides redness, spots and uneven tone in one layer.",
+      "eligible_categories": [
+        "foundation",
+        "cushion",
+        "concealer"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "coverage",
+          "target": 1.0,
+          "weight": 0.4
+        },
+        {
+          "type": "level",
+          "feature": "longevity",
+          "target": 1.0,
+          "weight": 0.3
+        },
+        {
+          "type": "level",
+          "feature": "blurring",
+          "target": 0.67,
+          "weight": 0.15
+        },
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.25,
+          "weight": 0.15
+        }
+      ]
+    },
+    {
+      "goal_id": "pore_blurring",
+      "area": "skin",
+      "name": "Pore blurring",
+      "name_ko": "모공 커버",
+      "aliases": [
+        "모공",
+        "pore"
+      ],
+      "description": "Soft-focus effect that visually smooths pores and texture.",
+      "eligible_categories": [
+        "loose_powder",
+        "pressed_powder",
+        "primer",
+        "foundation",
+        "cushion"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "blurring",
+          "target": 1.0,
+          "weight": 0.35
+        },
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.0,
+          "weight": 0.2
+        },
+        {
+          "type": "level",
+          "feature": "oil_control",
+          "target": 1.0,
+          "weight": 0.2
+        },
+        {
+          "type": "level",
+          "feature": "shimmer",
+          "target": 0.0,
+          "weight": 0.15
+        },
+        {
+          "type": "level",
+          "feature": "coverage",
+          "target": 0.67,
+          "weight": 0.1
+        }
+      ]
+    },
+    {
+      "goal_id": "under_eye_brightening",
+      "area": "skin",
+      "name": "Dark circle cover",
+      "name_ko": "다크서클 커버",
+      "aliases": [
+        "다크서클",
+        "dark circle",
+        "dark circles"
+      ],
+      "description": "Brightens dark circles without creasing.",
+      "eligible_categories": [
+        "concealer",
+        "highlighter",
+        "primer"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "brightening",
+          "target": 1.0,
+          "weight": 0.4
+        },
+        {
+          "type": "level",
+          "feature": "hydration",
+          "target": 0.67,
+          "weight": 0.2
+        },
+        {
+          "type": "level",
+          "feature": "coverage",
+          "target": 0.67,
+          "weight": 0.2
+        },
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.5,
+          "weight": 0.1
+        },
+        {
+          "type": "level",
+          "feature": "shimmer",
+          "target": 0.0,
+          "weight": 0.1
+        }
+      ]
+    },
+    {
+      "goal_id": "long_lasting_base",
+      "area": "skin",
+      "name": "Long-lasting base",
+      "name_ko": "무너짐 없는 베이스",
+      "aliases": [
+        "지속력"
+      ],
+      "description": "Base makeup that survives a full day without touch-ups.",
+      "eligible_categories": [
+        "foundation",
+        "cushion",
+        "concealer",
+        "primer",
+        "loose_powder",
+        "pressed_powder",
+        "setting_spray"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "longevity",
+          "target": 1.0,
+          "weight": 0.55
+        },
+        {
+          "type": "level",
+          "feature": "oil_control",
+          "target": 0.67,
+          "weight": 0.25
+        },
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.25,
+          "weight": 0.2
+        }
+      ]
+    },
+    {
+      "goal_id": "dewy_skin",
+      "area": "skin",
+      "name": "Dewy skin",
+      "name_ko": "촉촉한 피부",
+      "aliases": [
+        "촉촉",
+        "dewy"
+      ],
+      "description": "Moist, luminous base with visible healthy sheen.",
+      "eligible_categories": [
+        "cushion",
+        "foundation",
+        "primer",
+        "setting_spray",
+        "highlighter",
+        "moisturizer",
+        "sunscreen"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.75,
+          "weight": 0.35
+        },
+        {
+          "type": "level",
+          "feature": "hydration",
+          "target": 1.0,
+          "weight": 0.3
+        },
+        {
+          "type": "level",
+          "feature": "glow",
+          "target": 1.0,
+          "weight": 0.25
+        },
+        {
+          "type": "level",
+          "feature": "oil_control",
+          "target": 0.0,
+          "weight": 0.1
+        }
+      ]
+    },
+    {
+      "goal_id": "oily_skin_care",
+      "area": "skin",
+      "name": "Oil control skincare",
+      "name_ko": "지성 피부 케어",
+      "aliases": [
+        "지성",
+        "oily skin"
+      ],
+      "description": "Lightweight hydration that does not add shine.",
+      "eligible_categories": [
+        "toner",
+        "serum",
+        "moisturizer",
+        "sunscreen",
+        "primer"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "oil_control",
+          "target": 1.0,
+          "weight": 0.4
+        },
+        {
+          "type": "level",
+          "feature": "hydration",
+          "target": 0.67,
+          "weight": 0.25
+        },
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.25,
+          "weight": 0.2
+        },
+        {
+          "type": "level",
+          "feature": "glow",
+          "target": 0.0,
+          "weight": 0.15
+        }
+      ]
+    },
+    {
+      "goal_id": "lashes",
+      "area": "eye",
+      "name": "Lashes",
+      "name_ko": "속눈썹",
+      "aliases": [
+        "속눈썹",
+        "마스카라",
+        "mascara",
+        "lash"
+      ],
+      "description": "Volume and curl that hold all day without smudging.",
+      "eligible_categories": [
+        "mascara"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "volume",
+          "target": 1.0,
+          "weight": 0.4
+        },
+        {
+          "type": "level",
+          "feature": "longevity",
+          "target": 1.0,
+          "weight": 0.35
+        },
+        {
+          "type": "level",
+          "feature": "precision",
+          "target": 0.67,
+          "weight": 0.25
+        }
+      ]
+    },
+    {
+      "goal_id": "eyeliner",
+      "area": "eye",
+      "name": "Eyeliner",
+      "name_ko": "아이라이너",
+      "aliases": [
+        "아이라이너",
+        "라이너",
+        "eyeliner"
+      ],
+      "description": "A fine, steady line that does not smudge.",
+      "eligible_categories": [
+        "eyeliner"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "precision",
+          "target": 1.0,
+          "weight": 0.45
+        },
+        {
+          "type": "level",
+          "feature": "longevity",
+          "target": 1.0,
+          "weight": 0.4
+        },
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.0,
+          "weight": 0.15
+        }
+      ]
+    },
+    {
+      "goal_id": "eyeshadow",
+      "area": "eye",
+      "name": "Everyday eyeshadow",
+      "name_ko": "데일리 아이섀도우",
+      "aliases": [
+        "아이섀도우",
+        "섀도우",
+        "eyeshadow"
+      ],
+      "description": "Wearable shades with a little sheen that last until evening.",
+      "eligible_categories": [
+        "eyeshadow"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "longevity",
+          "target": 1.0,
+          "weight": 0.3
+        },
+        {
+          "type": "level",
+          "feature": "shimmer",
+          "target": 0.33,
+          "weight": 0.25
+        },
+        {
+          "type": "level",
+          "feature": "coverage",
+          "target": 0.67,
+          "weight": 0.2
+        },
+        {
+          "type": "one_of",
+          "feature": "shade_family",
+          "values": [
+            "brown",
+            "nude",
+            "rose",
+            "pink"
+          ],
+          "weight": 0.25
+        }
+      ]
+    },
+    {
+      "goal_id": "brows",
+      "area": "eye",
+      "name": "Brows",
+      "name_ko": "아이브로우",
+      "aliases": [
+        "아이브로우",
+        "눈썹",
+        "brow",
+        "eyebrow"
+      ],
+      "description": "Hair-like strokes with natural color and good staying power.",
+      "eligible_categories": [
+        "brow"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "precision",
+          "target": 1.0,
+          "weight": 0.4
+        },
+        {
+          "type": "level",
+          "feature": "longevity",
+          "target": 0.67,
+          "weight": 0.3
+        },
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.25,
+          "weight": 0.15
+        },
+        {
+          "type": "one_of",
+          "feature": "shade_family",
+          "values": [
+            "brown"
+          ],
+          "weight": 0.15
+        }
+      ]
+    },
+    {
+      "goal_id": "aegyo_sal",
+      "area": "eye",
+      "name": "Aegyo-sal",
+      "name_ko": "애교살",
+      "aliases": [
+        "애굣살",
+        "aegyosal",
+        "aegyo"
+      ],
+      "description": "Subtle brightness and fine shimmer under the eye without looking glittery.",
+      "eligible_categories": [
+        "eyeshadow",
+        "highlighter",
+        "concealer"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "brightening",
+          "target": 1.0,
+          "weight": 0.3
+        },
+        {
+          "type": "level",
+          "feature": "shimmer",
+          "target": 0.67,
+          "weight": 0.25
+        },
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.5,
+          "weight": 0.2
+        },
+        {
+          "type": "level",
+          "feature": "coverage",
+          "target": 0.0,
+          "weight": 0.1
+        },
+        {
+          "type": "one_of",
+          "feature": "shade_family",
+          "values": [
+            "champagne",
+            "pink",
+            "nude"
+          ],
+          "weight": 0.15
+        }
+      ]
+    },
+    {
+      "goal_id": "lipstick",
+      "area": "lip",
+      "name": "Lipstick",
+      "name_ko": "립스틱",
+      "aliases": [
+        "립스틱",
+        "lipstick"
+      ],
+      "description": "Rich, opaque color with a comfortable wear.",
+      "eligible_categories": [
+        "lipstick"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "coverage",
+          "target": 1.0,
+          "weight": 0.35
+        },
+        {
+          "type": "level",
+          "feature": "longevity",
+          "target": 0.67,
+          "weight": 0.3
+        },
+        {
+          "type": "level",
+          "feature": "hydration",
+          "target": 0.33,
+          "weight": 0.2
+        },
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.25,
+          "weight": 0.15
+        }
+      ]
+    },
+    {
+      "goal_id": "lip_tint",
+      "area": "lip",
+      "name": "Tint",
+      "name_ko": "틴트",
+      "aliases": [
+        "틴트",
+        "tint"
+      ],
+      "description": "Juicy color that stains and stays through meals.",
+      "eligible_categories": [
+        "lip_tint"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "longevity",
+          "target": 1.0,
+          "weight": 0.4
+        },
+        {
+          "type": "level",
+          "feature": "coverage",
+          "target": 0.33,
+          "weight": 0.2
+        },
+        {
+          "type": "level",
+          "feature": "hydration",
+          "target": 0.33,
+          "weight": 0.2
+        },
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.75,
+          "weight": 0.2
+        }
+      ]
+    },
+    {
+      "goal_id": "lip_plumper",
+      "area": "lip",
+      "name": "Lip maximizer",
+      "name_ko": "립 맥시마이저",
+      "aliases": [
+        "맥시마이저",
+        "립 플럼퍼",
+        "plumper",
+        "maximizer"
+      ],
+      "description": "Visibly fuller, glossy lips.",
+      "eligible_categories": [
+        "lip_plumper"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "volume",
+          "target": 1.0,
+          "weight": 0.5
+        },
+        {
+          "type": "level",
+          "feature": "glow",
+          "target": 0.67,
+          "weight": 0.25
+        },
+        {
+          "type": "level",
+          "feature": "hydration",
+          "target": 0.67,
+          "weight": 0.25
+        }
+      ]
+    },
+    {
+      "goal_id": "lip_liner",
+      "area": "lip",
+      "name": "Lip pencil",
+      "name_ko": "립펜슬",
+      "aliases": [
+        "립펜슬",
+        "립 라이너",
+        "lip liner",
+        "lip pencil"
+      ],
+      "description": "A precise outline in a natural shade.",
+      "eligible_categories": [
+        "lip_liner"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "precision",
+          "target": 1.0,
+          "weight": 0.4
+        },
+        {
+          "type": "level",
+          "feature": "longevity",
+          "target": 1.0,
+          "weight": 0.35
+        },
+        {
+          "type": "one_of",
+          "feature": "shade_family",
+          "values": [
+            "nude",
+            "rose",
+            "brown"
+          ],
+          "weight": 0.25
+        }
+      ]
+    },
+    {
+      "goal_id": "lip_gloss",
+      "area": "lip",
+      "name": "Gloss",
+      "name_ko": "글로스",
+      "aliases": [
+        "글로즈",
+        "글로스",
+        "립글로스",
+        "gloss",
+        "glaze"
+      ],
+      "description": "High-shine, wet-look lips that feel comfortable.",
+      "eligible_categories": [
+        "lip_gloss",
+        "lip_plumper"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 1.0,
+          "weight": 0.35
+        },
+        {
+          "type": "level",
+          "feature": "glow",
+          "target": 1.0,
+          "weight": 0.35
+        },
+        {
+          "type": "level",
+          "feature": "hydration",
+          "target": 0.67,
+          "weight": 0.3
+        }
+      ]
+    },
+    {
+      "goal_id": "lip_balm",
+      "area": "lip",
+      "name": "Lip balm",
+      "name_ko": "립밤",
+      "aliases": [
+        "립밤",
+        "lip balm"
+      ],
+      "description": "Moisture first, with at most a sheer tint.",
+      "eligible_categories": [
+        "lip_balm"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "hydration",
+          "target": 1.0,
+          "weight": 0.6
+        },
+        {
+          "type": "level",
+          "feature": "coverage",
+          "target": 0.0,
+          "weight": 0.2
+        },
+        {
+          "type": "level",
+          "feature": "glow",
+          "target": 0.33,
+          "weight": 0.2
+        }
+      ]
+    },
+    {
+      "goal_id": "mlbb_lips",
+      "area": "lip",
+      "name": "MLBB lips",
+      "name_ko": "MLBB 립",
+      "aliases": [
+        "mlbb",
+        "엠엘비비"
+      ],
+      "description": "'My lips but better': a shade close to natural lip color.",
+      "eligible_categories": [
+        "lip_tint",
+        "lipstick",
+        "lip_gloss",
+        "lip_balm"
+      ],
+      "criteria": [
+        {
+          "type": "one_of",
+          "feature": "shade_family",
+          "values": [
+            "nude",
+            "rose",
+            "brown"
+          ],
+          "weight": 0.5
+        },
+        {
+          "type": "level",
+          "feature": "coverage",
+          "target": 0.33,
+          "weight": 0.25
+        },
+        {
+          "type": "level",
+          "feature": "hydration",
+          "target": 0.67,
+          "weight": 0.25
+        }
+      ]
+    },
+    {
+      "goal_id": "long_lasting_lips",
+      "area": "lip",
+      "name": "Long-lasting lips",
+      "name_ko": "지워지지 않는 립",
+      "aliases": [
+        "안 지워지는 립"
+      ],
+      "description": "Lip color that survives meals and masks.",
+      "eligible_categories": [
+        "lip_tint",
+        "lipstick"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "longevity",
+          "target": 1.0,
+          "weight": 0.6
+        },
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.0,
+          "weight": 0.2
+        },
+        {
+          "type": "level",
+          "feature": "coverage",
+          "target": 0.67,
+          "weight": 0.2
+        }
+      ]
+    },
+    {
+      "goal_id": "natural_blush",
+      "area": "contour",
+      "name": "Blush",
+      "name_ko": "블러셔",
+      "aliases": [
+        "블러셔",
+        "혈색",
+        "blush"
+      ],
+      "description": "Sheer, buildable flush that looks like it comes from within.",
+      "eligible_categories": [
+        "blush",
+        "lip_tint"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "coverage",
+          "target": 0.0,
+          "weight": 0.3
+        },
+        {
+          "type": "level",
+          "feature": "shimmer",
+          "target": 0.0,
+          "weight": 0.2
+        },
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.5,
+          "weight": 0.2
+        },
+        {
+          "type": "one_of",
+          "feature": "shade_family",
+          "values": [
+            "pink",
+            "rose",
+            "coral"
+          ],
+          "weight": 0.3
+        }
+      ]
+    },
+    {
+      "goal_id": "shading",
+      "area": "contour",
+      "name": "Shading",
+      "name_ko": "쉐딩",
+      "aliases": [
+        "쉐딩",
+        "셰딩",
+        "컨투어",
+        "contour",
+        "shading"
+      ],
+      "description": "Cool-toned, matte shadow that sculpts without looking muddy.",
+      "eligible_categories": [
+        "contour"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.0,
+          "weight": 0.3
+        },
+        {
+          "type": "level",
+          "feature": "shimmer",
+          "target": 0.0,
+          "weight": 0.2
+        },
+        {
+          "type": "one_of",
+          "feature": "undertone",
+          "values": [
+            "cool",
+            "neutral"
+          ],
+          "weight": 0.25
+        },
+        {
+          "type": "level",
+          "feature": "blurring",
+          "target": 0.67,
+          "weight": 0.25
+        }
+      ]
+    },
+    {
+      "goal_id": "glow_highlight",
+      "area": "contour",
+      "name": "Highlighter",
+      "name_ko": "하이라이터",
+      "aliases": [
+        "하이라이터",
+        "광채",
+        "highlighter"
+      ],
+      "description": "Visible luminous highlight on the high points of the face.",
+      "eligible_categories": [
+        "highlighter",
+        "eyeshadow",
+        "serum"
+      ],
+      "criteria": [
+        {
+          "type": "level",
+          "feature": "glow",
+          "target": 1.0,
+          "weight": 0.35
+        },
+        {
+          "type": "level",
+          "feature": "shimmer",
+          "target": 1.0,
+          "weight": 0.3
+        },
+        {
+          "type": "level",
+          "feature": "brightening",
+          "target": 1.0,
+          "weight": 0.25
+        },
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.75,
+          "weight": 0.1
+        }
+      ]
+    },
+    {
+      "goal_id": "bronzer",
+      "area": "contour",
+      "name": "Bronzer",
+      "name_ko": "브론저",
+      "aliases": [
+        "브론저",
+        "bronzer"
+      ],
+      "description": "Warm, sun-kissed warmth for the face.",
+      "eligible_categories": [
+        "bronzer"
+      ],
+      "criteria": [
+        {
+          "type": "one_of",
+          "feature": "undertone",
+          "values": [
+            "warm"
+          ],
+          "weight": 0.3
+        },
+        {
+          "type": "one_of",
+          "feature": "shade_family",
+          "values": [
+            "brown",
+            "gold"
+          ],
+          "weight": 0.3
+        },
+        {
+          "type": "level",
+          "feature": "glow",
+          "target": 0.33,
+          "weight": 0.2
+        },
+        {
+          "type": "level",
+          "feature": "finish",
+          "target": 0.5,
+          "weight": 0.2
+        }
+      ]
+    }
+  ]
+}

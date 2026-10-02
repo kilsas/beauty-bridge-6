@@ -1,0 +1,2 @@
+pytest>=8
+rapidfuzz>=3  # optional: faster fuzzy search
