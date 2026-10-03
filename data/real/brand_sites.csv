@@ -1,0 +1,90 @@
+brand,market,url,search,kind,evidence,checked
+CLIO,KR,https://clubclio.co.kr/,,mall,CLUBCLIO official mall run by CLIO; cart,2026-10-03
+CLIO,US,https://clubclio.shop/,,shop,CLUBCLIO Official (Shopify); site said under renewal at check time,2026-10-03
+HERA,KR,https://brand.amoremall.com/kr/ko/hera,,mall,Amorepacific amoremall HERA brand shop,2026-10-03
+HERA,US,https://int.hera.com/,https://int.hera.com/search?q={q},shop,HERA International Shopify store; search tested,2026-10-03
+innisfree,KR,https://www.innisfree.com/kr/ko,,shop,이니스프리 공식 온라인 쇼핑몰; cart,2026-10-03
+innisfree,US,https://us.innisfree.com/,https://us.innisfree.com/search?q={q},shop,Official US Shopify store,2026-10-03
+the SAEM,KR,https://thesaem.com/,,shop,더샘 official mall; cart,2026-10-03
+rom&nd,KR,https://romand.co.kr/,,shop,롬앤 공식 홈페이지; cart; ships worldwide,2026-10-03
+rom&nd,US,https://romandbeauty.com/,https://romandbeauty.com/search?q={q},shop,rom&nd US Official; search tested,2026-10-03
+peripera,KR,https://clubclio.co.kr/,,mall,CLIO group mall CLUBCLIO carries peripera,2026-10-03
+LANEIGE,KR,https://brand.amoremall.com/kr/ko/laneige,,mall,Amorepacific amoremall LANEIGE brand shop,2026-10-03
+LANEIGE,US,https://us.laneige.com/,,shop,Official LANEIGE US store,2026-10-03
+dasique,KR,https://dasique.co.kr/,,shop,데이지크 official shop (search results),2026-10-03
+dasique,US,https://dasique.com/,https://dasique.com/search?q={q},shop,US Official Online store; search tested,2026-10-03
+3CE,KR,https://www.3cecosmetics.co.kr/,,info,3CE Korea official site (L'Oreal Korea); no cart found,2026-10-03
+3CE,US,https://www.3cecosmetics.com/,,info,3CE global official site; no cart found,2026-10-03
+too cool for school,KR,https://toocoolforschool.com/,https://toocoolforschool.com/product/search.html?keyword={q},shop,투쿨포스쿨 공식 온라인몰; cart,2026-10-03
+too cool for school,US,https://toocoolgirl.cafe24.com/shop2/,https://toocoolgirl.cafe24.com/shop2/product/search.html?keyword={q},shop,Official English store linked from KR mall,2026-10-03
+hince,KR,https://www.hince.co.kr/,https://www.hince.co.kr/product/search.html?keyword={q},shop,hince official mall; ships worldwide,2026-10-03
+Anua,KR,https://anua.kr/,https://anua.kr/product/search.html?keyword={q},shop,Anua official mall; cart,2026-10-03
+Anua,US,https://anua.com/,,shop,Anua Global Official Store,2026-10-03
+Beauty of Joseon,KR,https://beautyofjoseon.co.kr/,https://beautyofjoseon.co.kr/product/search.html?keyword={q},shop,조선미녀 공식몰; cart,2026-10-03
+Beauty of Joseon,US,https://beautyofjoseon.com/,https://beautyofjoseon.com/search?q={q},shop,Official store; search tested,2026-10-03
+Torriden,KR,https://www.torriden.com/,,shop,Torriden official mall; cart,2026-10-03
+Torriden,US,https://torriden.us/,,shop,Torriden US store (same company),2026-10-03
+COSRX,KR,https://www.cosrx.co.kr/,,shop,COSRX official mall; cart,2026-10-03
+COSRX,US,https://www.cosrx.com/,,shop,Site states it is the only official COSRX store,2026-10-03
+JUNG SAEM MOOL,KR,https://jsmbeauty.com/,,shop,정샘물뷰티 official mall; cart,2026-10-03
+JUNG SAEM MOOL,US,https://www.jsmbeauty.us/,https://www.jsmbeauty.us/Search/Product/result/keyword/{q},shop,Official online store in USD,2026-10-03
+VDL,KR,https://brand.naver.com/vdl,,flagship,VDL brand site buy button links to this Naver Brand Store,2026-10-03
+fwee,KR,https://fwee.kr/,https://fwee.kr/product/search.html?keyword={q},shop,fwee official mall; cart,2026-10-03
+fwee,US,https://fwee.us/,https://fwee.us/search?q={q},shop,fwee official US store; search tested,2026-10-03
+WONJUNGYO,JP,https://www.wonjungyobeauty.jp/shop,,shop,Wonjungyo 公式オンラインストア,2026-10-03
+TIRTIR,KR,https://tirtir.co.kr/,,shop,TIRTIR official mall; cart,2026-10-03
+TIRTIR,US,https://tirtir.global/,https://tirtir.global/search?q={q},shop,TIRTIR Official Mall; search tested,2026-10-03
+Huda Beauty,US,https://hudabeauty.com/en-us,https://hudabeauty.com/en-us/search?q={q},shop,Official store; search tested,2026-10-03
+Laura Mercier,US,https://www.lauramercier.com,https://www.lauramercier.com/search?q={q},shop,Laura Mercier US official store,2026-10-03
+Charlotte Tilbury,US,https://www.charlottetilbury.com/us,,shop,Official US store,2026-10-03
+Charlotte Tilbury,CN,https://charlottetilbury.tmall.hk,,flagship,Tmall Global flagship (search result),2026-10-03
+Fenty Beauty,US,https://fentybeauty.com,https://fentybeauty.com/search?q={q},shop,Official store,2026-10-03
+Fenty Beauty,CN,https://fentybeauty.tmall.hk,,flagship,Tmall Global flagship (search result),2026-10-03
+NARS,US,https://www.narscosmetics.com,,shop,The Official Store,2026-10-03
+NARS,JP,https://www.narscosmetics.jp,,shop,NARS official online shop; cart,2026-10-03
+Urban Decay,US,https://www.urbandecay.com,https://www.urbandecay.com/search?q={q},shop,Official US store,2026-10-03
+Too Faced,US,https://www.toofaced.com,https://www.toofaced.com/esearch?search={q},shop,Official store with checkout,2026-10-03
+MAC,US,https://www.maccosmetics.com,https://www.maccosmetics.com/search?q={q},shop,Official site; search tested,2026-10-03
+MAC,KR,https://www.maccosmetics.co.kr,https://www.maccosmetics.co.kr/esearch?search={q},shop,MAC official online mall Korea,2026-10-03
+MAC,JP,https://www.maccosmetics.jp,,shop,MAC公式オンラインショップ,2026-10-03
+MAC,CN,https://www.maccosmetics.com.cn,,shop,M·A·C中国官网,2026-10-03
+Summer Fridays,US,https://www.summerfridays.com,https://www.summerfridays.com/search?q={q},shop,Official store,2026-10-03
+Maybelline New York,US,https://www.maybelline.com,,info,Brand site; does not sell directly,2026-10-03
+Maybelline New York,CN,https://maybelline.tmall.com,,flagship,美宝莲旗舰店 on Tmall (search result),2026-10-03
+Stila,US,https://www.stilacosmetics.com,https://www.stilacosmetics.com/search?q={q},shop,Official store,2026-10-03
+Anastasia Beverly Hills,US,https://www.anastasiabeverlyhills.com,https://www.anastasiabeverlyhills.com/search?q={q},shop,Official store,2026-10-03
+Rare Beauty,US,https://www.rarebeauty.com,https://www.rarebeauty.com/search?q={q},shop,Official store; search tested,2026-10-03
+Benefit Cosmetics,US,https://www.benefitcosmetics.com/en-us,https://www.benefitcosmetics.com/en-us/search?q={q},shop,Official US store,2026-10-03
+Glow Recipe,US,https://www.glowrecipe.com,https://www.glowrecipe.com/search?q={q},shop,Official store; search tested,2026-10-03
+Physicians Formula,US,https://www.physiciansformula.com,https://www.physiciansformula.com/search?q={q},shop,Official store; search tested,2026-10-03
+NYX Professional Makeup,US,https://www.nyxcosmetics.com,https://www.nyxcosmetics.com/search?q={q},shop,Official store,2026-10-03
+e.l.f. Cosmetics,US,https://www.elfcosmetics.com,https://www.elfcosmetics.com/search?q={q},shop,Official store,2026-10-03
+tarte,US,https://tartecosmetics.com,https://tartecosmetics.com/search?q={q},shop,Official store,2026-10-03
+Dior,US,https://www.dior.com/en_us/beauty,,shop,Dior US beauty online boutique,2026-10-03
+Dior,KR,https://www.dior.com/ko_kr/beauty,,shop,Dior Korea beauty online boutique,2026-10-03
+Dior,JP,https://www.dior.com/ja_jp/beauty,,shop,Dior 公式オンラインブティック,2026-10-03
+La Roche-Posay,US,https://www.laroche-posay.us,,shop,Official US store,2026-10-03
+La Roche-Posay,KR,https://www.larocheposay.co.kr,,shop,라로슈포제 공식 온라인 몰 (search result),2026-10-03
+La Roche-Posay,JP,https://www.laroche-posay.jp,,shop,ラ ロッシュ ポゼ公式オンラインショップ,2026-10-03
+La Roche-Posay,CN,https://larocheposay.world.tmall.com,,flagship,理肤泉官方旗舰店 on Tmall (search result),2026-10-03
+CANMAKE,JP,https://www.canmake.com/,,info,Brand site; no direct sales; lists where to buy,2026-10-03
+KATE,JP,https://www.nomorerules.net/,,info,Kanebo KATE brand site; no direct sales,2026-10-03
+heroine make,JP,https://onlinestore.isehangroup.jp/collections/heroine,,mall,ISEHAN online store heroine make collection,2026-10-03
+MAJOLICA MAJORCA,JP,https://www.shiseido.co.jp/sw/onlinestore/premium/majolicamajorca/,,mall,Shiseido official online store brand page,2026-10-03
+CEZANNE,JP,https://www.cezanne.co.jp/,,info,Brand site; no direct sales; store locator,2026-10-03
+excel,JP,https://noevirgroup.jp/excel/,,shop,Official excel online shop (Noevir group),2026-10-03
+OPERA,JP,https://www.imju.jp/shop/c/c30/,,mall,IMJU official shop OPERA category; linked from opera-net.jp,2026-10-03
+Hada Labo,JP,https://jp.rohto.com/hadalabo/,,info,Rohto brand site; no direct sales; lists where to buy,2026-10-03
+SHISEIDO,JP,https://brand.shiseido.co.jp/,,shop,SHISEIDO brand official online store,2026-10-03
+SHISEIDO,US,https://www.shiseido.com/us/en/,https://www.shiseido.com/us/en/search?q={q},shop,Official US store; search tested,2026-10-03
+DECORTÉ,JP,https://www.decorte.com/,,shop,DECORTÉ公式オンラインブティック,2026-10-03
+RMK,JP,https://www.rmkrmk.com/ja/,,shop,RMK official site with online shop,2026-10-03
+Florasis,CN,https://huaxizi.tmall.com/,,flagship,花西子旗舰店 on Tmall (search result),2026-10-03
+Florasis,US,https://florasis.com/,,shop,Florasis official website; USD; add to bag,2026-10-03
+Perfect Diary,CN,https://perfectdiary.world.tmall.com/,,flagship,perfectdiary旗舰店 on Tmall (search result),2026-10-03
+Perfect Diary,US,https://www.perfectdiary.com/,,shop,Perfect Diary official English store,2026-10-03
+Judydoll,CN,https://judydoll.world.tmall.com/,,flagship,JUDYDOLL橘朵旗舰店 on Tmall (search result),2026-10-03
+Judydoll,US,https://judydoll.com/,,shop,JUDYDOLL official site; Shopify; USD,2026-10-03
+Colorkey,CN,https://colorkey.tmall.com/,,flagship,Tmall store linked from parent company site meishangcorp.com,2026-10-03
+MAOGEPING,CN,https://www.maogepingbeauty.com/,,info,毛戈平MGP official website,2026-10-03
+Caitang,CN,https://caitang.tmall.com/,,flagship,Tmall flagship listed on PROYA's official TIMAGE page,2026-10-03

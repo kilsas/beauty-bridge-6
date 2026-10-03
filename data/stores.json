@@ -1,0 +1,22 @@
+{
+  "_note": "Where the 'Buy' buttons on a product page send people, per country. {q} becomes the product's brand + name (Korean name for stores with lang 'ko'). To earn commission, either add your affiliate parameter to 'append' (e.g. \"&tag=yourtag-20\" for Amazon Associates) and set 'affiliate': true, or put exact per-product affiliate links in data/real/buy_links.csv. Any affiliate link makes the page show a disclosure line.",
+  "stores": {
+    "KR": [
+      {"id": "oliveyoung", "name": {"ko": "올리브영", "en": "Olive Young", "zh": "Olive Young", "ja": "オリーブヤング"}, "search": "https://www.oliveyoung.co.kr/store/search/getSearchMain.do?query={q}", "lang": "ko", "append": "", "affiliate": false},
+      {"id": "coupang", "name": {"ko": "쿠팡", "en": "Coupang", "zh": "Coupang", "ja": "クーパン"}, "search": "https://www.coupang.com/np/search?q={q}", "lang": "ko", "append": "", "affiliate": false}
+    ],
+    "US": [
+      {"id": "amazon_us", "name": {"ko": "아마존", "en": "Amazon", "zh": "亚马逊", "ja": "Amazon"}, "search": "https://www.amazon.com/s?k={q}", "lang": "en", "append": "", "affiliate": false},
+      {"id": "sephora_us", "name": {"ko": "세포라", "en": "Sephora", "zh": "丝芙兰", "ja": "セフォラ"}, "search": "https://www.sephora.com/search?keyword={q}", "lang": "en", "append": "", "affiliate": false},
+      {"id": "ulta", "name": {"ko": "얼타", "en": "Ulta", "zh": "Ulta", "ja": "アルタ"}, "search": "https://www.ulta.com/search?search={q}", "lang": "en", "append": "", "affiliate": false}
+    ],
+    "JP": [
+      {"id": "rakuten", "name": {"ko": "라쿠텐", "en": "Rakuten", "zh": "乐天", "ja": "楽天市場"}, "search": "https://search.rakuten.co.jp/search/mall/{q}/", "lang": "en", "append": "", "affiliate": false},
+      {"id": "amazon_jp", "name": {"ko": "아마존 재팬", "en": "Amazon Japan", "zh": "日本亚马逊", "ja": "Amazon.co.jp"}, "search": "https://www.amazon.co.jp/s?k={q}", "lang": "en", "append": "", "affiliate": false}
+    ],
+    "CN": [
+      {"id": "tmall", "name": {"ko": "티몰", "en": "Tmall", "zh": "天猫", "ja": "Tmall"}, "search": "https://list.tmall.com/search_product.htm?q={q}", "lang": "en", "append": "", "affiliate": false},
+      {"id": "jd", "name": {"ko": "징둥", "en": "JD.com", "zh": "京东", "ja": "JD.com"}, "search": "https://search.jd.com/Search?keyword={q}&enc=utf-8", "lang": "en", "append": "", "affiliate": false}
+    ]
+  }
+}

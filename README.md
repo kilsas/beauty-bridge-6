@@ -160,6 +160,14 @@ reviews in the last 7 days compared with the 7 days before.
   `GET /rankings/rising` (SQLite at `db/reviews.sqlite`).
 - Until a segment has reviews, its ranking falls back to goal fit and says so.
 
+## Buy buttons and purchase-intent ranking
+Each product page links to official shops in the chosen country (`data/stores.json`:
+Olive Young and Coupang in Korea, Amazon, Sephora and Ulta in the US, Rakuten and
+Amazon Japan, Tmall and JD in China). Clicks are stored (Supabase `buy_clicks`, run
+`supabase/buy_clicks.sql`; or the API's `POST /clicks`) and the **Most bought** ranking
+counts distinct people per product. Swap in affiliate links per store (`append`,
+`affiliate`) or per product (`data/real/buy_links.csv`); the page then shows a disclosure.
+
 ## ⚠️ Which data is real
 
 - `data/real/`: **real products** (92, from Korea, the USA, Japan, China and

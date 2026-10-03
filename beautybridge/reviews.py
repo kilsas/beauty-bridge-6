@@ -156,6 +156,42 @@ def trending(reviews: list[Review], now: datetime | None = None,
     return rows
 
 
+def click_stats(clicks: list[dict], now: datetime | None = None,
+                window_days: int = TREND_WINDOW_DAYS) -> dict[str, dict]:
+    """'Buy' button clicks per product: distinct people (all time and recent) and raw clicks.
+    Ranking uses people, so one visitor clicking many times counts once."""
+    now = now or datetime.now(timezone.utc)
+    start = now - timedelta(days=window_days)
+    people, recent, n = defaultdict(set), defaultdict(set), defaultdict(int)
+    for c in clicks:
+        pid, who = c["product_id"], c["visitor_id"]
+        people[pid].add(who)
+        n[pid] += 1
+        t = datetime.fromisoformat(str(c["created_at"]).replace("Z", "+00:00"))
+        if t.tzinfo is None:
+            t = t.replace(tzinfo=timezone.utc)
+        if t >= start:
+            recent[pid].add(who)
+    return {pid: {"people": len(people[pid]), "people_7d": len(recent[pid]), "clicks": n[pid]} for pid in people}
+
+
+def make_click(data: dict, known_products: set[str]) -> dict:
+    pid = str(data.get("product_id", "")).strip()
+    if pid not in known_products:
+        raise ReviewError(f"unknown product '{pid}'")
+    vid = str(data.get("visitor_id", "")).strip()
+    if not vid or len(vid) > 128:
+        raise ReviewError("visitor_id is required")
+    store = str(data.get("store", "")).strip()
+    if not store or len(store) > 40:
+        raise ReviewError("store is required")
+    market = (data.get("market") or "").upper() or None
+    if market is not None and market not in ("KR", "US", "JP", "CN"):
+        raise ReviewError("market must be KR, US, JP or CN")
+    return {"visitor_id": vid, "product_id": pid, "store": store, "market": market,
+            "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
+
+
 class ReviewStore:
     """SQLite-backed review storage for the API (one row per reviewer x product)."""
 
@@ -172,12 +208,22 @@ class ReviewStore:
         PRIMARY KEY (reviewer_id, product_id)
     )"""
 
+    CLICKS = """
+    CREATE TABLE IF NOT EXISTS buy_clicks (
+        visitor_id  TEXT NOT NULL,
+        product_id  TEXT NOT NULL,
+        store       TEXT NOT NULL,
+        market      TEXT,
+        created_at  TEXT NOT NULL
+    )"""
+
     def __init__(self, path):
         import sqlite3
         from pathlib import Path
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(path, check_same_thread=False)
         self.conn.execute(self.SCHEMA)
+        self.conn.execute(self.CLICKS)
         self.conn.commit()
 
     def upsert(self, r: Review) -> None:
@@ -195,3 +241,12 @@ class ReviewStore:
         cur = self.conn.execute(
             "SELECT reviewer_id, product_id, rating, created_at, skin_type, age_band, market, text FROM reviews")
         return [Review(*row[:4], row[4], row[5], row[6], row[7] or "") for row in cur]
+
+    def add_click(self, c: dict) -> None:
+        self.conn.execute("INSERT INTO buy_clicks VALUES (?,?,?,?,?)",
+                          (c["visitor_id"], c["product_id"], c["store"], c["market"], c["created_at"]))
+        self.conn.commit()
+
+    def clicks(self) -> list[dict]:
+        cur = self.conn.execute("SELECT visitor_id, product_id, store, market, created_at FROM buy_clicks")
+        return [dict(zip(("visitor_id", "product_id", "store", "market", "created_at"), row)) for row in cur]

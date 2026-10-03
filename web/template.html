@@ -308,6 +308,16 @@ footer button { text-decoration: underline; text-underline-offset: 2px; }
 .rbtns { display: flex; gap: 8px; align-items: center; }
 .btn-primary { background: var(--dark-chip); color: var(--dark-chip-ink); border-radius: 10px; padding: 11px 22px; font-weight: 700; }
 .btn-primary[disabled] { opacity: .4; cursor: not-allowed; }
+.buy { gap: 10px; }
+.buy-h { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; }
+.buy-h .chips { gap: 4px; }
+.buy-h .chip { padding: 4px 10px; font-size: 12px; }
+.buybtns { display: flex; flex-wrap: wrap; gap: 8px; }
+.buybtn { display: inline-flex; align-items: center; gap: 4px; background: var(--dark-chip); color: var(--dark-chip-ink); border-radius: 10px; padding: 10px 16px; font-weight: 700; font-size: 14px; text-decoration: none; }
+.buybtn:hover { opacity: .88; }
+.buybtn.off { background: var(--accent); color: var(--accent-ink); }
+.buybtn.off small { font-weight: 500; opacity: .85; }
+.buybtn .chev { width: 14px; height: 14px; }
 .revs { display: grid; }
 .rev { padding: 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 6px; }
 .rev p { margin: 0; font-size: 14px; color: var(--ink-2); white-space: pre-wrap; }
@@ -331,7 +341,7 @@ const CFG = /*__CONFIG__*/{};
 /* ---------------- state + routing ---------------- */
 const S = { view: "home", rtab: "market", lmkt: "KR", cat: "", skin: "dry", goal: "aegyo_sal", area: "eye", pid: "P001", ptab: "similar",
   origin: "", q: "", market: "KR", lang: "ko", hcat: "", hskin: "dry", harea: "eye", hgoal: "aegyo_sal", gskin: "", sheet: false, open: {},
-  age: "20s", draft: null };
+  age: "20s", draft: null, bmkt: "" };
 /* Live first-party reviews (db capability). One document per reviewer: reviews/<uid> = {items: {productId: review}} */
 const LIVE = { status: "loading", db: null, uid: null, canWrite: null, list: [], saving: false, msg: "" };
 try {
@@ -353,7 +363,7 @@ function fromHash() {
   const h = decodeURIComponent(location.hash.slice(1));
   if (h.startsWith("product-") && D.products[h.slice(8)]) { S.view = "product"; S.pid = h.slice(8); }
   else if (h.startsWith("goal-") && D.goals[h.slice(5)]) { S.view = "goals"; S.goal = h.slice(5); S.area = areaOf(S.goal); }
-  else if (h.startsWith("ranking-") && ["market", "rising", "category", "skin", "age", "goal", "brand"].includes(h.slice(8))) { S.view = "ranking"; S.rtab = h.slice(8); }
+  else if (h.startsWith("ranking-") && ["market", "rising", "buy", "category", "skin", "age", "goal", "brand"].includes(h.slice(8))) { S.view = "ranking"; S.rtab = h.slice(8); }
   else if (["ranking", "insight", "method", "search", "goals"].includes(h)) S.view = h;
   else S.view = "home";
 }
@@ -618,7 +628,7 @@ const goalChips = (attr, area, cur) => `<div class="chips">${goalsIn(area).map((
 function header() {
   const tabs = [["home", t("home")], ["ranking", t("ranking")], ["goals", t("goals")], ["insight", t("insight")]];
   const cur = ["product", "search", "method"].includes(S.view) ? "" : S.view;
-  const subs = [["market", t("marketRank")], ["rising", t("rising")], ["category", t("byCat")], ["skin", t("bySkin")], ["age", t("byAge")], ["goal", t("byGoal")], ["brand", t("byBrand")]];
+  const subs = [["market", t("marketRank")], ["rising", t("rising")], ["buy", t("buyRank")], ["category", t("byCat")], ["skin", t("bySkin")], ["age", t("byAge")], ["goal", t("byGoal")], ["brand", t("byBrand")]];
   const hdr = document.getElementById("hdr");
   hdr.className = "hdr" + (S.view === "ranking" || S.view === "goals" ? "" : " flat");
   let sub = "";
@@ -750,6 +760,13 @@ function vRanking() {
     } else {
       body = `<div class="empty">${t("noRising")}<br><br><button class="more" data-product="${D.featured[0]}" data-tab="reviews">${t("firstCta")} ${I.right}</button></div>`;
     }
+  } else if (S.rtab === "buy") {
+    const st = CLICKS.stats;
+    const ids = avail(Object.keys(st).filter((id) => D.products[id] && st[id].people > 0))
+      .sort((a, b) => st[b].people - st[a].people || st[b].people_7d - st[a].people_7d || a.localeCompare(b));
+    basis = `<span class="note"><span class="livedot"></span>${t("live")} · ${t("buyBasis")}</span>`;
+    body = ids.length ? rankedList(ids, { limit: 40, metric: (id) => `<b>${fmt(t("peopleN"), { n: st[id].people })}</b><small>${fmt(t("people7"), { n: st[id].people_7d })}</small>` })
+      : `<div class="empty">${CLICKS.status === "ready" ? t("noBuys") : CLICKS.status === "off" ? t("noBuyDb") : "…"}</div>`;
   } else if (S.rtab === "category") {
     filt = `<div><button class="chip drop" data-sheet="rank">${esc(catLabel(S.cat))}</button></div>`;
     const r = liveRank(avail(catIds(S.cat)), "all");
@@ -865,6 +882,7 @@ function vProduct() {
         ${rateLine(p)}
         <div class="price">${D.mode === "real" ? `<span class="note" style="font:500 12px var(--sans);margin-right:6px">${t("refPrice")}</span>` : ""}${localPrice(p)}<small>${(() => { const lm = S.market ? p.list.find((x) => x.m === S.market && x.price != null) : null; return lm ? `${money(lm.price, lm.cur)} · ${mktName(S.market)}` : `${money(p.price, p.cur)}`; })()}</small></div></div>
       <div class="tags">${tagv.map((x) => `<span class="tag">${esc(x)}</span>`).join("")}</div>
+      ${buyBox(p)}
       ${D.mode === "real" ? `<p class="note" style="margin:0">${t("labelsNote")}</p>` : ""}
       ${p.sig && Object.keys(p.sig).length ? `<div class="card evid"><span class="lbl">${t("evidence")}</span>${Object.entries(p.sig).map(([m, rows]) => rows.map((g) => `<div class="evrow"><span class="tag">${mktName(m)}</span><span>${esc(sigLabel(g))}</span><a class="src" href="${esc(g.url)}" target="_blank" rel="noopener">${t("source")} · ${esc(g.date)}</a></div>`).join("")).join("")}</div>` : ""}
       <div class="profile">
@@ -873,6 +891,63 @@ function vProduct() {
       </div></section>
     <nav class="ptabs">${tabs.map(([k, lb]) => `<button data-ptab="${k}" aria-current="${S.ptab === k}">${lb}</button>`).join("")}</nav>
     <section class="sec">${body}</section>`;
+}
+
+/* ---------------- buy buttons (official shops per country) + purchase-intent clicks ---------------- */
+const CLICKS = { status: "loading", stats: {}, sig: "" };
+function setClicks(rows) {
+  const stats = {};
+  for (const r of rows || []) if (r && D.products[r.product_id]) stats[r.product_id] = { people: +r.people || 0, people_7d: +r.people_7d || 0, clicks: +r.clicks || 0 };
+  const sig = JSON.stringify(stats);
+  const changed = sig !== CLICKS.sig || CLICKS.status !== "ready";
+  Object.assign(CLICKS, { status: "ready", stats, sig });
+  if (changed && (S.view === "product" || (S.view === "ranking" && S.rtab === "buy"))) render();
+}
+const buyMarket = (p) => S.bmkt || S.market || p.origin;
+const buyQuery = (p, lang) => lang === "ko" && p.ko ? `${p.bko} ${p.ko}` : `${p.brand} ${p.name}`;
+function buyLinks(p, m) {
+  const exact = (D.buyLinks || {})[p.id] || {};
+  return ((D.stores || {})[m] || []).map((s) => {
+    const x = exact[s.id];
+    return { id: s.id, name: s.name[S.lang] || s.name.en, aff: x ? x.aff : s.aff,
+      url: x ? x.url : s.search.replace("{q}", encodeURIComponent(buyQuery(p, s.lang))) + (s.append || "") };
+  });
+}
+/* the brand's own official store for a country (or the nearest one it has) */
+function officialFor(p, m) {
+  const all = (D.official || {})[p.brand] || [];
+  if (!all.length) return null;
+  const pick = all.find((o) => o.m === m) || all.find((o) => o.m === p.origin) || all.find((o) => o.m === "US") || all[0];
+  const q = encodeURIComponent(pick.m === "KR" && p.ko ? p.ko : p.name);
+  return { ...pick, href: pick.q ? pick.q.replace("{q}", q) : pick.url, other: pick.m !== m };
+}
+function officialBtn(p, m) {
+  const o = officialFor(p, m);
+  if (!o) return "";
+  const label = { shop: t("offShop"), mall: t("offMall"), flagship: t("offFlag"), info: t("offInfo") }[o.kind];
+  return `<a class="buybtn off" href="${esc(o.href)}" target="_blank" rel="noopener" data-buy="official" data-bm="${o.m}">${esc(label)}${o.other ? ` <small>· ${mktName(o.m)}</small>` : ""} ${I.right}</a>`;
+}
+function officialNote(p, m) {
+  const o = officialFor(p, m);
+  if (!o) return "";
+  return o.kind === "info" ? t("offInfoNote") : o.kind === "flagship" ? t("offFlagNote") : o.q ? t("offPayQ") : t("offPay");
+}
+function buyBox(p) {
+  const m = buyMarket(p), links = buyLinks(p, m);
+  const mk = Object.keys(D.stores || {});
+  if (!mk.length) return "";
+  const sold = p.list.some((l) => l.m === m && l.av !== "none");
+  const st = CLICKS.stats[p.id];
+  return `<div class="card buy"><div class="buy-h"><span class="lbl">${fmt(t("buyIn"), { m: mktName(m) })}</span>
+      <div class="chips">${mk.map((x) => `<button class="chip" data-bmkt="${x}" aria-pressed="${x === m}">${mktName(x)}</button>`).join("")}</div></div>
+    <div class="buybtns">${officialBtn(p, m)}${links.map((l) => `<a class="buybtn" href="${esc(l.url)}" target="_blank" rel="noopener${l.aff ? " sponsored" : ""}" data-buy="${esc(l.id)}" data-bm="${m}">${esc(l.name)} ${I.right}</a>`).join("")}</div>
+    ${officialNote(p, m) ? `<p class="note" style="margin:0">${officialNote(p, m)}</p>` : ""}
+    <p class="note" style="margin:0">${sold ? "" : t("buyNotListed") + " · "}${t("buyNote")}${st && st.people ? ` · <b>${fmt(t("buyPeople"), { n: st.people })}</b>` : ""}</p>
+    ${links.some((l) => l.aff) ? `<p class="note" style="margin:0">${t("affNote")}</p>` : ""}</div>`;
+}
+async function recordClick(pid, store, market) {
+  if (!BACKEND.click || !LIVE.uid) return;
+  try { await BACKEND.click(pid, store, market); } catch (e) { console.warn("buy click not saved", e); }
 }
 
 function myItems() {
@@ -913,7 +988,7 @@ function reviewsBody(p) {
   return `<p class="note"><span class="livedot"></span>${t("live")} · ${t("liveNote")}</p>${summary}${form}${items ? `<div class="revs">${items}</div>` : ""}`;
 }
 /* The active review storage. Each backend sets LIVE.uid, calls setReviews() and provides save(). */
-const BACKEND = { kind: "", save: null };
+const BACKEND = { kind: "", save: null, click: null };
 function setReviews(list) { LIVE.list = list; LIVE.status = "ready"; recompute(); render(); }
 async function saveReview(del = false) {
   if (!BACKEND.save || !LIVE.uid || LIVE.saving) return;
@@ -962,6 +1037,27 @@ async function initClaude(cl) {
     if (review) items[pid] = review; else delete items[pid];
     await db.doc("reviews/" + LIVE.uid).set({ items });
   };
+  let myClicks = {};
+  BACKEND.click = async (pid, store, market) => {
+    const now = new Date().toISOString(), c = myClicks[pid] || { n: 0, first: now };
+    myClicks = { ...myClicks, [pid]: { n: c.n + 1, first: c.first, last: now } };
+    await db.doc("clicks/" + LIVE.uid).set({ items: myClicks });
+  };
+  db.collection("clicks").onSnapshot((snap) => {
+    const agg = {}, since = Date.now() - D.reviewPrior.window * 864e5;
+    for (const doc of snap.docs) {
+      const items = (doc.data() || {}).items;
+      if (!items || typeof items !== "object") continue;
+      if (doc.id === LIVE.uid) myClicks = items;
+      for (const [pid, c] of Object.entries(items)) {
+        if (!D.products[pid] || !c) continue;
+        const a = agg[pid] ||= { product_id: pid, people: 0, people_7d: 0, clicks: 0 };
+        a.people += 1; a.clicks += Math.max(1, +c.n || 1);
+        if (Date.parse(c.last) >= since) a.people_7d += 1;
+      }
+    }
+    setClicks(Object.values(agg));
+  }, () => { CLICKS.status = "off"; });
   db.collection("reviews").onSnapshot((snap) => {
     const out = [];
     for (const doc of snap.docs) {
@@ -1006,6 +1102,18 @@ async function initSupabase(rc) {
     const refresh = () => { clearTimeout(pending); pending = setTimeout(() => fetchAll().catch(() => {}), 400); };
     client.channel("reviews-live").on("postgres_changes", { event: "*", schema: "public", table: "reviews" }, refresh).subscribe();
     setInterval(refresh, 60000);
+    const loadClicks = async () => {
+      const { data, error } = await client.from("buy_click_stats").select("product_id,people,people_7d,clicks");
+      if (error) throw error;
+      setClicks(data);
+    };
+    loadClicks().catch((e) => { CLICKS.status = "off"; console.warn("buy clicks unavailable (run supabase/buy_clicks.sql)", e); render(); });
+    setInterval(() => loadClicks().catch(() => {}), 60000);
+    BACKEND.click = async (pid, store, market) => {
+      const { error } = await client.from("buy_clicks").insert({ visitor_id: LIVE.uid, product_id: pid, store, market });
+      if (error) throw error;
+      await loadClicks();
+    };
     BACKEND.kind = "supabase";
     BACKEND.save = async (pid, review) => {
       const q = review
@@ -1042,6 +1150,14 @@ async function initApi(rc) {
     };
     await fetchAll();
     setInterval(() => fetchAll().catch(() => {}), 20000);
+    const loadClicks = async () => { const r = await fetch(base + "/clicks/stats"); if (!r.ok) throw new Error("HTTP " + r.status); setClicks(await r.json()); };
+    loadClicks().catch(() => { CLICKS.status = "off"; render(); });
+    setInterval(() => loadClicks().catch(() => {}), 20000);
+    BACKEND.click = async (pid, store, market) => {
+      const r = await fetch(base + "/clicks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ visitor_id: rid, product_id: pid, store, market }) });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      await loadClicks();
+    };
     BACKEND.kind = "api";
     BACKEND.save = async (pid, review) => {
       const res = review
@@ -1063,7 +1179,7 @@ async function initLive() {
   const rc = CFG.reviews || {};
   if (rc.backend === "supabase" && rc.supabaseUrl && rc.supabaseAnonKey && await initSupabase(rc)) return;
   if (rc.backend === "api" && rc.apiUrl && await initApi(rc)) return;
-  LIVE.status = "nodb"; render();
+  LIVE.status = "nodb"; CLICKS.status = "off"; render();
 }
 
 function vGoals() {
@@ -1241,7 +1357,8 @@ document.addEventListener("click", (e) => {
   if (d.pickcat !== undefined) { if (S.sheet === "home") S.hcat = d.pickcat; else S.cat = d.pickcat; S.sheet = false; S.sheetOpen = undefined; render(); return; }
   if (d.accg) { S.sheetOpen = S.sheetOpen === d.accg ? "" : d.accg; renderSheet(); return; }
   if (d.sheet) { S.sheet = d.sheet; S.sheetOpen = undefined; renderSheet(); return; }
-  if (d.product) { LIVE.msg = ""; go("product", { pid: d.product, ptab: d.tab || "similar", origin: d.orig || "", draft: null }); return; }
+  if (d.product) { LIVE.msg = ""; go("product", { pid: d.product, ptab: d.tab || "similar", origin: d.orig || "", draft: null, bmkt: "" }); return; }
+  if (d.bmkt) { S.bmkt = d.bmkt; render(); return; }
   if (d.goal) { go("goals", { goal: d.goal, area: areaOf(d.goal), gskin: "" }); return; }
   if (d.go) { const extra = {}; if (d.rtab) extra.rtab = d.rtab; if (d.cat !== undefined) extra.cat = d.cat; if (d.skin) extra.skin = d.skin; if (d.go === "ranking" && d.rtab === "goal") extra.area = areaOf(S.goal); go(d.go, extra); return; }
   if (d.rtab) { S.rtab = d.rtab; go("ranking"); return; }
@@ -1266,6 +1383,7 @@ document.addEventListener("click", (e) => {
   if (d.q) { go("search", { q: d.q }); return; }
   if (d.setmarket) { S.market = d.setmarket; render(); return; }
 });
+document.addEventListener("click", (e) => { const a = e.target.closest("a[data-buy]"); if (a) recordClick(S.pid, a.dataset.buy, a.dataset.bm); });
 document.addEventListener("toggle", (e) => { const el = e.target; if (el.matches && el.matches("details.res")) S.open[el.dataset.key] = el.open; }, true);
 document.addEventListener("input", (e) => { if (e.target.id === "rtext" && S.draft) S.draft.text = e.target.value; });
 document.addEventListener("submit", (e) => { if (e.target.id !== "sform") return; e.preventDefault(); go("search", { q: document.getElementById("sq").value }); });

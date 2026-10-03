@@ -382,5 +382,63 @@ class TestResearchTools(unittest.TestCase):
         self.assertTrue(math.isclose(agreement.weighted_kappa(list("0123"), list("0123"), levels), 1.0))
 
 
+class TestBuyButtons(unittest.TestCase):
+    def test_click_stats_count_people_not_clicks(self):
+        from datetime import datetime, timezone
+        from beautybridge import reviews as rv
+        now = datetime(2026, 10, 2, tzinfo=timezone.utc)
+        clicks = [{"visitor_id": "a", "product_id": "R004", "created_at": "2026-10-01T00:00:00+00:00"}] * 5 + [
+            {"visitor_id": "b", "product_id": "R004", "created_at": "2026-09-01T00:00:00+00:00"},
+            {"visitor_id": "a", "product_id": "U001", "created_at": "2026-10-01T00:00:00Z"}]
+        st = rv.click_stats(clicks, now=now)
+        self.assertEqual(st["R004"], {"people": 2, "people_7d": 1, "clicks": 6})
+        self.assertEqual(st["U001"]["people"], 1)
+
+    def test_make_click_validates(self):
+        from beautybridge import reviews as rv
+        ok = rv.make_click({"visitor_id": "v", "product_id": "R004", "store": "oliveyoung", "market": "kr"}, {"R004"})
+        self.assertEqual(ok["market"], "KR")
+        for bad in ({"visitor_id": "v", "product_id": "X", "store": "s"},
+                    {"visitor_id": "", "product_id": "R004", "store": "s"},
+                    {"visitor_id": "v", "product_id": "R004", "store": ""},
+                    {"visitor_id": "v", "product_id": "R004", "store": "s", "market": "FR"}):
+            with self.assertRaises(rv.ReviewError):
+                rv.make_click(bad, {"R004"})
+
+    def test_click_store_roundtrip(self):
+        from beautybridge import reviews as rv
+        with tempfile.TemporaryDirectory() as d:
+            store = rv.ReviewStore(Path(d) / "r.sqlite")
+            store.add_click(rv.make_click({"visitor_id": "v", "product_id": "R004", "store": "coupang"}, {"R004"}))
+            self.assertEqual(rv.click_stats(store.clicks())["R004"]["people"], 1)
+
+    def test_stores_and_buy_links(self):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import build_site
+        stores = build_site.stores_config()
+        self.assertEqual(set(stores), {"KR", "US", "JP", "CN"})
+        for rows in stores.values():
+            for s in rows:
+                self.assertTrue(s["search"].startswith("https://") and "{q}" in s["search"])
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "buy_links.csv").write_text("product_id,store,url,affiliate\nR004,coupang,https://link.coupang.com/a/x,yes\n", encoding="utf-8")
+            self.assertEqual(build_site.buy_links(Path(d), {"R004": 1}), {"R004": {"coupang": {"url": "https://link.coupang.com/a/x", "aff": True}}})
+            Path(d, "buy_links.csv").write_text("product_id,store,url,affiliate\nR004,coupang,http://x,no\n", encoding="utf-8")
+            with self.assertRaises(SystemExit):
+                build_site.buy_links(Path(d), {"R004": 1})
+
+
+    def test_official_sites_cover_every_brand(self):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import build_site
+        brands = {r["brand"] for r in csv.DictReader(open(ROOT / "data" / "real" / "products.csv", encoding="utf-8"))}
+        off = build_site.official_sites(ROOT / "data" / "real", brands)
+        self.assertEqual(set(off), brands)
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "brand_sites.csv").write_text("brand,market,url,search,kind\nCLIO,KR,https://x.kr,https://x.kr/s?k=,shop\n", encoding="utf-8")
+            with self.assertRaises(SystemExit):
+                build_site.official_sites(Path(d), {"CLIO"})
+
+
 if __name__ == "__main__":
     unittest.main()

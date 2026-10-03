@@ -88,6 +88,30 @@ def all_reviews():
     return out
 
 
+class ClickIn(BaseModel):
+    visitor_id: str
+    product_id: str
+    store: str
+    market: str | None = None
+
+
+@app.post("/clicks", status_code=201)
+def post_click(body: ClickIn):
+    """Record a 'Buy' button click (purchase intent)."""
+    try:
+        c = rv.make_click(body.model_dump(), set(engine.ds.products))
+    except rv.ReviewError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from None
+    store.add_click(c)
+    return {"ok": True}
+
+
+@app.get("/clicks/stats")
+def click_stats():
+    """Per product: distinct people who clicked 'Buy' (all time, last 7 days) and raw clicks."""
+    return [{"product_id": pid, **s} for pid, s in rv.click_stats(store.clicks()).items()]
+
+
 @app.delete("/reviews/{reviewer_id}/{product_id}", status_code=204)
 def delete_review(reviewer_id: str, product_id: str):
     store.delete(reviewer_id, product_id)

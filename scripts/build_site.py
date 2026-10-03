@@ -96,6 +96,62 @@ def read_csv(path: Path) -> list[dict]:
         return list(csv.DictReader(f))
 
 
+def stores_config() -> dict:
+    """Shops behind the 'Buy' buttons, per country (data/stores.json)."""
+    path = ROOT / "data" / "stores.json"
+    if not path.exists():
+        return {}
+    stores = json.loads(path.read_text(encoding="utf-8")).get("stores", {})
+    out = {}
+    for m, rows in stores.items():
+        for s in rows:
+            url = s.get("search", "")
+            if not url.startswith("https://") or "{q}" not in url:
+                raise SystemExit(f"data/stores.json: store '{s.get('id')}' needs an https search URL containing {{q}}")
+        out[m] = [{"id": s["id"], "name": s["name"], "search": s["search"], "lang": s.get("lang", "en"),
+                   "append": s.get("append", ""), "aff": bool(s.get("affiliate"))} for s in rows]
+    return out
+
+
+def buy_links(data_dir: Path, products: dict) -> dict:
+    """Exact per-product links (e.g. affiliate links) that replace the store search link."""
+    out: dict = {}
+    for r in read_csv(data_dir / "buy_links.csv"):
+        pid, store, url = r.get("product_id", "").strip(), r.get("store", "").strip(), r.get("url", "").strip()
+        if not pid or not url:
+            continue
+        if pid not in products:
+            raise SystemExit(f"buy_links.csv: unknown product '{pid}'")
+        if not url.startswith("https://"):
+            raise SystemExit(f"buy_links.csv: link for {pid}/{store} must start with https://")
+        out.setdefault(pid, {})[store] = {"url": url, "aff": r.get("affiliate", "").strip().lower() in ("1", "true", "yes", "y")}
+    return out
+
+
+OFFICIAL_KINDS = {"shop", "mall", "flagship", "info"}
+
+
+def official_sites(data_dir: Path, brands: set[str]) -> dict:
+    """Brand official stores per country (data/real/brand_sites.csv), checked by hand.
+    kind: shop = brand's own online store, mall = official group/parent mall,
+    flagship = official flagship on a marketplace, info = brand site without direct sales."""
+    out: dict = {}
+    for r in read_csv(data_dir / "brand_sites.csv"):
+        b, m, url, q, kind = (r.get(k, "").strip() for k in ("brand", "market", "url", "search", "kind"))
+        if not b:
+            continue
+        if b not in brands:
+            raise SystemExit(f"brand_sites.csv: unknown brand '{b}'")
+        if m not in ("KR", "US", "JP", "CN"):
+            raise SystemExit(f"brand_sites.csv: {b} has unknown market '{m}'")
+        if not url.startswith("https://") or (q and (not q.startswith("https://") or "{q}" not in q)):
+            raise SystemExit(f"brand_sites.csv: {b}/{m} needs https URLs (search must contain {{q}})")
+        if kind not in OFFICIAL_KINDS:
+            raise SystemExit(f"brand_sites.csv: {b}/{m} kind must be one of {sorted(OFFICIAL_KINDS)}")
+        out.setdefault(b, []).append({"m": m, "url": url, "q": q, "kind": kind, "at": r.get("checked", "")})
+    return out
+
+
 def build(engine, ds_dir) -> dict:
     ds = engine.ds
     P = ds.products
@@ -221,6 +277,9 @@ def build(engine, ds_dir) -> dict:
         "mode": "real" if real else "demo",
         "featured": ([x for x in (data_dir / "featured.txt").read_text().split() if x in P]
                      if (data_dir / "featured.txt").exists() else feat) or list(P)[:3],
+        "stores": stores_config(),
+        "buyLinks": buy_links(data_dir, P),
+        "official": official_sites(data_dir, {p.brand for p in P.values()}),
         "reviewPrior": {"weight": rv.PRIOR_WEIGHT, "mean": rv.DEFAULT_PRIOR_MEAN, "window": rv.TREND_WINDOW_DAYS,
                         "ages": rv.AGE_BANDS, "maxText": rv.MAX_TEXT},
         "market": {

@@ -51,3 +51,33 @@ GitHub 저장소 **Settings → Secrets and variables → Actions → Variables*
   익명 로그인 속도 제한과 CAPTCHA(Authentication → Attack Protection)를 켜 두세요.
 - **삭제**: 부적절한 리뷰는 Supabase **Table Editor → reviews**에서 지울 수 있어요.
 - **개인정보**: 리뷰에는 이름이나 이메일을 저장하지 않아요. 익명 ID만 남아요.
+
+## 구매하기 버튼과 구매 클릭 순위
+제품 페이지마다 나라별 공식 판매처 버튼이 있어요
+(한국 올리브영·쿠팡, 미국 Amazon·Sephora·Ulta, 일본 라쿠텐·Amazon Japan, 중국 티몰·징둥).
+누르면 그 판매처의 제품 검색 결과가 새 탭으로 열려요.
+
+**클릭 기록 켜기 (한 번만)**: Supabase **SQL Editor → New query**에 `supabase/buy_clicks.sql`을
+붙여 넣고 **Run**. 이후 랭킹의 **구매 인기** 탭에 "구매 버튼을 누른 사람 수" 순위가 나와요.
+- 한 사람이 여러 번 눌러도 1명으로 세요. 방문자는 남의 클릭 기록을 볼 수 없고 합계만 보여요.
+- 연구용 원자료: Supabase **Table Editor → buy_clicks → Export → CSV**
+  (visitor_id, product_id, store, market, created_at). 리뷰도 같은 방법으로 내려받을 수 있어요.
+
+**판매처 바꾸기**: `data/stores.json`에서 이름과 검색 주소(`{q}` 자리에 제품명이 들어가요)를 고쳐요.
+
+**제휴 링크로 바꾸기 (수수료 받기)**
+- 판매처 전체에 붙이는 방식(예: Amazon Associates): `stores.json`의 해당 판매처에
+  `"append": "&tag=내태그-20"`, `"affiliate": true`를 넣어요.
+- 제품마다 받은 링크(예: 쿠팡 파트너스): `data/real/buy_links.csv`에
+  `product_id,store,url,affiliate` 형식으로 한 줄씩 넣어요. 예: `R004,coupang,https://link.coupang.com/a/xxxx,yes`
+- 제휴 링크가 하나라도 있으면 제품 페이지에 "제휴 링크" 안내 문구가 자동으로 나와요.
+  쿠팡 파트너스처럼 프로그램이 정한 문구가 있으면 `web/i18n.js`의 `affNote`를 그 문구로 바꾸세요.
+
+## 브랜드 공식몰 버튼
+구매하기 상자의 맨 앞 분홍 버튼은 브랜드 공식몰로 연결돼요(58개 브랜드, `data/real/brand_sites.csv`).
+결제는 공식몰에서 이뤄지고, 이 사이트는 결제·개인정보를 다루지 않아요.
+- 공식몰 검색 주소가 확인된 브랜드는 제품 검색 결과로 바로 열리고, 나머지는 공식몰 첫 화면이 열려요.
+- 고른 나라에 공식몰이 없으면 가장 가까운 나라의 공식몰을 "· 미국"처럼 표시해서 보여줘요.
+- `kind`: shop(브랜드 자체 몰), mall(그룹 공식몰, 예: 아모레몰), flagship(티몰·네이버 공식 스토어),
+  info(직접 판매하지 않는 브랜드 사이트 — CANMAKE, KATE, CEZANNE, 하다라보, 3CE, 메이블린 미국 등).
+- 주소는 2026-10-03에 확인했어요. 몰 주소가 바뀌면 이 CSV의 해당 줄만 고치면 돼요.
