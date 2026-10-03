@@ -38,7 +38,13 @@ One value from: face base — `foundation`, `cushion`, `concealer`, `primer`,
 `loose_powder`, `pressed_powder`, `setting_spray`; cheek — `blush`,
 `highlighter`, `contour`; eye — `eyeshadow`, `eyeliner`, `brow`, `mascara`;
 lip — `lip_tint`, `lipstick`, `lip_gloss`, `lip_balm`; skincare —
-`cleanser`, `toner`, `serum`, `moisturizer`, `sunscreen`.
+`cleanser`, `toner`, `toner_pad`, `serum`, `moisturizer`, `sunscreen`, `mask`.
+
+Skincare rules: essences, ampoules and essence-toners are `serum` unless the
+brand sells them as a toner/lotion (化粧水 = `toner`). Emulsions/milks (乳液)
+are `moisturizer` with texture `liquid`. Cleansing oils, balms and foams are
+`cleanser`. Pads are `toner_pad` (texture `pad`); sheet masks are `mask`
+(texture `sheet`). The site splits **makeup** and **skincare** by this group.
 
 Decision rules: tinted moisturizers and skin tints are `foundation`. Liquid
 lipsticks are `lipstick` with texture `liquid`. Tone-up creams sold as
@@ -95,6 +101,12 @@ Definitions:
 - `brightening`: makes the area look lighter/brighter (tone-up, highlight).
 - `glow`: overall luminous sheen without distinct particles.
 - `longevity`: wear time claims (3 = "24h", "transfer-proof", confirmed).
+
+Skincare-only intensities (leave blank for makeup):
+- `soothing`: calms redness/sensitivity (cica, heartleaf, oat, panthenol).
+- `exfoliation`: removes dead skin (AHA/BHA/PHA, pads, peeling).
+- `anti_aging`: firming / fine lines (retinol, peptides, adenosine).
+- `acne_care`: breakouts and post-blemish marks (BHA, tea tree, madecassoside).
 
 ## Skin types (`skin_types`)
 

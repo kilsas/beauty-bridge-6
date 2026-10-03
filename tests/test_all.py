@@ -190,7 +190,7 @@ class TestRecommendations(unittest.TestCase):
 class TestGoalAreas(unittest.TestCase):
     def test_every_goal_has_area(self):
         areas = {g.area for g in ENGINE.ds.goals.values()}
-        self.assertEqual(areas, {"skin", "eye", "lip", "contour"})
+        self.assertEqual(areas, {"skin", "eye", "lip", "contour", "moist", "clear", "tone", "sun"})
 
     def test_every_goal_has_candidates(self):
         for gid in ENGINE.ds.goals:
@@ -431,13 +431,43 @@ class TestBuyButtons(unittest.TestCase):
     def test_official_sites_cover_every_brand(self):
         sys.path.insert(0, str(ROOT / "scripts"))
         import build_site
-        brands = {r["brand"] for r in csv.DictReader(open(ROOT / "data" / "real" / "products.csv", encoding="utf-8"))}
+        with open(ROOT / "data" / "real" / "products.csv", encoding="utf-8") as f:
+            brands = {r["brand"] for r in csv.DictReader(f)}
         off = build_site.official_sites(ROOT / "data" / "real", brands)
         self.assertEqual(set(off), brands)
         with tempfile.TemporaryDirectory() as d:
             Path(d, "brand_sites.csv").write_text("brand,market,url,search,kind\nCLIO,KR,https://x.kr,https://x.kr/s?k=,shop\n", encoding="utf-8")
             with self.assertRaises(SystemExit):
                 build_site.official_sites(Path(d), {"CLIO"})
+
+
+class TestSkincareSection(unittest.TestCase):
+    def setUp(self):
+        self.e = load_engine(ROOT / "data" / "real")
+
+    def test_enough_skincare_products_in_every_country(self):
+        from collections import Counter
+        sk = [p for p in self.e.ds.products.values() if p.category_group == "skincare"]
+        self.assertGreaterEqual(len(sk), 40)
+        by = Counter(p.country_origin if p.country_origin in ("KR", "US", "JP", "CN") else "US" for p in sk)
+        for m in ("KR", "US", "JP", "CN"):
+            self.assertGreaterEqual(by[m], 7, m)
+
+    def test_skincare_goals_only_rank_skincare(self):
+        import json
+        areas = {a["area"]: a.get("section", "makeup") for a in json.loads((ROOT / "data" / "beauty_goals.json").read_text("utf-8"))["areas"]}
+        for g in self.e.ds.goals.values():
+            recs = self.e.goal(g.goal_id, k=10)
+            want_skin = areas[g.area] == "skincare"
+            self.assertGreaterEqual(len(recs), 3 if want_skin else 2, g.goal_id)
+            for r in recs:
+                self.assertEqual(r.product.category_group == "skincare", want_skin, (g.goal_id, r.product.product_id))
+
+    def test_new_skincare_products_have_sourced_signals(self):
+        sig = {r["product_id"] for r in self.e.ds.signals}
+        for pid, p in self.e.ds.products.items():
+            if p.category_group == "skincare" and pid >= "C011" and pid[0] == "C" or pid in ("R030", "U027", "J026"):
+                self.assertIn(pid, sig)
 
 
 if __name__ == "__main__":

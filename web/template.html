@@ -70,6 +70,9 @@ a { color: inherit; }
 .mkt::after { content: ""; position: absolute; right: 9px; top: 50%; border: 4px solid transparent; border-top-color: var(--ink); transform: translateY(-2px); pointer-events: none; }
 .lang { font: 600 12px var(--num); letter-spacing: 0.04em; padding: 6px 8px; border-radius: 8px; color: var(--muted); }
 .lang:hover { background: var(--chip); color: var(--ink); }
+.secsw { display: flex; gap: 4px; margin: 2px 16px 4px; padding: 3px; background: var(--chip); border-radius: 999px; width: max-content; }
+.secsw button { padding: 6px 16px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--muted); }
+.secsw button[aria-pressed="true"] { background: var(--bg); color: var(--ink); box-shadow: var(--shadow); }
 .tabs { display: flex; gap: 22px; padding: 6px 16px 0; overflow-x: auto; scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
 .tabs button { padding: 8px 0 10px; font-size: 16px; font-weight: 500; color: var(--ink-2); white-space: nowrap; position: relative; }
@@ -98,6 +101,7 @@ h1 { margin: 0; font-size: 24px; line-height: 1.3; letter-spacing: -0.02em; text
 /* chips */
 .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
 .chips::-webkit-scrollbar { display: none; }
+.chips .eyebrow { flex: none; white-space: nowrap; }
 .chip { flex: none; padding: 7px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); font-size: 14px; color: var(--ink-2); white-space: nowrap; }
 .chip[aria-pressed="true"] { background: var(--dark-chip); border-color: var(--dark-chip); color: var(--dark-chip-ink); font-weight: 700; }
 .chip.drop { background: var(--dark-chip); border-color: var(--dark-chip); color: var(--dark-chip-ink); font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
@@ -341,15 +345,16 @@ const CFG = /*__CONFIG__*/{};
 /* ---------------- state + routing ---------------- */
 const S = { view: "home", rtab: "market", lmkt: "KR", cat: "", skin: "dry", goal: "aegyo_sal", area: "eye", pid: "P001", ptab: "similar",
   origin: "", q: "", market: "KR", lang: "ko", hcat: "", hskin: "dry", harea: "eye", hgoal: "aegyo_sal", gskin: "", sheet: false, open: {},
-  age: "20s", draft: null, bmkt: "" };
+  age: "20s", draft: null, bmkt: "", sec: "makeup" };
 /* Live first-party reviews (db capability). One document per reviewer: reviews/<uid> = {items: {productId: review}} */
 const LIVE = { status: "loading", db: null, uid: null, canWrite: null, list: [], saving: false, msg: "" };
 try {
   const saved = JSON.parse(localStorage.getItem("bb3") || "{}");
   if (saved.market !== undefined && saved.market in MKT_TX.en) S.market = saved.market;
   if (saved.lang in LANGS) S.lang = saved.lang;
+  if (saved.sec === "skincare" || saved.sec === "makeup") S.sec = saved.sec;
 } catch (e) {}
-const persist = () => { try { localStorage.setItem("bb3", JSON.stringify({ market: S.market, lang: S.lang })); } catch (e) {} };
+const persist = () => { try { localStorage.setItem("bb3", JSON.stringify({ market: S.market, lang: S.lang, sec: S.sec })); } catch (e) {} };
 const MARKETS = ["", "KR", "US", "JP", "CN"];
 const areaOf = (g) => D.goals[g].meta.area;
 
@@ -384,7 +389,29 @@ const isEn = () => S.lang === "en";
 const tx = (map, key) => key == null ? "" : isEn() ? nice(key) : (TR[S.lang][map][key] || nice(key));
 for (const [id, p] of Object.entries(D.products)) p.id = id;
 const P = (id) => D.products[id];
-const mktName = (m) => MKT_TX[S.lang][m];
+/* makeup / skincare sections */
+const secOf = (p) => p.grp === "skincare" ? "skincare" : "makeup";
+const inSec = (id) => secOf(P(id)) === S.sec;
+const secIds = () => Object.keys(D.products).filter(inSec);
+const areaSec = (a) => (D.areas.find((x) => x.area === a) || {}).section || "makeup";
+const areasIn = () => D.areas.filter((a) => (a.section || "makeup") === S.sec);
+const secGroups = () => Object.entries(D.codebook.groups).filter(([g]) => (g === "skincare") === (S.sec === "skincare"));
+function setSec(sec) {
+  if (sec === S.sec) return;
+  S.sec = sec;
+  const a = areasIn()[0].area, g = goalsIn(a)[0];
+  Object.assign(S, { area: a, goal: g, harea: a, hgoal: g, cat: "", hcat: "", gskin: "" });
+}
+/* products shown in the "dupes" block and banners: makeup uses the curated list, skincare the strongest cross-country matches */
+function secFeatured() {
+  if (S.sec === "makeup") return D.featured;
+  const best = secIds().map((id) => ({ id, r: (D.similar[id][""] || []).find((x) => P(x.id).origin !== P(id).origin) }))
+    .filter((x) => x.r).sort((a, b) => b.r.pct - a.r.pct || a.id.localeCompare(b.id));
+  const out = [];
+  for (const x of best) if (!out.some((y) => P(y).cat === P(x.id).cat)) out.push(x.id);
+  return out.slice(0, 3);
+}
+const mktName = (m) => MKT_TX[S.lang][m] ?? ORIGIN_TX[S.lang]?.[m] ?? m;
 const catName = (c) => tx("cat", c);
 const grpName = (g) => tx("grp", g);
 const skinName = (s) => tx("skin", s);
@@ -483,6 +510,8 @@ function kindOf(p) {
   if (c === "lipstick") return x === "liquid" ? "wand" : "bullet";
   if (c === "lip_balm") return x === "balm" ? "tube" : "stick";
   if (c === "toner") return "tall";
+  if (c === "toner_pad") return "jar";
+  if (c === "mask") return "pouch";
   if (c === "serum") return "dropper";
   if (c === "moisturizer") return x === "gel" ? "tube" : "jar";
   if (c === "eyeshadow") return x === "liquid" ? "wand" : x === "cream" ? "jar" : "palette";
@@ -497,6 +526,7 @@ function thumbSvg(p) {
   const ini = esc(p.brand.split(" ").map((w) => w[0]).join("").slice(0, 2));
   const lab = (x, y, w) => `<text x="${x}" y="${y}" text-anchor="middle" font-family="Outfit, sans-serif" font-size="${w}" font-weight="600" fill="${B}">${ini}</text>`;
   const shapes = {
+    pouch: `<path d="M28 16h44l4 8v58a4 4 0 0 1-4 4H28a4 4 0 0 1-4-4V24z" fill="${W}" stroke="${L}"/><rect x="24" y="16" width="52" height="10" fill="${B}"/><path d="M36 44c4-6 24-6 28 0" fill="none" stroke="${Sd}" stroke-width="5" stroke-linecap="round"/>${lab(50, 74, 8)}`,
     jar: `<rect x="26" y="30" width="48" height="16" rx="4" fill="${B}"/><rect x="28" y="46" width="44" height="34" rx="6" fill="${W}" stroke="${L}"/><rect x="28" y="58" width="44" height="9" fill="${Sd}"/>${lab(50, 76, 7)}`,
     compact: `<circle cx="50" cy="52" r="32" fill="${B}"/><circle cx="50" cy="52" r="23" fill="${Sd}"/><circle cx="41" cy="43" r="7" fill="#fff" opacity=".28"/>`,
     palette: `<rect x="16" y="28" width="68" height="46" rx="6" fill="${B}"/>${[[31, 44], [50, 44], [69, 44], [40, 60], [60, 60]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="8" fill="${Sd}" opacity="${1 - i * 0.14}"/>`).join("")}`,
@@ -525,9 +555,11 @@ function sigLabel(g) {
 }
 const topSig = (p, m = sigMarket()) => (p.sig && p.sig[m] || [])[0];
 function sigBadge(p) { const g = topSig(p); return g ? `<span class="sigb">${esc(sigLabel(g))}</span>` : ""; }
+// strongest signal first; an overall #1 (e.g. a grand prize) beats a category #1
+const lead = (id, m) => P(id).sig[m][0].s + (P(id).sig[m].some((g) => g.cat === "overall" && g.rank === 1) ? 0.05 : 0);
 function leadersIn(m, cat) {
-  return Object.keys(D.products).filter((id) => P(id).sig && P(id).sig[m] && (!cat || P(id).cat === cat || P(id).grp === cat))
-    .sort((a, b) => P(b).sig[m][0].s - P(a).sig[m][0].s || a.localeCompare(b));
+  return secIds().filter((id) => P(id).sig && P(id).sig[m] && (!cat || P(id).cat === cat || P(id).grp === cat))
+    .sort((a, b) => lead(b, m) - lead(a, m) || a.localeCompare(b));
 }
 const countryChips = () => `<div class="chips">${["KR", "US", "JP", "CN"].map((m) => `<button class="chip" data-lmkt="${m}" aria-pressed="${S.lmkt === m}">${mktName(m)}</button>`).join("")}</div>`;
 
@@ -597,31 +629,31 @@ const basisNote = (r) => r.live ? `<span class="note"><span class="livedot"></sp
 /* ---------------- ranking data ---------------- */
 const pop = (id) => { const st = liveStats()[id]; return st ? (st.score - 1) / 4 : (P(id).pop[S.market] ?? 0); };
 const byPop = (ids) => ids.filter((id) => available(P(id))).sort((a, b) => pop(b) - pop(a) || a.localeCompare(b));
-const catIds = (cat) => Object.keys(D.products).filter((id) => !cat || P(id).cat === cat || P(id).grp === cat);
+const catIds = (cat) => secIds().filter((id) => !cat || P(id).cat === cat || P(id).grp === cat);
 // skin type only matters for products that sit on the skin
-const skinIds = (s) => Object.keys(D.products).filter((id) => P(id).skin.includes(s) && (P(id).grp === "face_base" || P(id).grp === "skincare"));
+const skinIds = (s) => secIds().filter((id) => P(id).skin.includes(s) && (S.sec === "skincare" || P(id).grp === "face_base"));
 function trendRows() {
   const m = S.market && D.trends[S.market] ? S.market : (D.trends.KR ? "KR" : Object.keys(D.trends)[0]);
   return { m, rows: D.trends[m] || [] };
 }
-function risingLive() { return liveTrending().filter((r) => available(P(r.id))); }
+function risingLive() { return liveTrending().filter((r) => available(P(r.id)) && inSec(r.id)); }
 function risingIds() {
   const { rows } = trendRows();
-  return rows.slice().sort((a, b) => ((b.st === "new" ? 99 : b.chg ?? 0) - (a.st === "new" ? 99 : a.chg ?? 0)) || a.rank - b.rank);
+  return rows.filter((r) => inSec(r.id)).sort((a, b) => ((b.st === "new" ? 99 : b.chg ?? 0) - (a.st === "new" ? 99 : a.chg ?? 0)) || a.rank - b.rank);
 }
 const goalIds = (g) => (D.goals[g].r[S.market] || []).map((r) => r.id);
 const goalPct = (g, id) => ((D.goals[g].r[S.market] || []).find((x) => x.id === id) || {}).pct;
 const goalsIn = (a) => Object.keys(D.goals).filter((g) => areaOf(g) === a);
 function brandRanking() {
   const by = {};
-  for (const id of Object.keys(D.products)) { if (!available(P(id))) continue; (by[P(id).brand] ||= []).push(id); }
+  for (const id of secIds()) { if (!available(P(id))) continue; (by[P(id).brand] ||= []).push(id); }
   return Object.entries(by).map(([b, ids]) => {
     const sorted = ids.sort((x, y) => pop(y) - pop(x));
     return { b, ids: sorted, score: sorted.slice(0, 3).reduce((s, id) => s + pop(id), 0) / 3 };
   }).sort((a, b) => b.score - a.score);
 }
 const catLabel = (c) => !c ? t("allCats") : (D.codebook.groups[c] ? grpName(c) : catName(c));
-const areaTabs = (attr, cur) => `<div class="areas">${D.areas.map((a) => `<button class="area" ${attr}="${a.area}" aria-pressed="${cur === a.area}">${areaName(a.area)}</button>`).join("")}</div>`;
+const areaTabs = (attr, cur) => `<div class="areas">${areasIn().map((a) => `<button class="area" ${attr}="${a.area}" aria-pressed="${cur === a.area}">${areaName(a.area)}</button>`).join("")}</div>`;
 const goalChips = (attr, area, cur) => `<div class="chips">${goalsIn(area).map((g) => `<button class="chip" ${attr}="${g}" aria-pressed="${cur === g}">${esc(goalName(g))}</button>`).join("")}</div>`;
 
 /* ---------------- header ---------------- */
@@ -633,7 +665,7 @@ function header() {
   hdr.className = "hdr" + (S.view === "ranking" || S.view === "goals" ? "" : " flat");
   let sub = "";
   if (S.view === "ranking") sub = `<nav class="sub" aria-label="${t("ranking")}">${subs.map(([k, l]) => `<button data-rtab="${k}" aria-current="${S.rtab === k}">${l}</button>`).join("")}</nav>`;
-  if (S.view === "goals") sub = `<nav class="sub" aria-label="${t("goals")}">${D.areas.map((a) => `<button data-garea="${a.area}" aria-current="${S.area === a.area}">${areaName(a.area)}</button>`).join("")}</nav>`;
+  if (S.view === "goals") sub = `<nav class="sub" aria-label="${t("goals")}">${areasIn().map((a) => `<button data-garea="${a.area}" aria-current="${S.area === a.area}">${areaName(a.area)}</button>`).join("")}</nav>`;
   hdr.innerHTML = `<div class="hdr-top">
       <button class="logo" data-go="home" aria-label="Beauty Bridge home">${I.logo}<span>beauty bridge</span></button>
       <div class="tools">
@@ -641,6 +673,7 @@ function header() {
         <label class="mkt">${I.globe}<select id="mkt" aria-label="Market">${MARKETS.map((m) => `<option value="${m}" ${m === S.market ? "selected" : ""}>${m ? mktName(m) : t("all")}</option>`).join("")}</select></label>
         <label class="langsel"><select id="lang" aria-label="Language">${Object.entries(LANGS).map(([k, v]) => `<option value="${k}" ${k === S.lang ? "selected" : ""}>${v}</option>`).join("")}</select></label>
       </div></div>
+    ${["home", "ranking", "goals", "search"].includes(S.view) ? `<div class="secsw" role="group" aria-label="${t("secAria")}">${[["makeup", t("secMakeup")], ["skincare", t("secSkin")]].map(([k, l]) => `<button data-sec="${k}" aria-pressed="${S.sec === k}">${l}</button>`).join("")}</div>` : ""}
     <nav class="tabs" aria-label="Main">${tabs.map(([k, l]) => `<button data-go="${k}" ${cur === k ? 'aria-current="page"' : ""}>${l}</button>`).join("")}</nav>${sub}`;
   document.documentElement.style.setProperty("--hdr-h", hdr.offsetHeight + "px");
 }
@@ -648,19 +681,20 @@ function header() {
 /* ---------------- views ---------------- */
 const secHead = (title, go) => `<div class="sec-h"><h2>${title}</h2>${go ? `<button class="go" ${go} aria-label="${t("seeAll")}">${I.right}</button>` : ""}</div>`;
 function vHome() {
-  const f0 = D.featured[0], p1 = P(f0);
+  const feat = secFeatured(), f0 = feat[0], p1 = P(f0);
   const r1 = D.similar[f0][""].find((x) => P(x.id).origin !== p1.origin) || D.similar[f0][""][0];
-  const aegyo = goalIds("aegyo_sal")[0] || "P032";
+  const g2 = S.sec === "skincare" ? "soothing_care" : "aegyo_sal";
+  const aegyo = goalIds(g2)[0] || f0;
   const chart = `<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="16" y="54" width="14" height="28" rx="2" fill="#b9bdc6"/><rect x="36" y="42" width="14" height="40" rx="2" fill="#b9bdc6"/><rect x="56" y="30" width="14" height="52" rx="2" fill="#8e2b63"/><rect x="76" y="18" width="14" height="64" rx="2" fill="#8e2b63"/></svg>`;
   const slides = [
     { bg: "linear-gradient(135deg,#f6dfe9,#e9d8f4)", k: t("banner1K"), h: fmt(t("banner1H"), { p: esc(prodName(p1)), n: r1.pct, o: mktName(P(r1.id).origin) || P(r1.id).origin }), s: t("banner1S"), a: `data-product="${f0}" data-tab="similar"`, img: pic(P(r1.id)) },
-    { bg: "linear-gradient(135deg,#fde6d8,#f8d9e2)", k: t("banner2K"), h: t("banner2H"), s: t("banner2S"), a: `data-goal="aegyo_sal"`, img: pic(P(aegyo)) },
+    { bg: "linear-gradient(135deg,#fde6d8,#f8d9e2)", k: t("banner2K"), h: S.sec === "skincare" ? t("banner2Hs") : t("banner2H"), s: S.sec === "skincare" ? t("banner2Ss") : t("banner2S"), a: `data-goal="${g2}"`, img: pic(P(aegyo)) },
     { bg: "linear-gradient(135deg,#dfe9f6,#e6e0f5)", k: t("insightK"), h: t("insightH"), s: t("banner3S"), a: `data-go="insight"`, img: chart },
   ];
   const { m: rm } = trendRows();
   const rising = risingIds().slice(0, 8);
   const brands = brandRanking().slice(0, 2);
-  const pairs = D.featured.map((ref) => ({ ref, r: (D.similar[ref][S.market] || []).find((x) => P(x.id).origin !== P(ref).origin) || (D.similar[ref][S.market] || [])[0] })).filter((x) => x.r);
+  const pairs = feat.map((ref) => ({ ref, r: (D.similar[ref][S.market] || []).find((x) => P(x.id).origin !== P(ref).origin) || (D.similar[ref][S.market] || [])[0] })).filter((x) => x.r);
   const risingList = D.trends[rm] || [];
   return `
     <div class="banner"><div class="btrack" id="btrack">${slides.map((s) => `<button class="slide" style="background:${s.bg}" ${s.a}><span><span class="k">${s.k}</span><span class="h">${s.h}</span><span class="s">${s.s} ›</span></span>${s.img}</button>`).join("")}</div>
@@ -724,7 +758,7 @@ function homeRising(chart, rm) {
     `<div class="hscroll">${live.map((r, i) => { const p = P(r.id); return `<button class="pcard" data-product="${r.id}"><span class="thumb${p.img ? " photo" : ""}">${pic(p)}<span class="num">${i + 1}</span>${r.growth > 0 ? `<span class="chg up">▲${r.growth}</span>` : ""}</span>${nameLine(p)}${rateLine(p)}</button>`; }).join("")}</div>`;
   if (chart.length) return head(`${dateFmt(D.chartDates[1])} · ${mktName(rm)} · ${t("demo")}`) +
     `<div class="hscroll">${chart.map((r) => { const p = P(r.id); return `<button class="pcard" data-product="${r.id}"><span class="thumb${p.img ? " photo" : ""}">${pic(p)}<span class="num">${r.rank}</span>${change(r.chg, r.st)}</span>${nameLine(p)}${rateLine(p)}</button>`; }).join("")}</div>`;
-  return head(`<span class="livedot"></span>${t("live")}`) + `<button class="card" data-product="${D.featured[0]}" data-tab="reviews" style="text-align:left"><h3>${t("noRising")}</h3><span class="note">${t("firstCta")} ›</span></button>`;
+  return head(`<span class="livedot"></span>${t("live")}`) + `<button class="card" data-product="${secFeatured()[0]}" data-tab="reviews" style="text-align:left"><h3>${t("noRising")}</h3><span class="note">${t("firstCta")} ›</span></button>`;
 }
 function brandBlock(b, n, k) {
   const p0 = P(b.ids[0]);
@@ -758,11 +792,11 @@ function vRanking() {
       basis = `<span class="note">${t("demo")}${S.market && S.market !== m ? " · " + t("chartMissing") : ""}</span>`;
       body = rankedList(risingIds().map((r) => r.id), { limit: 30, extra: (id) => ({ chg: find(id).chg, st: find(id).st }), metric: (id) => `<small>${t("now")} #${find(id).rank}</small>` });
     } else {
-      body = `<div class="empty">${t("noRising")}<br><br><button class="more" data-product="${D.featured[0]}" data-tab="reviews">${t("firstCta")} ${I.right}</button></div>`;
+      body = `<div class="empty">${t("noRising")}<br><br><button class="more" data-product="${secFeatured()[0]}" data-tab="reviews">${t("firstCta")} ${I.right}</button></div>`;
     }
   } else if (S.rtab === "buy") {
     const st = CLICKS.stats;
-    const ids = avail(Object.keys(st).filter((id) => D.products[id] && st[id].people > 0))
+    const ids = avail(Object.keys(st).filter((id) => D.products[id] && st[id].people > 0 && inSec(id)))
       .sort((a, b) => st[b].people - st[a].people || st[b].people_7d - st[a].people_7d || a.localeCompare(b));
     basis = `<span class="note"><span class="livedot"></span>${t("live")} · ${t("buyBasis")}</span>`;
     body = ids.length ? rankedList(ids, { limit: 40, metric: (id) => `<b>${fmt(t("peopleN"), { n: st[id].people })}</b><small>${fmt(t("people7"), { n: st[id].people_7d })}</small>` })
@@ -774,12 +808,12 @@ function vRanking() {
   } else if (S.rtab === "skin") {
     filt = `<div class="chips">${D.codebook.skin.map((x) => `<button class="chip" data-skin="${x}" aria-pressed="${S.skin === x}">${skinName(x)}</button>`).join("")}</div>`;
     const key = "skin:" + S.skin, pred = (x) => x.skin_type === S.skin;
-    const r = liveRank(avail(Object.keys(D.products)).filter((id) => segStats(key, pred)[id] || skinIds(S.skin).includes(id)), key, pred);
+    const r = liveRank(avail(secIds()).filter((id) => segStats(key, pred)[id] || skinIds(S.skin).includes(id)), key, pred);
     basis = basisNote(r); body = rankedList(r.ids, { metric: (id) => stars(id, key, pred, skinName(S.skin)) });
   } else if (S.rtab === "age") {
     filt = `<div class="chips">${D.reviewPrior.ages.map((a) => `<button class="chip" data-age="${a}" aria-pressed="${S.age === a}">${t("ageName")[a]}</button>`).join("")}</div>`;
     const key = "age:" + S.age, pred = (x) => x.age_band === S.age;
-    const r = liveRank(avail(Object.keys(D.products)), key, pred);
+    const r = liveRank(avail(secIds()), key, pred);
     basis = basisNote(r); body = rankedList(r.ids, { metric: (id) => stars(id, key, pred, t("ageName")[S.age]) });
   } else if (S.rtab === "goal") {
     filt = areaTabs("data-rarea", S.area) + goalChips("data-rgoal", S.area, S.goal);
@@ -848,6 +882,11 @@ function resultRows(list, kind, ref) {
   }).join("");
 }
 
+/* the function bars that matter for this kind of product */
+const SKIN_FEATS = ["hydration", "soothing", "oil_control", "brightening", "glow", "exfoliation", "anti_aging", "acne_care"];
+const featsFor = (p) => p.grp === "skincare"
+  ? SKIN_FEATS.filter((k) => p.int[k] != null).concat(p.int.blurring > 0 ? ["blurring"] : [])
+  : D.codebook.intensity.filter((k) => p.int[k] != null && !SKIN_FEATS.slice(5).includes(k) && k !== "soothing");
 function vProduct() {
   const p = P(S.pid);
   const nRev = (liveStats()[S.pid] || {}).n || 0;
@@ -887,7 +926,7 @@ function vProduct() {
       ${p.sig && Object.keys(p.sig).length ? `<div class="card evid"><span class="lbl">${t("evidence")}</span>${Object.entries(p.sig).map(([m, rows]) => rows.map((g) => `<div class="evrow"><span class="tag">${mktName(m)}</span><span>${esc(sigLabel(g))}</span><a class="src" href="${esc(g.url)}" target="_blank" rel="noopener">${t("source")} · ${esc(g.date)}</a></div>`).join("")).join("")}</div>` : ""}
       <div class="profile">
         ${p.finish ? `<div><span class="lbl">${t("finish")}</span><div class="scale">${D.codebook.finish.map((k) => `<div class="${k === p.finish ? "on" : ""}">${tx("finish", k)}</div>`).join("")}</div></div>` : ""}
-        <div><span class="lbl">${t("func")}</span><div class="ints">${D.codebook.intensity.filter((k) => p.int[k] != null).map((k) => `<span>${tx("feat", k)}</span><span class="d" aria-label="${p.int[k]}/3">${[1, 2, 3].map((i) => `<i class="${i <= p.int[k] ? "f" : ""}"></i>`).join("")}</span>`).join("")}</div></div>
+        <div><span class="lbl">${t("func")}</span><div class="ints">${featsFor(p).map((k) => `<span>${tx("feat", k)}</span><span class="d" aria-label="${p.int[k]}/3">${[1, 2, 3].map((i) => `<i class="${i <= p.int[k] ? "f" : ""}"></i>`).join("")}</span>`).join("")}</div></div>
       </div></section>
     <nav class="ptabs">${tabs.map(([k, lb]) => `<button data-ptab="${k}" aria-current="${S.ptab === k}">${lb}</button>`).join("")}</nav>
     <section class="sec">${body}</section>`;
@@ -1186,7 +1225,7 @@ function vGoals() {
   if (areaOf(S.goal) !== S.area) S.goal = goalsIn(S.area)[0];
   const g = S.goal, meta = D.goals[g].meta;
   const list = (D.goals[g].r[S.market] || []).filter((r) => !S.gskin || !P(r.id).skin.length || P(r.id).skin.includes(S.gskin)).slice(0, 10);
-  const skinUseful = meta.area === "skin";
+  const skinUseful = meta.area === "skin" || areaSec(meta.area) === "skincare";
   return `<section class="sec" style="padding-top:16px">
       ${goalChips("data-goal", S.area, g)}
       <div><span class="eyebrow">${areaName(meta.area)} · ${meta.cats.map(catName).join(" · ")}</span><h1>${esc(goalName(g))}</h1><p class="note" style="font-size:14px;margin:6px 0 0">${esc(goalDesc(g))}</p></div>
@@ -1326,10 +1365,11 @@ function renderSheet() {
   const el = document.getElementById("sheet");
   if (!S.sheet) { el.innerHTML = ""; return; }
   const cur = S.sheet === "home" ? S.hcat : S.cat;
-  const openG = S.sheetOpen ?? Object.entries(D.codebook.groups).find(([g, cs]) => g === cur || cs.includes(cur))?.[0];
+  const groups = secGroups();
+  const openG = S.sheetOpen ?? (groups.find(([g, cs]) => g === cur || cs.includes(cur)) || (groups.length === 1 ? groups[0] : []))[0];
   el.innerHTML = `<div class="scrim" data-close="1"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="${t("allCats")}"><div class="handle"></div>
     <div class="acc"><button aria-expanded="true" style="font-weight:700">${t("all")}</button><div class="chips"><button class="chip" data-pickcat="" aria-pressed="${!cur}">${t("allCats")}</button></div></div>
-    ${Object.entries(D.codebook.groups).map(([g, cs]) => `<div class="acc"><button data-accg="${g}" aria-expanded="${openG === g}">${grpName(g)} ${I.chev}</button>
+    ${groups.map(([g, cs]) => `<div class="acc"><button data-accg="${g}" aria-expanded="${openG === g}">${grpName(g)} ${I.chev}</button>
       ${openG === g ? `<div class="chips"><button class="chip" data-pickcat="${g}" aria-pressed="${cur === g}">${grpName(g)} · ${t("all")}</button>${cs.map((c) => `<button class="chip" data-pickcat="${c}" aria-pressed="${cur === c}">${catName(c)}</button>`).join("")}</div>` : ""}</div>`).join("")}
   </div>`;
 }
@@ -1357,9 +1397,10 @@ document.addEventListener("click", (e) => {
   if (d.pickcat !== undefined) { if (S.sheet === "home") S.hcat = d.pickcat; else S.cat = d.pickcat; S.sheet = false; S.sheetOpen = undefined; render(); return; }
   if (d.accg) { S.sheetOpen = S.sheetOpen === d.accg ? "" : d.accg; renderSheet(); return; }
   if (d.sheet) { S.sheet = d.sheet; S.sheetOpen = undefined; renderSheet(); return; }
-  if (d.product) { LIVE.msg = ""; go("product", { pid: d.product, ptab: d.tab || "similar", origin: d.orig || "", draft: null, bmkt: "" }); return; }
+  if (d.sec) { setSec(d.sec); render(); return; }
+  if (d.product) { if (D.products[d.product]) S.sec = secOf(P(d.product)); LIVE.msg = ""; go("product", { pid: d.product, ptab: d.tab || "similar", origin: d.orig || "", draft: null, bmkt: "" }); return; }
   if (d.bmkt) { S.bmkt = d.bmkt; render(); return; }
-  if (d.goal) { go("goals", { goal: d.goal, area: areaOf(d.goal), gskin: "" }); return; }
+  if (d.goal) { S.sec = areaSec(areaOf(d.goal)); go("goals", { goal: d.goal, area: areaOf(d.goal), gskin: "" }); return; }
   if (d.go) { const extra = {}; if (d.rtab) extra.rtab = d.rtab; if (d.cat !== undefined) extra.cat = d.cat; if (d.skin) extra.skin = d.skin; if (d.go === "ranking" && d.rtab === "goal") extra.area = areaOf(S.goal); go(d.go, extra); return; }
   if (d.rtab) { S.rtab = d.rtab; go("ranking"); return; }
   if (d.garea) { go("goals", { area: d.garea, goal: goalsIn(d.garea)[0], gskin: "" }); return; }
@@ -1394,7 +1435,10 @@ document.addEventListener("change", (e) => {
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && S.sheet) { S.sheet = false; renderSheet(); } });
 
 if (!D.products[S.pid]) S.pid = D.featured[0];
+if (S.sec === "skincare") { S.sec = "makeup"; setSec("skincare"); }
 fromHash();
+if (S.view === "product") S.sec = secOf(P(S.pid));
+if (S.view === "goals") { S.sec = areaSec(areaOf(S.goal)); }
 if (S.view !== "goals") S.area = areaOf(S.goal);
 render();
 initLive();

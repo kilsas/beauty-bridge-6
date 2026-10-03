@@ -116,43 +116,43 @@ const T = {
 
 const TR = {
   ko: {
-    cat: { loose_powder: "루스 파우더", pressed_powder: "팩트", foundation: "파운데이션", cushion: "쿠션", concealer: "컨실러", primer: "프라이머", setting_spray: "픽서", blush: "블러셔", highlighter: "하이라이터", contour: "쉐딩", bronzer: "브론저", eyeshadow: "아이섀도우", eyeliner: "아이라이너", brow: "아이브로우", mascara: "마스카라", lip_tint: "틴트", lipstick: "립스틱", lip_gloss: "립글로스", lip_balm: "립밤", lip_liner: "립펜슬", lip_plumper: "립 맥시마이저", cleanser: "클렌저", toner: "토너", serum: "세럼·앰플", moisturizer: "크림", sunscreen: "선크림" },
+    cat: { loose_powder: "루스 파우더", pressed_powder: "팩트", foundation: "파운데이션", cushion: "쿠션", concealer: "컨실러", primer: "프라이머", setting_spray: "픽서", blush: "블러셔", highlighter: "하이라이터", contour: "쉐딩", bronzer: "브론저", eyeshadow: "아이섀도우", eyeliner: "아이라이너", brow: "아이브로우", mascara: "마스카라", lip_tint: "틴트", lipstick: "립스틱", lip_gloss: "립글로스", lip_balm: "립밤", lip_liner: "립펜슬", lip_plumper: "립 맥시마이저", cleanser: "클렌저", toner: "토너", toner_pad: "토너 패드", mask: "마스크팩", serum: "세럼·앰플", moisturizer: "크림", sunscreen: "선크림" },
     grp: { face_base: "베이스메이크업", cheek: "치크·컨투어", eye: "아이메이크업", lip: "립메이크업", skincare: "스킨케어" },
     skin: { oily: "지성", dry: "건성", combination: "복합성", normal: "중성", sensitive: "민감성" },
     finish: { matte: "매트", soft_matte: "세미매트", satin: "새틴", dewy: "듀이", glossy: "글로시" },
     coverage: { sheer: "시어", light: "라이트", medium: "미디엄", full: "풀" },
-    texture: { loose_powder: "가루", pressed_powder: "압축 파우더", liquid: "리퀴드", cream: "크림", gel: "젤", balm: "밤", stick: "스틱", cushion: "쿠션", water: "워터", oil: "오일", mousse: "무스", pencil: "펜슬" },
+    texture: { loose_powder: "가루", pressed_powder: "압축 파우더", liquid: "리퀴드", cream: "크림", gel: "젤", balm: "밤", stick: "스틱", cushion: "쿠션", water: "워터", oil: "오일", mousse: "무스", pencil: "펜슬", pad: "패드", sheet: "시트" },
     tone: { cool: "쿨톤", neutral: "뉴트럴", warm: "웜톤" },
     shade: { nude: "누드", rose: "로즈", pink: "핑크", coral: "코랄", red: "레드", berry: "베리", brown: "브라운", champagne: "샴페인", gold: "골드", clear: "투명" },
-    feat: { oil_control: "피지 조절", hydration: "보습", blurring: "블러", shimmer: "펄감", brightening: "톤업", glow: "광채", longevity: "지속력", volume: "볼륨", precision: "정교함", finish: "마무리감", coverage: "커버력", shade_family: "컬러", texture: "제형", undertone: "톤" },
+    feat: { oil_control: "피지 조절", hydration: "보습", blurring: "블러", shimmer: "펄감", brightening: "톤업", glow: "광채", longevity: "지속력", volume: "볼륨", precision: "정교함", soothing: "진정", exfoliation: "각질 케어", anti_aging: "탄력·주름", acne_care: "트러블 케어", finish: "마무리감", coverage: "커버력", shade_family: "컬러", texture: "제형", undertone: "톤" },
     level: { none: "없음", slight: "약함", clear: "보통", primary: "강함" },
     attr: { category: "카테고리", function: "기능", finish: "마무리감", texture: "제형", skin_type: "피부 타입", coverage: "커버력", price: "가격" },
     comp: { similarity: "유사도", price: "가격", local: "현지 적합도", popularity: "인기도", goal: "목표 적합도" },
   },
   zh: {
-    cat: { loose_powder: "散粉", pressed_powder: "粉饼", foundation: "粉底液", cushion: "气垫", concealer: "遮瑕", primer: "妆前乳", setting_spray: "定妆喷雾", blush: "腮红", highlighter: "高光", contour: "修容", bronzer: "古铜粉", eyeshadow: "眼影", eyeliner: "眼线", brow: "眉笔", mascara: "睫毛膏", lip_tint: "唇釉", lipstick: "口红", lip_gloss: "唇彩", lip_balm: "润唇膏", lip_liner: "唇线笔", lip_plumper: "丰唇蜜", cleanser: "洁面", toner: "化妆水", serum: "精华", moisturizer: "面霜", sunscreen: "防晒" },
+    cat: { loose_powder: "散粉", pressed_powder: "粉饼", foundation: "粉底液", cushion: "气垫", concealer: "遮瑕", primer: "妆前乳", setting_spray: "定妆喷雾", blush: "腮红", highlighter: "高光", contour: "修容", bronzer: "古铜粉", eyeshadow: "眼影", eyeliner: "眼线", brow: "眉笔", mascara: "睫毛膏", lip_tint: "唇釉", lipstick: "口红", lip_gloss: "唇彩", lip_balm: "润唇膏", lip_liner: "唇线笔", lip_plumper: "丰唇蜜", cleanser: "洁面", toner: "化妆水", toner_pad: "化妆棉片", mask: "面膜", serum: "精华", moisturizer: "面霜", sunscreen: "防晒" },
     grp: { face_base: "底妆", cheek: "腮红·修容", eye: "眼妆", lip: "唇妆", skincare: "护肤" },
     skin: { oily: "油性", dry: "干性", combination: "混合性", normal: "中性", sensitive: "敏感性" },
     finish: { matte: "哑光", soft_matte: "柔雾", satin: "缎光", dewy: "水光", glossy: "镜面" },
     coverage: { sheer: "透薄", light: "轻薄", medium: "中等", full: "高遮瑕" },
-    texture: { loose_powder: "散粉", pressed_powder: "压粉", liquid: "液体", cream: "膏霜", gel: "啫喱", balm: "膏状", stick: "棒状", cushion: "气垫", water: "水状", oil: "油状", mousse: "慕斯", pencil: "笔状" },
+    texture: { loose_powder: "散粉", pressed_powder: "压粉", liquid: "液体", cream: "膏霜", gel: "啫喱", balm: "膏状", stick: "棒状", cushion: "气垫", water: "水状", oil: "油状", mousse: "慕斯", pencil: "笔状", pad: "棉片", sheet: "片状" },
     tone: { cool: "冷调", neutral: "中性调", warm: "暖调" },
     shade: { nude: "裸色", rose: "玫瑰", pink: "粉色", coral: "珊瑚", red: "红色", berry: "莓果", brown: "棕色", champagne: "香槟", gold: "金色", clear: "透明" },
-    feat: { oil_control: "控油", hydration: "保湿", blurring: "柔焦", shimmer: "珠光", brightening: "提亮", glow: "光泽", longevity: "持久", volume: "丰盈", precision: "精准", finish: "妆效", coverage: "遮瑕力", shade_family: "色系", texture: "质地", undertone: "色调" },
+    feat: { oil_control: "控油", hydration: "保湿", blurring: "柔焦", shimmer: "珠光", brightening: "提亮", glow: "光泽", longevity: "持久", volume: "丰盈", precision: "精准", soothing: "舒缓", exfoliation: "去角质", anti_aging: "抗老", acne_care: "祛痘", finish: "妆效", coverage: "遮瑕力", shade_family: "色系", texture: "质地", undertone: "色调" },
     level: { none: "无", slight: "弱", clear: "中", primary: "强" },
     attr: { category: "品类", function: "功效", finish: "妆效", texture: "质地", skin_type: "肤质", coverage: "遮瑕力", price: "价格" },
     comp: { similarity: "相似度", price: "价格", local: "本地适配", popularity: "人气", goal: "目标匹配" },
   },
   ja: {
-    cat: { loose_powder: "ルースパウダー", pressed_powder: "プレストパウダー", foundation: "ファンデーション", cushion: "クッション", concealer: "コンシーラー", primer: "下地", setting_spray: "フィックスミスト", blush: "チーク", highlighter: "ハイライト", contour: "シェーディング", bronzer: "ブロンザー", eyeshadow: "アイシャドウ", eyeliner: "アイライナー", brow: "アイブロウ", mascara: "マスカラ", lip_tint: "ティント", lipstick: "リップスティック", lip_gloss: "リップグロス", lip_balm: "リップバーム", lip_liner: "リップライナー", lip_plumper: "リッププランパー", cleanser: "洗顔", toner: "化粧水", serum: "美容液", moisturizer: "クリーム", sunscreen: "日焼け止め" },
+    cat: { loose_powder: "ルースパウダー", pressed_powder: "プレストパウダー", foundation: "ファンデーション", cushion: "クッション", concealer: "コンシーラー", primer: "下地", setting_spray: "フィックスミスト", blush: "チーク", highlighter: "ハイライト", contour: "シェーディング", bronzer: "ブロンザー", eyeshadow: "アイシャドウ", eyeliner: "アイライナー", brow: "アイブロウ", mascara: "マスカラ", lip_tint: "ティント", lipstick: "リップスティック", lip_gloss: "リップグロス", lip_balm: "リップバーム", lip_liner: "リップライナー", lip_plumper: "リッププランパー", toner_pad: "拭き取りパッド", mask: "シートマスク", cleanser: "洗顔", toner: "化粧水", serum: "美容液", moisturizer: "クリーム", sunscreen: "日焼け止め" },
     grp: { face_base: "ベースメイク", cheek: "チーク・輪郭", eye: "アイメイク", lip: "リップメイク", skincare: "スキンケア" },
     skin: { oily: "脂性肌", dry: "乾燥肌", combination: "混合肌", normal: "普通肌", sensitive: "敏感肌" },
     finish: { matte: "マット", soft_matte: "セミマット", satin: "サテン", dewy: "ツヤ", glossy: "グロッシー" },
     coverage: { sheer: "シアー", light: "ライト", medium: "ミディアム", full: "フル" },
-    texture: { loose_powder: "ルース", pressed_powder: "プレスト", liquid: "リキッド", cream: "クリーム", gel: "ジェル", balm: "バーム", stick: "スティック", cushion: "クッション", water: "ウォーター", oil: "オイル", mousse: "ムース", pencil: "ペンシル" },
+    texture: { loose_powder: "ルース", pressed_powder: "プレスト", liquid: "リキッド", cream: "クリーム", gel: "ジェル", balm: "バーム", stick: "スティック", cushion: "クッション", water: "ウォーター", oil: "オイル", mousse: "ムース", pencil: "ペンシル", pad: "パッド", sheet: "シート" },
     tone: { cool: "ブルベ", neutral: "ニュートラル", warm: "イエベ" },
     shade: { nude: "ヌード", rose: "ローズ", pink: "ピンク", coral: "コーラル", red: "レッド", berry: "ベリー", brown: "ブラウン", champagne: "シャンパン", gold: "ゴールド", clear: "クリア" },
-    feat: { oil_control: "皮脂コントロール", hydration: "保湿", blurring: "ぼかし", shimmer: "パール感", brightening: "トーンアップ", glow: "ツヤ感", longevity: "持続力", volume: "ボリューム", precision: "描きやすさ", finish: "仕上がり", coverage: "カバー力", shade_family: "カラー", texture: "テクスチャー", undertone: "トーン" },
+    feat: { oil_control: "皮脂コントロール", hydration: "保湿", blurring: "ぼかし", shimmer: "パール感", brightening: "トーンアップ", glow: "ツヤ感", longevity: "持続力", volume: "ボリューム", precision: "描きやすさ", soothing: "鎮静", exfoliation: "角質ケア", anti_aging: "ハリ・シワ", acne_care: "ニキビケア", finish: "仕上がり", coverage: "カバー力", shade_family: "カラー", texture: "テクスチャー", undertone: "トーン" },
     level: { none: "なし", slight: "弱", clear: "中", primary: "強" },
     attr: { category: "カテゴリー", function: "機能", finish: "仕上がり", texture: "テクスチャー", skin_type: "肌質", coverage: "カバー力", price: "価格" },
     comp: { similarity: "類似度", price: "価格", local: "現地適合度", popularity: "人気度", goal: "目標適合度" },
@@ -165,11 +165,15 @@ const MKT_TX = {
   zh: { "": "全部国家", KR: "韩国", US: "美国", JP: "日本", CN: "中国" },
   ja: { "": "すべての国", KR: "韓国", US: "アメリカ", JP: "日本", CN: "中国" },
 };
+const ORIGIN_TX = {
+  ko: { FR: "프랑스", CA: "캐나다" }, en: { FR: "France", CA: "Canada" },
+  zh: { FR: "法国", CA: "加拿大" }, ja: { FR: "フランス", CA: "カナダ" },
+};
 const AREA_TX = {
-  ko: { skin: "피부", eye: "눈", lip: "입술", contour: "컨투어" },
-  en: { skin: "Skin", eye: "Eyes", lip: "Lips", contour: "Contour" },
-  zh: { skin: "肌肤", eye: "眼部", lip: "唇部", contour: "修容" },
-  ja: { skin: "肌", eye: "目元", lip: "唇", contour: "輪郭" },
+  ko: { skin: "피부", eye: "눈", lip: "입술", contour: "컨투어", moist: "보습·진정", clear: "트러블·모공", tone: "톤·탄력", sun: "선케어" },
+  en: { skin: "Skin", eye: "Eyes", lip: "Lips", contour: "Contour", moist: "Hydration & calm", clear: "Blemish & pores", tone: "Tone & firming", sun: "Sun care" },
+  zh: { skin: "肌肤", eye: "眼部", lip: "唇部", contour: "修容", moist: "保湿·舒缓", clear: "痘痘·毛孔", tone: "肤色·紧致", sun: "防晒" },
+  ja: { skin: "肌", eye: "目元", lip: "唇", contour: "輪郭", moist: "保湿・鎮静", clear: "ニキビ・毛穴", tone: "トーン・ハリ", sun: "UVケア" },
 };
 
 /* Phrases used to explain scores in each language (English uses the engine's own text). */
@@ -189,7 +193,17 @@ const GOAL_TX = {
   under_eye_brightening: { ko: "다크서클을 밝히고 주름지지 않게.", zh: ["黑眼圈遮盖", "提亮黑眼圈且不卡纹。"], ja: ["クマカバー", "クマを明るくしてヨレにくい。"] },
   long_lasting_base: { ko: "수정 화장 없이 하루를 버티는 베이스.", zh: ["持妆底妆", "无需补妆的全天底妆。"], ja: ["崩れにくいベース", "化粧直しなしで一日もつベース。"] },
   dewy_skin: { ko: "건강한 윤기가 도는 촉촉한 피부.", zh: ["水润肌", "透出健康光泽的水润肌。"], ja: ["しっとり肌", "健康的なツヤのあるしっとり肌。"] },
-  oily_skin_care: { ko: "번들거림 없이 가볍게 수분 공급.", zh: ["油皮护理", "清爽补水不泛油。"], ja: ["脂性肌ケア", "テカらず軽やかに保湿。"] },
+  oily_skin_care: { ko: "번들거림 없이 가볍게 수분 공급.", zh: ["控油护理", "清爽补水不泛油。"], ja: ["皮脂・テカリケア", "テカらず軽やかに保湿。"] },
+  deep_hydration: { ko: "건조하고 당기는 피부에 오래가는 수분.", zh: ["深层补水", "给干燥紧绷的肌肤持久水分。"], ja: ["うるおい保湿", "乾燥でつっぱる肌に長く続くうるおい。"] },
+  soothing_care: { ko: "붉고 예민해진 피부를 진정시켜요.", zh: ["舒缓修护", "舒缓泛红敏感的肌肤。"], ja: ["鎮静ケア", "赤みやゆらぎ肌を落ち着かせる。"] },
+  barrier_care: { ko: "약해진 피부 장벽을 채워 주는 진한 보습.", zh: ["屏障修护", "修护受损屏障的滋润保湿。"], ja: ["バリアケア", "ゆらいだバリアを支える濃密保湿。"] },
+  acne_clear: { ko: "트러블과 남은 흔적을 케어해요.", zh: ["痘痘护理", "护理痘痘和痘印。"], ja: ["ニキビケア", "ニキビとその跡をケア。"] },
+  gentle_exfoliation: { ko: "각질과 거친 피부결을 정돈해요 (AHA·BHA, 패드).", zh: ["去角质", "清理角质、改善粗糙肤质（AHA·BHA、棉片）。"], ja: ["角質ケア", "古い角質とざらつきを整える（AHA・BHA、パッド）。"] },
+  bright_tone: { ko: "칙칙함과 잡티를 맑게 정돈해요.", zh: ["提亮肤色", "改善暗沉、淡化斑点。"], ja: ["明るい肌トーン", "くすみとシミを明るく整える。"] },
+  firming: { ko: "탄력을 주고 잔주름을 완화해요.", zh: ["紧致抗皱", "提拉紧致、淡化细纹。"], ja: ["ハリ・小じわケア", "ハリを与え小じわを目立たなくする。"] },
+  sun_light: { ko: "백탁·무거움 없이 촉촉한 선크림.", zh: ["水润防晒", "不泛白、不厚重的水润防晒。"], ja: ["しっとり日焼け止め", "白浮きせず重くない、うるおう日焼け止め。"] },
+  sun_matte: { ko: "지성 피부도 화장 아래 보송하게.", zh: ["清爽控油防晒", "油皮在妆下也保持哑光。"], ja: ["さらさら日焼け止め", "脂性肌もメイク下でさらっと。"] },
+  sun_gentle: { ko: "민감한 피부를 위한 순한 선크림.", zh: ["温和防晒", "适合敏感肌的低刺激防晒。"], ja: ["低刺激日焼け止め", "敏感肌向けのやさしい日焼け止め。"] },
   lashes: { ko: "번지지 않고 하루 종일 유지되는 볼륨과 컬.", zh: ["睫毛", "持久不晕染的浓密卷翘。"], ja: ["まつげ", "にじまず一日続くボリュームとカール。"] },
   eyeliner: { ko: "번지지 않는 가늘고 또렷한 라인.", zh: ["眼线", "纤细清晰、不晕染的线条。"], ja: ["アイライナー", "にじまない細くくっきりしたライン。"] },
   eyeshadow: { ko: "은은한 펄의 데일리 컬러, 저녁까지 지속.", zh: ["日常眼影", "带微珠光的日常色，持久到晚上。"], ja: ["デイリーアイシャドウ", "ほんのりパールの日常カラー、夜まで持続。"] },
@@ -369,12 +383,20 @@ const SIG_SRC = {
   allure2025: { ko: "얼루어 독자 선정 2025", en: "Allure Readers' Choice 2025", zh: "Allure 读者之选 2025", ja: "アリュール読者賞2025" },
   circana2024: { ko: "Circana 미국 2024", en: "Circana US 2024", zh: "Circana 美国 2024", ja: "Circana 米国2024" },
   tmall2025: { ko: "티몰 색조 2025", en: "Tmall makeup 2025", zh: "天猫彩妆 2025", ja: "Tmallメイク2025" },
+  allurebob2025: { ko: "얼루어 베스트 오브 뷰티 2025", en: "Allure Best of Beauty 2025", zh: "Allure 年度美妆大奖 2025", ja: "アリュール ベスト・オブ・ビューティー2025" },
+  amazon2025: { ko: "아마존 뷰티 Top 25 (2025 1분기)", en: "Amazon beauty top 25 (Q1 2025)", zh: "亚马逊美妆 Top 25（2025 Q1）", ja: "Amazonビューティー Top25（2025年Q1）" },
+  amazon2026: { ko: "아마존 뷰티 Top 25 (2026 1분기)", en: "Amazon beauty top 25 (Q1 2026)", zh: "亚马逊美妆 Top 25（2026 Q1）", ja: "Amazonビューティー Top25（2026年Q1）" },
+  tmall618_2025: { ko: "티몰 618 2025", en: "Tmall 618 2025", zh: "天猫 618 2025", ja: "Tmall 618 2025" },
+  tmall11_2025: { ko: "티몰 광군제 2025", en: "Tmall Double 11 2025", zh: "天猫双11 2025", ja: "Tmall 独身の日2025" },
+  tmall2026: { ko: "티몰 카테고리 순위 2026", en: "Tmall category ranking 2026", zh: "天猫类目榜 2026", ja: "Tmallカテゴリーランキング2026" },
+  douyin2025: { ko: "더우인 뷰티 2025", en: "Douyin beauty 2025", zh: "抖音美妆 2025", ja: "抖音ビューティー2025" },
+  cnsales2025: { ko: "중국 판매 실적 보도 2025", en: "China sales reports 2025", zh: "2025 销量报道", ja: "中国販売実績報道2025" },
 };
 const SIG_CAT = {
-  ko: { overall: "종합", lip_makeup: "립메이크업", lip_care: "립케어", rising_star: "라이징 스타", md_pick: "MD 추천", liquid_foundation: "리퀴드 파운데이션", liquid_rouge: "리퀴드 루주", plump_lip: "플럼핑 립", multi_palette: "멀티 팔레트", under_eye: "애교살 메이크업", readers_choice: "메이크업 부문 수상", top_mass_launch: "매스 신제품 매출 1위", top_prestige_launch: "프레스티지 신제품 매출 1위", mass_brand: "매스 색조 브랜드 매출", brand_rank: "색조 브랜드 순위", bestseller: "베스트셀러" },
-  en: { overall: "overall", lip_makeup: "lip makeup", lip_care: "lip care", rising_star: "rising star", md_pick: "MD's pick", liquid_foundation: "liquid foundation", liquid_rouge: "liquid rouge", plump_lip: "plumping lip", multi_palette: "multi palette", under_eye: "under-eye makeup", readers_choice: "makeup winner", top_mass_launch: "top mass launch by sales", top_prestige_launch: "top prestige launch by sales", mass_brand: "mass makeup brand by sales", brand_rank: "makeup brand ranking", bestseller: "bestseller" },
-  zh: { overall: "综合", lip_makeup: "唇妆", lip_care: "唇部护理", rising_star: "新星", md_pick: "MD 推荐", liquid_foundation: "粉底液", liquid_rouge: "液体唇膏", plump_lip: "丰唇", multi_palette: "多用盘", under_eye: "卧蚕妆", readers_choice: "彩妆获奖", top_mass_launch: "大众新品销量第一", top_prestige_launch: "高端新品销量第一", mass_brand: "大众彩妆品牌销量", brand_rank: "彩妆品牌排名", bestseller: "畅销品" },
-  ja: { overall: "総合", lip_makeup: "リップメイク", lip_care: "リップケア", rising_star: "ライジングスター", md_pick: "MDおすすめ", liquid_foundation: "リキッドファンデ", liquid_rouge: "リキッドルージュ", plump_lip: "プランプリップ", multi_palette: "マルチパレット", under_eye: "涙袋メイク", readers_choice: "メイク部門受賞", top_mass_launch: "マス新製品 売上1位", top_prestige_launch: "プレステージ新製品 売上1位", mass_brand: "マス メイクブランド売上", brand_rank: "メイクブランド順位", bestseller: "ベストセラー" },
+  ko: { toner: "토너", toner_pad: "패드", serum: "에센스·세럼", cream: "크림", sunscreen: "선케어", cleansing: "클렌징", mask: "마스크팩", cleanser: "클렌저", exfoliant: "각질 제거제", moisturizer: "보습제", skincare_steal: "가성비 스킨케어", cream_cleanser: "크림 클렌저", gel_sunscreen: "젤 선크림", face_wash: "세안제", lotion: "화장수", milky_lotion: "유액", face_cream: "페이스 크림", low_price_sunscreen: "저가 선크림", sheet_mask: "시트 마스크", top10_brand: "뷰티 브랜드 Top 10", sensitive_sunscreen: "민감 피부 선크림 매출", overall: "종합", lip_makeup: "립메이크업", lip_care: "립케어", rising_star: "라이징 스타", md_pick: "MD 추천", liquid_foundation: "리퀴드 파운데이션", liquid_rouge: "리퀴드 루주", plump_lip: "플럼핑 립", multi_palette: "멀티 팔레트", under_eye: "애교살 메이크업", readers_choice: "메이크업 부문 수상", top_mass_launch: "매스 신제품 매출 1위", top_prestige_launch: "프레스티지 신제품 매출 1위", mass_brand: "매스 색조 브랜드 매출", brand_rank: "색조 브랜드 순위", bestseller: "베스트셀러" },
+  en: { toner: "toner", toner_pad: "pad", serum: "essence/serum", cream: "cream", sunscreen: "sun care", cleansing: "cleansing", mask: "mask pack", cleanser: "cleanser", exfoliant: "exfoliant", moisturizer: "moisturizer", skincare_steal: "skin care steal", cream_cleanser: "cream cleanser", gel_sunscreen: "gel sunscreen", face_wash: "face wash", lotion: "lotion", milky_lotion: "milky lotion", face_cream: "face cream", low_price_sunscreen: "low-price sunscreen", sheet_mask: "sheet mask", top10_brand: "beauty brand top 10", sensitive_sunscreen: "sensitive-skin sunscreen sales", overall: "overall", lip_makeup: "lip makeup", lip_care: "lip care", rising_star: "rising star", md_pick: "MD's pick", liquid_foundation: "liquid foundation", liquid_rouge: "liquid rouge", plump_lip: "plumping lip", multi_palette: "multi palette", under_eye: "under-eye makeup", readers_choice: "makeup winner", top_mass_launch: "top mass launch by sales", top_prestige_launch: "top prestige launch by sales", mass_brand: "mass makeup brand by sales", brand_rank: "makeup brand ranking", bestseller: "bestseller" },
+  zh: { toner: "化妆水", toner_pad: "棉片", serum: "精华", cream: "面霜", sunscreen: "防晒", cleansing: "卸妆", mask: "面膜", cleanser: "洁面", exfoliant: "去角质", moisturizer: "保湿", skincare_steal: "高性价比护肤", cream_cleanser: "乳霜洁面", gel_sunscreen: "啫喱防晒", face_wash: "洁面", lotion: "化妆水", milky_lotion: "乳液", face_cream: "面霜", low_price_sunscreen: "平价防晒", sheet_mask: "片状面膜", top10_brand: "美妆品牌 Top 10", sensitive_sunscreen: "敏感肌防晒销量", overall: "综合", lip_makeup: "唇妆", lip_care: "唇部护理", rising_star: "新星", md_pick: "MD 推荐", liquid_foundation: "粉底液", liquid_rouge: "液体唇膏", plump_lip: "丰唇", multi_palette: "多用盘", under_eye: "卧蚕妆", readers_choice: "彩妆获奖", top_mass_launch: "大众新品销量第一", top_prestige_launch: "高端新品销量第一", mass_brand: "大众彩妆品牌销量", brand_rank: "彩妆品牌排名", bestseller: "畅销品" },
+  ja: { toner: "化粧水", toner_pad: "パッド", serum: "美容液", cream: "クリーム", sunscreen: "日焼け止め", cleansing: "クレンジング", mask: "パック", cleanser: "洗顔料", exfoliant: "角質ケア", moisturizer: "保湿", skincare_steal: "高コスパスキンケア", cream_cleanser: "クリーム洗顔", gel_sunscreen: "ジェル日焼け止め", face_wash: "洗顔料", lotion: "化粧水", milky_lotion: "乳液", face_cream: "フェイスクリーム", low_price_sunscreen: "ロープライス日焼け止め", sheet_mask: "シートマスク", top10_brand: "美容ブランドTop10", sensitive_sunscreen: "敏感肌日焼け止め売上", overall: "総合", lip_makeup: "リップメイク", lip_care: "リップケア", rising_star: "ライジングスター", md_pick: "MDおすすめ", liquid_foundation: "リキッドファンデ", liquid_rouge: "リキッドルージュ", plump_lip: "プランプリップ", multi_palette: "マルチパレット", under_eye: "涙袋メイク", readers_choice: "メイク部門受賞", top_mass_launch: "マス新製品 売上1位", top_prestige_launch: "プレステージ新製品 売上1位", mass_brand: "マス メイクブランド売上", brand_rank: "メイクブランド順位", bestseller: "ベストセラー" },
 };
 const RANK_FMT = { ko: (r) => `${r}위`, en: (r) => `#${r}`, zh: (r) => `第${r}名`, ja: (r) => `${r}位` };
 
@@ -386,3 +408,12 @@ const T_BUY = {
   ja: { offShop: "ブランド公式ストア", offMall: "公式ストア", offFlag: "公式旗艦店", offInfo: "ブランド公式サイト", offPay: "公式ストアでそのまま決済できます。開いたら製品名で検索してください。", offPayQ: "公式ストアの製品検索結果が開き、そのまま決済できます。", offFlagNote: "ブランド公式の旗艦店で購入できます。", offInfoNote: "このブランドは公式サイトで直接販売していません。公式サイトの取扱店情報か下のショップをご利用ください。", buyRank: "購入人気", buyIn: "{m}で購入", buyNote: "ショップの検索結果に移動します。価格・在庫はショップでご確認ください。", buyNotListed: "この国での販売情報がないため、ショップに無い場合があります", buyPeople: "{n}人が購入へ", affNote: "一部のリンクはアフィリエイトリンクです。リンク経由で購入するとサイト運営者に手数料が入る場合がありますが、購入価格は変わりません。", buyBasis: "購入ボタンを押した人数に基づく（同じ人が何度押しても1人）", peopleN: "{n}人", people7: "直近7日 {n}人", noBuys: "まだ購入ボタンを押した人はいません。製品ページのショップボタンを押すとここに反映されます。", noBuyDb: "購入クリックの保存先がまだ接続されていません。" },
 };
 for (const k of Object.keys(T_BUY)) Object.assign(T[k], T_BUY[k]);
+
+/* Makeup / skincare sections */
+const T_SEC = {
+  ko: { secMakeup: "메이크업", secSkin: "스킨케어", secAria: "제품 구분", banner2Hs: "예민해진 피부,<br>뭘로 진정시킬까?", banner2Ss: "진정·보습 성분 기준으로 골랐어요" },
+  en: { secMakeup: "Makeup", secSkin: "Skincare", secAria: "Section", banner2Hs: "Irritated skin?<br>What calms it", banner2Ss: "Picked for soothing and hydration" },
+  zh: { secMakeup: "彩妆", secSkin: "护肤", secAria: "分区", banner2Hs: "肌肤敏感泛红，<br>用什么舒缓？", banner2Ss: "按舒缓与保湿功效挑选" },
+  ja: { secMakeup: "メイク", secSkin: "スキンケア", secAria: "カテゴリー", banner2Hs: "ゆらぎ肌、<br>何で落ち着かせる？", banner2Ss: "鎮静と保湿で選びました" },
+};
+for (const k of Object.keys(T_SEC)) Object.assign(T[k], T_SEC[k]);

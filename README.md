@@ -160,6 +160,14 @@ reviews in the last 7 days compared with the 7 days before.
   `GET /rankings/rising` (SQLite at `db/reviews.sqlite`).
 - Until a segment has reviews, its ranking falls back to goal fit and says so.
 
+## Makeup and skincare sections
+A switch at the top of the site splits everything into **Makeup** and **Skincare**
+(home, rankings, beauty goals). Skincare has 43 real products across Korea, the US,
+Japan and China (Olive Young Awards 2025, @cosme Best Cosme 2025, Allure 2025,
+Amazon top-25 and Tmall/Douyin reports, each with a source link), four goal areas
+(hydration & calm, blemish & pores, tone & firming, sun care) and four skincare
+intensities (`soothing`, `exfoliation`, `anti_aging`, `acne_care`).
+
 ## Buy buttons and purchase-intent ranking
 Each product page links to official shops in the chosen country (`data/stores.json`:
 Olive Young and Coupang in Korea, Amazon, Sephora and Ulta in the US, Rakuten and

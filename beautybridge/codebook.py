@@ -17,7 +17,7 @@ CATEGORY_GROUPS: dict[str, list[str]] = {
     "cheek": ["blush", "highlighter", "contour", "bronzer"],
     "eye": ["eyeshadow", "eyeliner", "brow", "mascara"],
     "lip": ["lip_tint", "lipstick", "lip_gloss", "lip_balm", "lip_liner", "lip_plumper"],
-    "skincare": ["cleanser", "toner", "serum", "moisturizer", "sunscreen"],
+    "skincare": ["cleanser", "toner", "toner_pad", "serum", "moisturizer", "sunscreen", "mask"],
 }
 CATEGORIES: list[str] = [c for group in CATEGORY_GROUPS.values() for c in group]
 CATEGORY_TO_GROUP: dict[str, str] = {
@@ -39,6 +39,11 @@ RELATED_CATEGORIES: dict[frozenset, float] = {
     frozenset({"lip_plumper", "lip_gloss"}): 0.6,
     frozenset({"lip_liner", "lipstick"}): 0.4,
     frozenset({"eyeliner", "brow"}): 0.3,
+    frozenset({"toner", "toner_pad"}): 0.6,
+    frozenset({"toner", "serum"}): 0.4,      # essence-toners sit between the two
+    frozenset({"serum", "moisturizer"}): 0.4,
+    frozenset({"mask", "serum"}): 0.4,       # a sheet mask is a serum-soaked sheet
+    frozenset({"moisturizer", "sunscreen"}): 0.3,
 }
 SAME_GROUP_SIMILARITY = 0.3
 
@@ -65,6 +70,7 @@ COVERAGE_SCALE: dict[str, float] = {
 TEXTURES: list[str] = [
     "loose_powder", "pressed_powder", "liquid", "cream", "gel",
     "balm", "stick", "cushion", "water", "oil", "mousse", "pencil",
+    "pad", "sheet",
 ]
 RELATED_TEXTURES: dict[frozenset, float] = {
     frozenset({"loose_powder", "pressed_powder"}): 0.7,
@@ -76,6 +82,9 @@ RELATED_TEXTURES: dict[frozenset, float] = {
     frozenset({"liquid", "gel"}): 0.5,
     frozenset({"cream", "stick"}): 0.4,
     frozenset({"pencil", "stick"}): 0.7,
+    frozenset({"pad", "water"}): 0.5,
+    frozenset({"sheet", "water"}): 0.3,
+    frozenset({"pad", "sheet"}): 0.4,
 }
 
 UNDERTONES: list[str] = ["cool", "neutral", "warm"]
@@ -96,7 +105,13 @@ INTENSITY_FEATURES: list[str] = [
     "brightening", "glow", "longevity",
     "volume",      # lash volume, lip plumping
     "precision",   # fine, controllable tip (liners, brow, pencils)
+    # skincare
+    "soothing",    # calms redness / sensitivity (cica, heartleaf, oat, panthenol)
+    "exfoliation", # AHA / BHA / PHA, pads, peeling
+    "anti_aging",  # firming, wrinkles (retinol, peptides, adenosine)
+    "acne_care",   # blemish / trouble care (BHA, tea tree, niacinamide for marks)
 ]
+SKINCARE_FEATURES: list[str] = ["soothing", "exfoliation", "anti_aging", "acne_care"]
 INTENSITY_MAX = 3
 
 # Columns every product CSV must have, in order.
