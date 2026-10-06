@@ -71,6 +71,25 @@ a { color: inherit; }
 .mkt::after { content: ""; position: absolute; right: 9px; top: 50%; border: 4px solid transparent; border-top-color: var(--ink); transform: translateY(-2px); pointer-events: none; }
 .lang { font: 600 12px var(--num); letter-spacing: 0.04em; padding: 6px 8px; border-radius: 8px; color: var(--muted); }
 .lang:hover { background: var(--chip); color: var(--ink); }
+.seasons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.seasons button { padding: 10px 4px; border-radius: 12px; font-weight: 700; font-size: 14px; color: #2a2230; border: 2px solid transparent; }
+.seasons button[aria-pressed="true"] { border-color: var(--ink); }
+.pcboard { display: grid; gap: 14px; }
+.pcboard > *, .pctype > *, .pcrow { min-width: 0; }
+.pctype { border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: grid; gap: 12px; min-width: 0; }
+.pctype-h { display: flex; align-items: flex-start; gap: 10px; }
+.pctype-h .pcdot { width: 18px; height: 18px; margin-top: 2px; }
+.pctype-h h3 { margin: 0; font-size: 17px; }
+.pctype-h .note { display: block; margin-top: 2px; }
+.pctype-h .mine { margin-left: auto; flex: none; font-size: 12px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); white-space: nowrap; }
+.pctype-h .mine[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.pcrow .lbl { display: block; margin-bottom: 6px; }
+.swrow { display: grid; grid-auto-flow: column; grid-auto-columns: 84px; gap: 10px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.swrow::-webkit-scrollbar { display: none; }
+.swcard { display: grid; justify-items: center; gap: 4px; text-align: center; font-size: 11px; line-height: 1.3; }
+.swcard .sw { width: 46px; height: 46px; }
+.swcard b { font-size: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.swcard span { color: var(--muted); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .pcchips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 .pcchips .chip { display: inline-flex; align-items: center; gap: 6px; }
 .pcdot { width: 10px; height: 10px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .08); }
@@ -363,7 +382,7 @@ const CFG = /*__CONFIG__*/{};
 /* ---------------- state + routing ---------------- */
 const S = { view: "home", rtab: "market", lmkt: "KR", cat: "", skin: "dry", goal: "aegyo_sal", area: "eye", pid: "P001", ptab: "similar",
   origin: "", q: "", market: "KR", lang: "ko", hcat: "", hskin: "dry", harea: "eye", hgoal: "aegyo_sal", gskin: "", sheet: false, open: {},
-  age: "20s", draft: null, bmkt: "", sec: "makeup", pc: "", pcg: "" };
+  age: "20s", draft: null, bmkt: "", sec: "makeup", pc: "", pcg: "", season: "", pcList: "" };
 /* Live first-party reviews (db capability). One document per reviewer: reviews/<uid> = {items: {productId: review}} */
 const LIVE = { status: "loading", db: null, uid: null, canWrite: null, list: [], saving: false, msg: "" };
 try {
@@ -450,6 +469,34 @@ function pcList(rows, limit = 40) {
       <span class="thumb${p.img ? " photo" : ""}">${pic(p)}<span class="swb${r.s.t === "clear" ? " sw clear" : ""}" style="background:${r.s.hex}"></span></span>
       <span class="pinfo">${nameLine(p)}<span class="shname">${esc(shadeName(p, r.s))}</span>${r.s.st.includes(S.pc) && r.s.stt ? `<span class="note">✓ ${t("pcStated")}</span>` : ""}</span>
       <span class="metric"><b>${r.f}%</b><small>${fitWord(r.f)}</small></span></button>`; }).join("")}</div>`;
+}
+const SEASONS = { spring: ["spring_light", "spring_bright"], summer: ["summer_light", "summer_mute"], autumn: ["autumn_mute", "autumn_deep"], winter: ["winter_bright", "winter_deep"] };
+const SEASON_BG = { spring: "linear-gradient(135deg,#ffe3cc,#ffc2a8)", summer: "linear-gradient(135deg,#e3e9fb,#d9cfe8)", autumn: "linear-gradient(135deg,#ecd7bd,#c99a74)", winter: "linear-gradient(135deg,#f0d0e2,#b9a8d8)" };
+const seasonOf = (k) => k.split("_")[0];
+/* rows of the board: lips, blush, eyes, shading & highlight */
+const PC_ROWS = [["lip", (p) => p.grp === "lip"], ["blush", (p) => p.cat === "blush"], ["eye", (p) => p.grp === "eye"], ["face", (p) => ["contour", "bronzer", "highlighter"].includes(p.cat)]];
+function swatchStrip(type, test) {
+  const per = {};
+  const rows = pcRows(type, "").filter((r) => r.s.t !== "clear" && test(P(r.pid)) && (per[r.pid] = (per[r.pid] || 0) + 1) <= 2).slice(0, 12);
+  if (!rows.length) return "";
+  return `<div class="swrow">${rows.map((r) => { const p = P(r.pid);
+    return `<button class="swcard" data-product="${r.pid}" title="${esc(brandName(p) + " " + prodName(p))}"><span class="sw" style="background:${r.s.hex}"></span><b>${esc(shadeName(p, r.s))}</b><span>${esc(brandName(p))}</span><span>${r.f}%</span></button>`; }).join("")}</div>`;
+}
+function pcBoard() {
+  const season = S.season || (S.pc ? seasonOf(S.pc) : "spring");
+  if (S.pcList) {
+    return `<button class="more" data-pclist="" style="width:auto;justify-self:start;padding:8px 14px">‹ ${t("pcBack")}</button>
+      <div class="pctype-h"><span class="pcdot" style="background:${PC_DOT[S.pcList]}"></span><div><h3>${esc(pcName(S.pcList))}</h3><span class="note">${esc(PC_DESC[S.lang][S.pcList])}</span></div></div>
+      <div class="chips">${["", "lip", "cheek", "eye"].map((g) => `<button class="chip" data-pcg="${g}" aria-pressed="${S.pcg === g}">${g ? grpName(g) : t("all")}</button>`).join("")}</div>
+      ${pcList(pcRows(S.pcList))}`;
+  }
+  return `<div class="seasons">${Object.keys(SEASONS).map((k) => `<button data-season="${k}" aria-pressed="${season === k}" style="background:${SEASON_BG[k]}">${esc(SEASON_TX[S.lang][k])}</button>`).join("")}</div>
+    <div class="pcboard">${SEASONS[season].map((type) => `<div class="pctype">
+      <div class="pctype-h"><span class="pcdot" style="background:${PC_DOT[type]}"></span><div><h3>${esc(pcName(type))}</h3><span class="note">${esc(PC_DESC[S.lang][type])}</span></div>
+        <button class="mine" data-pc="${type}" aria-pressed="${S.pc === type}">${S.pc === type ? "✓ " : ""}${t("pcMine")}</button></div>
+      ${PC_ROWS.map(([k, test]) => { const strip = swatchStrip(type, test); return strip ? `<div class="pcrow"><span class="lbl">${t("pcRow_" + k)}</span>${strip}</div>` : ""; }).join("")}
+      <button class="more" data-pclist="${type}">${esc(pcName(type))} ${t("seeAll")} ${I.right}</button>
+    </div>`).join("")}</div>`;
 }
 function shadeCard(p) {
   const ss = (D.shades || {})[p.id];
@@ -871,10 +918,7 @@ function vRanking() {
       body = `<div class="empty">${t("noRising")}<br><br><button class="more" data-product="${secFeatured()[0]}" data-tab="reviews">${t("firstCta")} ${I.right}</button></div>`;
     }
   } else if (S.rtab === "pc" && S.sec === "makeup") {
-    filt = `<div><span class="lbl">${t("pcPick")}</span>${pcChips(S.pc)}</div>
-      <div class="chips">${["", "lip", "cheek", "eye"].map((g) => `<button class="chip" data-pcg="${g}" aria-pressed="${S.pcg === g}">${g ? grpName(g) : t("all")}</button>`).join("")}</div>`;
-    basis = `<p class="note" style="margin:0">${t("pcHow")} ${t("pcEst")} ${t("pcNote")}</p>`;
-    body = S.pc ? pcList(pcRows(S.pc)) : `<div class="empty">${t("pcPickFirst")}</div>`;
+    body = pcBoard() + `<p class="note" style="margin:0">${t("pcHow")} ${t("pcEst")} ${t("pcNote")}</p>`;
   } else if (S.rtab === "buy") {
     const st = CLICKS.stats;
     const ids = avail(Object.keys(st).filter((id) => D.products[id] && st[id].people > 0 && inSec(id)))
@@ -1482,11 +1526,13 @@ document.addEventListener("click", (e) => {
   if (d.sec) { setSec(d.sec); render(); return; }
   if (d.pc) { S.pc = S.pc === d.pc ? "" : d.pc; render(); return; }
   if (d.pcg !== undefined) { S.pcg = d.pcg; render(); return; }
+  if (d.season) { S.season = d.season; S.pcList = ""; render(); return; }
+  if (d.pclist !== undefined) { S.pcList = d.pclist; S.pcg = ""; render(); window.scrollTo(0, 0); return; }
   if (d.product) { if (D.products[d.product]) S.sec = secOf(P(d.product)); LIVE.msg = ""; go("product", { pid: d.product, ptab: d.tab || "similar", origin: d.orig || "", draft: null, bmkt: "" }); return; }
   if (d.bmkt) { S.bmkt = d.bmkt; render(); return; }
   if (d.goal) { S.sec = areaSec(areaOf(d.goal)); go("goals", { goal: d.goal, area: areaOf(d.goal), gskin: "" }); return; }
   if (d.go) { const extra = {}; if (d.rtab) extra.rtab = d.rtab; if (d.cat !== undefined) extra.cat = d.cat; if (d.skin) extra.skin = d.skin; if (d.go === "ranking" && d.rtab === "goal") extra.area = areaOf(S.goal); go(d.go, extra); return; }
-  if (d.rtab) { S.rtab = d.rtab; go("ranking"); return; }
+  if (d.rtab) { S.rtab = d.rtab; S.pcList = ""; go("ranking"); return; }
   if (d.garea) { go("goals", { area: d.garea, goal: goalsIn(d.garea)[0], gskin: "" }); return; }
   if (d.ptab) { S.ptab = d.ptab; LIVE.msg = ""; render(); return; }
   if (d.rstar) { S.draft.rating = +d.rstar; render(); return; }

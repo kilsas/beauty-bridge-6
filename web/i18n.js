@@ -438,3 +438,23 @@ const T_PC = {
   ja: { pcRank: "パーソナルカラー", pcPick: "私のパーソナルカラー", pcPickFirst: "上でパーソナルカラーを選ぶと、似合う色番が表示されます。", pcPickHint: "パーソナルカラーを選ぶと、似合う順に並びます。", pcGood: "似合う", pcOk: "なじむ", pcLow: "あまり似合わない", pcShades: "色番別パーソナルカラー", pcStated: "出典の意見", pcMine: "私のタイプ", pcForYou: "{t}に似合う色番", pcClear: "クリア · 全タイプ", pcHow: "色番の黄み・明るさ・鮮やかさを各タイプの基準と比べたスコアです。", pcEst: "色番名はリンク先の販売ページに基づき、色の特性と色見本は説明からの推定です。", pcNote: "正確な診断には、ドレープを使った対面診断をおすすめします。" },
 };
 for (const k of Object.keys(T_PC)) Object.assign(T[k], T_PC[k]);
+
+const SEASON_TX = {
+  ko: { spring: "봄웜", summer: "여름쿨", autumn: "가을웜", winter: "겨울쿨" },
+  en: { spring: "Spring", summer: "Summer", autumn: "Autumn", winter: "Winter" },
+  zh: { spring: "春季型", summer: "夏季型", autumn: "秋季型", winter: "冬季型" },
+  ja: { spring: "イエベ春", summer: "ブルベ夏", autumn: "イエベ秋", winter: "ブルベ冬" },
+};
+const PC_DESC = {
+  ko: { spring_light: "밝고 맑은 웜톤 · 피치, 연코랄, 살구", spring_bright: "선명하고 화사한 웜톤 · 코랄, 오렌지, 코랄 레드", summer_light: "밝고 부드러운 쿨톤 · 베이비 핑크, 라벤더", summer_mute: "차분하고 회기 있는 쿨톤 · 로즈, 모브, 말린 장미", autumn_mute: "부드럽고 차분한 웜톤 · 베이지, 누드 브라운, 테라코타", autumn_deep: "깊고 진한 웜톤 · 브릭, 브라운, 버건디 브라운", winter_bright: "선명하고 쨍한 쿨톤 · 푸시아, 체리 레드", winter_deep: "깊고 강한 쿨톤 · 버건디, 플럼, 와인" },
+  en: { spring_light: "Light, clear warm · peach, soft coral, apricot", spring_bright: "Vivid warm · coral, orange, coral red", summer_light: "Light, soft cool · baby pink, lavender", summer_mute: "Soft, greyed cool · rose, mauve, dried rose", autumn_mute: "Soft, calm warm · beige, nude brown, terracotta", autumn_deep: "Deep, rich warm · brick, brown, brown burgundy", winter_bright: "Vivid cool · fuchsia, cherry red", winter_deep: "Deep, strong cool · burgundy, plum, wine" },
+  zh: { spring_light: "明亮清透的暖调 · 蜜桃、浅珊瑚、杏色", spring_bright: "鲜明亮丽的暖调 · 珊瑚、橘色、珊瑚红", summer_light: "明亮柔和的冷调 · 婴儿粉、薰衣草", summer_mute: "柔和带灰的冷调 · 玫瑰、豆沙紫、干枯玫瑰", autumn_mute: "柔和沉静的暖调 · 米色、裸棕、陶土色", autumn_deep: "浓郁深邃的暖调 · 砖红、棕色、棕调酒红", winter_bright: "鲜明强烈的冷调 · 玫红、樱桃红", winter_deep: "深邃浓烈的冷调 · 酒红、梅子、葡萄酒色" },
+  ja: { spring_light: "明るく澄んだイエベ · ピーチ、ライトコーラル、アプリコット", spring_bright: "鮮やかで華やかなイエベ · コーラル、オレンジ、コーラルレッド", summer_light: "明るくやわらかなブルベ · ベビーピンク、ラベンダー", summer_mute: "くすみのある落ち着いたブルベ · ローズ、モーブ、ドライローズ", autumn_mute: "やわらかく落ち着いたイエベ · ベージュ、ヌードブラウン、テラコッタ", autumn_deep: "深く濃いイエベ · ブリック、ブラウン、ブラウンボルドー", winter_bright: "鮮やかでくっきりしたブルベ · フューシャ、チェリーレッド", winter_deep: "深く強いブルベ · バーガンディ、プラム、ワイン" },
+};
+const T_PC2 = {
+  ko: { pcBack: "타입 한눈에 보기", pcRow_lip: "립", pcRow_blush: "블러셔", pcRow_eye: "아이", pcRow_face: "쉐딩·하이라이터" },
+  en: { pcBack: "All types", pcRow_lip: "Lips", pcRow_blush: "Blush", pcRow_eye: "Eyes", pcRow_face: "Contour & highlight" },
+  zh: { pcBack: "查看全部类型", pcRow_lip: "唇妆", pcRow_blush: "腮红", pcRow_eye: "眼妆", pcRow_face: "修容·高光" },
+  ja: { pcBack: "タイプ一覧に戻る", pcRow_lip: "リップ", pcRow_blush: "チーク", pcRow_eye: "アイ", pcRow_face: "シェーディング・ハイライト" },
+};
+for (const k of Object.keys(T_PC2)) Object.assign(T[k], T_PC2[k]);
