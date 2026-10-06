@@ -458,3 +458,10 @@ const T_PC2 = {
   ja: { pcBack: "タイプ一覧に戻る", pcRow_lip: "リップ", pcRow_blush: "チーク", pcRow_eye: "アイ", pcRow_face: "シェーディング・ハイライト" },
 };
 for (const k of Object.keys(T_PC2)) Object.assign(T[k], T_PC2[k]);
+
+const SUB_TX = {
+  ko: { light: "라이트", bright: "브라이트", mute: "뮤트", deep: "딥" },
+  en: { light: "Light", bright: "Bright", mute: "Mute", deep: "Deep" },
+  zh: { light: "浅色", bright: "净色", mute: "柔色", deep: "深色" },
+  ja: { light: "ライト", bright: "ブライト", mute: "ミュート", deep: "ディープ" },
+};

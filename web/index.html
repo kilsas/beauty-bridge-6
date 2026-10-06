@@ -75,6 +75,10 @@ a { color: inherit; }
 .seasons button { padding: 10px 4px; border-radius: 12px; font-weight: 700; font-size: 14px; color: #2a2230; border: 2px solid transparent; }
 .seasons button[aria-pressed="true"] { border-color: var(--ink); }
 .pcboard { display: grid; gap: 14px; }
+.subtypes { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--line); }
+.subtypes button { display: flex; justify-content: center; align-items: center; gap: 6px; padding: 12px 0; font-size: 15px; font-weight: 600; color: var(--muted); position: relative; }
+.subtypes button[aria-pressed="true"] { color: var(--ink); }
+.subtypes button[aria-pressed="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--ink); }
 .pcboard > *, .pctype > *, .pcrow { min-width: 0; }
 .pctype { border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: grid; gap: 12px; min-width: 0; }
 .pctype-h { display: flex; align-items: flex-start; gap: 10px; }
@@ -838,11 +842,18 @@ const T_PC2 = {
 };
 for (const k of Object.keys(T_PC2)) Object.assign(T[k], T_PC2[k]);
 
+const SUB_TX = {
+  ko: { light: "라이트", bright: "브라이트", mute: "뮤트", deep: "딥" },
+  en: { light: "Light", bright: "Bright", mute: "Mute", deep: "Deep" },
+  zh: { light: "浅色", bright: "净色", mute: "柔色", deep: "深色" },
+  ja: { light: "ライト", bright: "ブライト", mute: "ミュート", deep: "ディープ" },
+};
+
 
 /* ---------------- state + routing ---------------- */
 const S = { view: "home", rtab: "market", lmkt: "KR", cat: "", skin: "dry", goal: "aegyo_sal", area: "eye", pid: "P001", ptab: "similar",
   origin: "", q: "", market: "KR", lang: "ko", hcat: "", hskin: "dry", harea: "eye", hgoal: "aegyo_sal", gskin: "", sheet: false, open: {},
-  age: "20s", draft: null, bmkt: "", sec: "makeup", pc: "", pcg: "", season: "", pcList: "" };
+  age: "20s", draft: null, bmkt: "", sec: "makeup", pc: "", pcg: "", season: "", pcType: "", pcCat: "" };
 /* Live first-party reviews (db capability). One document per reviewer: reviews/<uid> = {items: {productId: review}} */
 const LIVE = { status: "loading", db: null, uid: null, canWrite: null, list: [], saving: false, msg: "" };
 try {
@@ -911,11 +922,11 @@ function pcChips(cur, attr = "data-pc") {
   return `<div class="pcchips">${D.pc.types.map((k) => `<button class="chip" ${attr}="${k}" aria-pressed="${cur === k}"><span class="pcdot" style="background:${PC_DOT[k]}"></span>${esc(pcName(k))}</button>`).join("")}</div>`;
 }
 /* every shade that suits a type, best first (stated by a source breaks ties; clear shades last) */
-function pcRows(type, group = S.pcg) {
+function pcRows(type, group = S.pcg, test = null) {
   const out = [];
   for (const [pid, ss] of Object.entries(D.shades || {})) {
     const p = P(pid);
-    if (!p || !available(p) || (group && p.grp !== group)) continue;
+    if (!p || !available(p) || (group && p.grp !== group) || (test && !test(p))) continue;
     ss.forEach((s, i) => { if (s.fit[type] >= D.pc.ok * 100) out.push({ pid, i, s, f: s.fit[type] }); });
   }
   const G = { lip: 0, cheek: 1, eye: 2 }, gi = (r) => G[P(r.pid).grp] ?? 3, shading = (r) => ["contour", "bronzer"].includes(P(r.pid).cat);
@@ -935,28 +946,18 @@ const SEASON_BG = { spring: "linear-gradient(135deg,#ffe3cc,#ffc2a8)", summer: "
 const seasonOf = (k) => k.split("_")[0];
 /* rows of the board: lips, blush, eyes, shading & highlight */
 const PC_ROWS = [["lip", (p) => p.grp === "lip"], ["blush", (p) => p.cat === "blush"], ["eye", (p) => p.grp === "eye"], ["face", (p) => ["contour", "bronzer", "highlighter"].includes(p.cat)]];
-function swatchStrip(type, test) {
-  const per = {};
-  const rows = pcRows(type, "").filter((r) => r.s.t !== "clear" && test(P(r.pid)) && (per[r.pid] = (per[r.pid] || 0) + 1) <= 2).slice(0, 12);
-  if (!rows.length) return "";
-  return `<div class="swrow">${rows.map((r) => { const p = P(r.pid);
-    return `<button class="swcard" data-product="${r.pid}" title="${esc(brandName(p) + " " + prodName(p))}"><span class="sw" style="background:${r.s.hex}"></span><b>${esc(shadeName(p, r.s))}</b><span>${esc(brandName(p))}</span><span>${r.f}%</span></button>`; }).join("")}</div>`;
-}
 function pcBoard() {
   const season = S.season || (S.pc ? seasonOf(S.pc) : "spring");
-  if (S.pcList) {
-    return `<button class="more" data-pclist="" style="width:auto;justify-self:start;padding:8px 14px">‹ ${t("pcBack")}</button>
-      <div class="pctype-h"><span class="pcdot" style="background:${PC_DOT[S.pcList]}"></span><div><h3>${esc(pcName(S.pcList))}</h3><span class="note">${esc(PC_DESC[S.lang][S.pcList])}</span></div></div>
-      <div class="chips">${["", "lip", "cheek", "eye"].map((g) => `<button class="chip" data-pcg="${g}" aria-pressed="${S.pcg === g}">${g ? grpName(g) : t("all")}</button>`).join("")}</div>
-      ${pcList(pcRows(S.pcList))}`;
-  }
+  const types = SEASONS[season];
+  const type = types.includes(S.pcType) ? S.pcType : types.includes(S.pc) ? S.pc : types[0];
+  const cat = PC_ROWS.find(([k]) => k === S.pcCat);
+  const rows = pcRows(type, "", cat ? cat[1] : null);
   return `<div class="seasons">${Object.keys(SEASONS).map((k) => `<button data-season="${k}" aria-pressed="${season === k}" style="background:${SEASON_BG[k]}">${esc(SEASON_TX[S.lang][k])}</button>`).join("")}</div>
-    <div class="pcboard">${SEASONS[season].map((type) => `<div class="pctype">
-      <div class="pctype-h"><span class="pcdot" style="background:${PC_DOT[type]}"></span><div><h3>${esc(pcName(type))}</h3><span class="note">${esc(PC_DESC[S.lang][type])}</span></div>
-        <button class="mine" data-pc="${type}" aria-pressed="${S.pc === type}">${S.pc === type ? "✓ " : ""}${t("pcMine")}</button></div>
-      ${PC_ROWS.map(([k, test]) => { const strip = swatchStrip(type, test); return strip ? `<div class="pcrow"><span class="lbl">${t("pcRow_" + k)}</span>${strip}</div>` : ""; }).join("")}
-      <button class="more" data-pclist="${type}">${esc(pcName(type))} ${t("seeAll")} ${I.right}</button>
-    </div>`).join("")}</div>`;
+    <div class="subtypes">${types.map((k) => `<button data-pctype="${k}" aria-pressed="${type === k}"><span class="pcdot" style="background:${PC_DOT[k]}"></span>${esc(SUB_TX[S.lang][k.split("_")[1]])}</button>`).join("")}</div>
+    <div class="pctype-h"><div><h3>${esc(pcName(type))}</h3><span class="note">${esc(PC_DESC[S.lang][type])}</span></div>
+      <button class="mine" data-pc="${type}" aria-pressed="${S.pc === type}">${S.pc === type ? "✓ " : ""}${t("pcMine")}</button></div>
+    <div class="chips">${[["", t("all")], ...PC_ROWS.map(([k]) => [k, t("pcRow_" + k)])].map(([k, l]) => `<button class="chip" data-pccat="${k}" aria-pressed="${(S.pcCat || "") === k}">${l}</button>`).join("")}</div>
+    ${pcList(rows)}`;
 }
 function shadeCard(p) {
   const ss = (D.shades || {})[p.id];
@@ -1986,13 +1987,14 @@ document.addEventListener("click", (e) => {
   if (d.sec) { setSec(d.sec); render(); return; }
   if (d.pc) { S.pc = S.pc === d.pc ? "" : d.pc; render(); return; }
   if (d.pcg !== undefined) { S.pcg = d.pcg; render(); return; }
-  if (d.season) { S.season = d.season; S.pcList = ""; render(); return; }
-  if (d.pclist !== undefined) { S.pcList = d.pclist; S.pcg = ""; render(); window.scrollTo(0, 0); return; }
+  if (d.season) { S.season = d.season; S.pcType = ""; render(); return; }
+  if (d.pctype) { S.pcType = d.pctype; render(); return; }
+  if (d.pccat !== undefined) { S.pcCat = d.pccat; render(); return; }
   if (d.product) { if (D.products[d.product]) S.sec = secOf(P(d.product)); LIVE.msg = ""; go("product", { pid: d.product, ptab: d.tab || "similar", origin: d.orig || "", draft: null, bmkt: "" }); return; }
   if (d.bmkt) { S.bmkt = d.bmkt; render(); return; }
   if (d.goal) { S.sec = areaSec(areaOf(d.goal)); go("goals", { goal: d.goal, area: areaOf(d.goal), gskin: "" }); return; }
   if (d.go) { const extra = {}; if (d.rtab) extra.rtab = d.rtab; if (d.cat !== undefined) extra.cat = d.cat; if (d.skin) extra.skin = d.skin; if (d.go === "ranking" && d.rtab === "goal") extra.area = areaOf(S.goal); go(d.go, extra); return; }
-  if (d.rtab) { S.rtab = d.rtab; S.pcList = ""; go("ranking"); return; }
+  if (d.rtab) { S.rtab = d.rtab; go("ranking"); return; }
   if (d.garea) { go("goals", { area: d.garea, goal: goalsIn(d.garea)[0], gskin: "" }); return; }
   if (d.ptab) { S.ptab = d.ptab; LIVE.msg = ""; render(); return; }
   if (d.rstar) { S.draft.rating = +d.rstar; render(); return; }
