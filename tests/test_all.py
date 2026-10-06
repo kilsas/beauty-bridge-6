@@ -470,5 +470,46 @@ class TestSkincareSection(unittest.TestCase):
                 self.assertIn(pid, sig)
 
 
+class TestPersonalColor(unittest.TestCase):
+    def setUp(self):
+        from beautybridge import personal_color as pc
+        self.pc = pc
+        self.e = load_engine(ROOT / "data" / "real")
+        self.sh = pc.load_shades(ROOT / "data" / "real" / "shades.csv", set(self.e.ds.products))
+
+    def test_fit_follows_theory(self):
+        f = self.pc.fit_scores
+        self.assertEqual(max(f("cool", "medium", "muted"), key=f("cool", "medium", "muted").get), "summer_mute")
+        self.assertEqual(max(f("warm", "deep", "soft"), key=f("warm", "deep", "soft").get), "autumn_deep")
+        self.assertEqual(max(f("cool", "medium", "vivid"), key=f("cool", "medium", "vivid").get), "winter_bright")
+        self.assertTrue(all(v == 1.0 for v in f("clear", "light", "soft").values()))
+        warm = f("warm", "light", "vivid")
+        self.assertGreater(warm["spring_bright"], warm["summer_light"])
+
+    def test_stated_season_only_nudges(self):
+        base = self.pc.fit_scores("cool", "light", "soft")
+        nudged = self.pc.fit_scores("cool", "light", "soft", {"summer_mute"})
+        self.assertAlmostEqual(nudged["summer_mute"] - base["summer_mute"], self.pc.STATED_BONUS, places=3)
+        self.assertGreater(nudged["summer_light"], nudged["summer_mute"])
+
+    def test_shade_data_is_complete_and_sourced(self):
+        self.assertGreaterEqual(sum(len(v) for v in self.sh.values()), 150)
+        for ss in self.sh.values():
+            for s in ss:
+                self.assertTrue(s.shade_url.startswith("https://"), s.name)
+                if s.stated_text:
+                    self.assertTrue(s.stated_url.startswith("https://"), s.name)
+        for t in self.pc.TYPES:
+            self.assertGreaterEqual(len(self.pc.best_shades(self.sh, t, k=999)), 10, t)
+
+    def test_bad_rows_are_rejected(self):
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d) / "shades.csv"
+            f.write_text("product_id,name,name_local,temp,value,chroma,hex,stated,stated_text,stated_url,shade_url\n"
+                         "R007,x,,cool,light,soft,#aabbcc,summer,says so,,https://x\n", encoding="utf-8")
+            with self.assertRaises(self.pc.ShadeError):
+                self.pc.load_shades(f, {"R007"})
+
+
 if __name__ == "__main__":
     unittest.main()

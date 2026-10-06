@@ -168,6 +168,18 @@ Amazon top-25 and Tmall/Douyin reports, each with a source link), four goal area
 (hydration & calm, blemish & pores, tone & firming, sun care) and four skincare
 intensities (`soothing`, `exfoliation`, `anti_aging`, `acne_care`).
 
+## Personal colour (퍼스널 컬러) by shade
+Personal colour belongs to a shade, not a product, so `data/real/shades.csv` lists
+171 real shades of 40 colour products (shade names from the linked shop pages).
+Each shade is labelled on warmth / lightness / clarity, and
+`beautybridge/personal_color.py` scores it against eight types (spring light/bright,
+summer light/mute, autumn mute/deep, winter bright/deep):
+`fit = 1 - (0.5·|warmth| + 0.25·|lightness| + 0.25·|clarity|)` distances to each type.
+Seasons stated by a source (brand, magazine, review) are kept with their link and add
+a small bonus but never replace the score. The site lets people pick the type they were
+diagnosed with (no online self-test, which is unreliable). API: `GET /personal-color/{type}`,
+`GET /products/{id}/shades`. Labels and swatches are estimates.
+
 ## Buy buttons and purchase-intent ranking
 Each product page links to official shops in the chosen country (`data/stores.json`:
 Olive Young and Coupang in Korea, Amazon, Sephora and Ulta in the US, Rakuten and

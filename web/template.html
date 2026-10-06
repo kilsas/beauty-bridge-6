@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Beauty Bridge</title>
 <meta name="description" content="Explainable cross-market beauty rankings and recommendations">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,6 +71,23 @@ a { color: inherit; }
 .mkt::after { content: ""; position: absolute; right: 9px; top: 50%; border: 4px solid transparent; border-top-color: var(--ink); transform: translateY(-2px); pointer-events: none; }
 .lang { font: 600 12px var(--num); letter-spacing: 0.04em; padding: 6px 8px; border-radius: 8px; color: var(--muted); }
 .lang:hover { background: var(--chip); color: var(--ink); }
+.pcchips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.pcchips .chip { display: inline-flex; align-items: center; gap: 6px; }
+.pcdot { width: 10px; height: 10px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .08); }
+.sw { width: 28px; height: 28px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .1); }
+.sw.clear { background: repeating-linear-gradient(45deg, #fff, #fff 4px, #eee 4px, #eee 8px) !important; }
+.shades { display: grid; gap: 10px; }
+.shrow { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.shrow .nm { font-weight: 600; font-size: 14px; }
+.shrow .ax { font-size: 12px; color: var(--muted); }
+.shrow .pcs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+.shrow .pct { text-align: right; font: 700 15px var(--num); }
+.shrow .pct small { display: block; font: 500 11px var(--sans); color: var(--muted); }
+.shrow.me .pct { color: var(--accent); }
+.pctag { font-size: 11px; padding: 2px 7px; border-radius: 999px; background: var(--chip); color: var(--ink-2); display: inline-flex; align-items: center; gap: 4px; }
+.prow .thumb { position: relative; }
+.thumb .swb { position: absolute; right: 4px; bottom: 4px; width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 0 2px var(--bg); }
+.shname { display: inline-block; font-size: 12px; font-weight: 600; margin-top: 2px; }
 .secsw { display: flex; gap: 4px; margin: 2px 16px 4px; padding: 3px; background: var(--chip); border-radius: 999px; width: max-content; }
 .secsw button { padding: 6px 16px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--muted); }
 .secsw button[aria-pressed="true"] { background: var(--bg); color: var(--ink); box-shadow: var(--shadow); }
@@ -345,7 +363,7 @@ const CFG = /*__CONFIG__*/{};
 /* ---------------- state + routing ---------------- */
 const S = { view: "home", rtab: "market", lmkt: "KR", cat: "", skin: "dry", goal: "aegyo_sal", area: "eye", pid: "P001", ptab: "similar",
   origin: "", q: "", market: "KR", lang: "ko", hcat: "", hskin: "dry", harea: "eye", hgoal: "aegyo_sal", gskin: "", sheet: false, open: {},
-  age: "20s", draft: null, bmkt: "", sec: "makeup" };
+  age: "20s", draft: null, bmkt: "", sec: "makeup", pc: "", pcg: "" };
 /* Live first-party reviews (db capability). One document per reviewer: reviews/<uid> = {items: {productId: review}} */
 const LIVE = { status: "loading", db: null, uid: null, canWrite: null, list: [], saving: false, msg: "" };
 try {
@@ -353,8 +371,9 @@ try {
   if (saved.market !== undefined && saved.market in MKT_TX.en) S.market = saved.market;
   if (saved.lang in LANGS) S.lang = saved.lang;
   if (saved.sec === "skincare" || saved.sec === "makeup") S.sec = saved.sec;
+  if (D.pc && D.pc.types.includes(saved.pc)) S.pc = saved.pc;
 } catch (e) {}
-const persist = () => { try { localStorage.setItem("bb3", JSON.stringify({ market: S.market, lang: S.lang, sec: S.sec })); } catch (e) {} };
+const persist = () => { try { localStorage.setItem("bb3", JSON.stringify({ market: S.market, lang: S.lang, sec: S.sec, pc: S.pc })); } catch (e) {} };
 const MARKETS = ["", "KR", "US", "JP", "CN"];
 const areaOf = (g) => D.goals[g].meta.area;
 
@@ -368,7 +387,7 @@ function fromHash() {
   const h = decodeURIComponent(location.hash.slice(1));
   if (h.startsWith("product-") && D.products[h.slice(8)]) { S.view = "product"; S.pid = h.slice(8); }
   else if (h.startsWith("goal-") && D.goals[h.slice(5)]) { S.view = "goals"; S.goal = h.slice(5); S.area = areaOf(S.goal); }
-  else if (h.startsWith("ranking-") && ["market", "rising", "buy", "category", "skin", "age", "goal", "brand"].includes(h.slice(8))) { S.view = "ranking"; S.rtab = h.slice(8); }
+  else if (h.startsWith("ranking-") && ["market", "rising", "buy", "pc", "category", "skin", "age", "goal", "brand"].includes(h.slice(8))) { S.view = "ranking"; S.rtab = h.slice(8); }
   else if (["ranking", "insight", "method", "search", "goals"].includes(h)) S.view = h;
   else S.view = "home";
 }
@@ -402,6 +421,54 @@ function setSec(sec) {
   const a = areasIn()[0].area, g = goalsIn(a)[0];
   Object.assign(S, { area: a, goal: g, harea: a, hgoal: g, cat: "", hcat: "", gskin: "" });
 }
+/* ---------------- personal colour (shade level) ---------------- */
+const PC_DOT = { spring_light: "#f6c9a6", spring_bright: "#f2784e", summer_light: "#c7d4f0", summer_mute: "#a59fbf", autumn_mute: "#c39a6b", autumn_deep: "#87492a", winter_bright: "#d0246b", winter_deep: "#3a2958" };
+const pcName = (k) => PC_TX[S.lang][k] || k;
+const LANG_OF = { KR: "ko", JP: "ja", CN: "zh" };
+const shadeName = (p, s) => S.lang !== "en" && LANG_OF[p.origin] === S.lang && s.l ? s.l : s.n;
+const axisLabel = (s) => s.t === "clear" ? t("pcClear") : [AX_TX[S.lang][s.t], AX_TX[S.lang][s.v], AX_TX[S.lang][s.c]].join(" · ");
+
+function pcChips(cur, attr = "data-pc") {
+  return `<div class="pcchips">${D.pc.types.map((k) => `<button class="chip" ${attr}="${k}" aria-pressed="${cur === k}"><span class="pcdot" style="background:${PC_DOT[k]}"></span>${esc(pcName(k))}</button>`).join("")}</div>`;
+}
+/* every shade that suits a type, best first (stated by a source breaks ties; clear shades last) */
+function pcRows(type, group = S.pcg) {
+  const out = [];
+  for (const [pid, ss] of Object.entries(D.shades || {})) {
+    const p = P(pid);
+    if (!p || !available(p) || (group && p.grp !== group)) continue;
+    ss.forEach((s, i) => { if (s.fit[type] >= D.pc.ok * 100) out.push({ pid, i, s, f: s.fit[type] }); });
+  }
+  const G = { lip: 0, cheek: 1, eye: 2 }, gi = (r) => G[P(r.pid).grp] ?? 3, shading = (r) => ["contour", "bronzer"].includes(P(r.pid).cat);
+  return out.sort((a, b) => (a.s.t === "clear") - (b.s.t === "clear") || b.f - a.f || b.s.st.includes(type) - a.s.st.includes(type) || shading(a) - shading(b) || gi(a) - gi(b) || a.pid.localeCompare(b.pid) || a.i - b.i);
+}
+const fitWord = (f) => f >= D.pc.good * 100 ? t("pcGood") : t("pcOk");
+function pcList(rows, limit = 40) {
+  if (!rows.length) return `<div class="empty">${t("noResult")}</div>`;
+  return `<div class="plist">${rows.slice(0, limit).map((r, n) => { const p = P(r.pid);
+    return `<button class="prow" data-product="${r.pid}" data-tab="similar"><span class="rk">${n < 3 ? medal(n + 1) : `<b>${n + 1}</b>`}</span>
+      <span class="thumb${p.img ? " photo" : ""}">${pic(p)}<span class="swb${r.s.t === "clear" ? " sw clear" : ""}" style="background:${r.s.hex}"></span></span>
+      <span class="pinfo">${nameLine(p)}<span class="shname">${esc(shadeName(p, r.s))}</span>${r.s.st.includes(S.pc) && r.s.stt ? `<span class="note">✓ ${t("pcStated")}</span>` : ""}</span>
+      <span class="metric"><b>${r.f}%</b><small>${fitWord(r.f)}</small></span></button>`; }).join("")}</div>`;
+}
+function shadeCard(p) {
+  const ss = (D.shades || {})[p.id];
+  const colour = ["lip", "cheek", "eye"].includes(p.grp);
+  if (!ss && !(colour && p.shade === "clear")) return "";
+  if (!ss) return `<div class="card"><span class="lbl">${t("pcShades")}</span><div class="shrow"><span class="sw clear"></span><span><span class="nm">${t("pcClear")}</span></span><span></span></div></div>`;
+  const rows = ss.map((s, i) => ({ s, i })).sort((a, b) => S.pc ? b.s.fit[S.pc] - a.s.fit[S.pc] || a.i - b.i : a.i - b.i);
+  const top = (s) => D.pc.types.filter((k) => s.fit[k] >= D.pc.good * 100).sort((a, b) => s.fit[b] - s.fit[a]).slice(0, 3);
+  return `<div class="card"><div class="sec-h" style="margin:0"><span class="lbl">${t("pcShades")}</span><button class="go" data-go="ranking" data-rtab="pc" aria-label="${t("pcRank")}">${I.right}</button></div>
+    ${S.pc ? `<p class="note" style="margin:0"><span class="pcdot" style="display:inline-block;background:${PC_DOT[S.pc]}"></span> ${t("pcMine")}: <b>${esc(pcName(S.pc))}</b></p>` : `<p class="note" style="margin:0">${t("pcPickHint")}</p>`}
+    <div class="shades">${rows.map(({ s }) => { const f = S.pc ? s.fit[S.pc] : null;
+      return `<div class="shrow${f != null && f >= D.pc.good * 100 ? " me" : ""}"><span class="sw${s.t === "clear" ? " clear" : ""}" style="background:${s.hex}"></span>
+        <span><span class="nm">${esc(shadeName(p, s))}</span> <span class="ax">${axisLabel(s)}</span>
+          <span class="pcs">${s.t === "clear" ? "" : top(s).map((k) => `<span class="pctag"><span class="pcdot" style="background:${PC_DOT[k]}"></span>${esc(pcName(k))}</span>`).join("")}</span>
+          ${s.stt ? `<span class="note" style="display:block">${t("pcStated")}: “${esc(s.stt)}” · <a class="src" href="${esc(s.su)}" target="_blank" rel="noopener">${t("source")}</a></span>` : ""}</span>
+        <span class="pct">${f != null ? `${f}%<small>${f >= D.pc.ok * 100 ? fitWord(f) : t("pcLow")}</small>` : ""}</span></div>`; }).join("")}</div>
+    <p class="note" style="margin:0">${t("pcEst")} ${t("pcNote")}</p></div>`;
+}
+
 /* products shown in the "dupes" block and banners: makeup uses the curated list, skincare the strongest cross-country matches */
 function secFeatured() {
   if (S.sec === "makeup") return D.featured;
@@ -660,7 +727,7 @@ const goalChips = (attr, area, cur) => `<div class="chips">${goalsIn(area).map((
 function header() {
   const tabs = [["home", t("home")], ["ranking", t("ranking")], ["goals", t("goals")], ["insight", t("insight")]];
   const cur = ["product", "search", "method"].includes(S.view) ? "" : S.view;
-  const subs = [["market", t("marketRank")], ["rising", t("rising")], ["buy", t("buyRank")], ["category", t("byCat")], ["skin", t("bySkin")], ["age", t("byAge")], ["goal", t("byGoal")], ["brand", t("byBrand")]];
+  const subs = [["market", t("marketRank")], ["rising", t("rising")], ["buy", t("buyRank")], ...(S.sec === "makeup" ? [["pc", t("pcRank")]] : []), ["category", t("byCat")], ["skin", t("bySkin")], ["age", t("byAge")], ["goal", t("byGoal")], ["brand", t("byBrand")]];
   const hdr = document.getElementById("hdr");
   hdr.className = "hdr" + (S.view === "ranking" || S.view === "goals" ? "" : " flat");
   let sub = "";
@@ -733,6 +800,14 @@ function vHome() {
       <button class="more" data-go="ranking" data-rtab="skin" data-skin="${S.hskin}">${skinName(S.hskin)} ${t("seeAll")} ${I.right}</button>
     </section>
 
+    ${S.sec === "makeup" && D.shades ? `<section class="sec">
+      ${secHead(S.pc ? fmt(t("pcForYou"), { t: esc(pcName(S.pc)) }) : t("pcRank"), `data-go="ranking" data-rtab="pc"`)}
+      ${pcChips(S.pc)}
+      ${S.pc ? (() => { const rows = pcRows(S.pc, "").filter((r) => P(r.pid).grp === "lip" || P(r.pid).cat === "blush"); const seen = new Set(); const uniq = rows.filter((r) => !seen.has(r.pid) && seen.add(r.pid));
+        return `<div class="hscroll">${uniq.slice(0, 10).map((r) => { const p = P(r.pid); return `<button class="pcard" data-product="${r.pid}"><span class="thumb${p.img ? " photo" : ""}">${pic(p)}<span class="swb" style="background:${r.s.hex}"></span></span>${nameLine(p)}<span class="shname">${esc(shadeName(p, r.s))} · ${r.f}%</span></button>`; }).join("")}</div>`; })()
+        : `<p class="note" style="margin:0">${t("pcNote")}</p>`}
+    </section>` : ""}
+
     <section class="sec">
       ${secHead(t("dupes"))}
       <div style="display:grid;gap:10px">${pairs.map(({ ref, r }) => { const a = P(ref), b = P(r.id); return `<button class="pair" data-product="${ref}" data-tab="similar">
@@ -768,6 +843,7 @@ function brandBlock(b, n, k) {
 }
 
 function vRanking() {
+  if (S.rtab === "pc" && S.sec !== "makeup") S.rtab = "market";
   const date = D.chartDates[1] ? `<div class="updated">${dateFmt(D.chartDates[1])} ${t("updated")}</div>` : "";
   const avail = (ids) => ids.filter((id) => available(P(id)));
   // segment metric: that segment's own average and count (the row's stars show the overall rating)
@@ -794,6 +870,11 @@ function vRanking() {
     } else {
       body = `<div class="empty">${t("noRising")}<br><br><button class="more" data-product="${secFeatured()[0]}" data-tab="reviews">${t("firstCta")} ${I.right}</button></div>`;
     }
+  } else if (S.rtab === "pc" && S.sec === "makeup") {
+    filt = `<div><span class="lbl">${t("pcPick")}</span>${pcChips(S.pc)}</div>
+      <div class="chips">${["", "lip", "cheek", "eye"].map((g) => `<button class="chip" data-pcg="${g}" aria-pressed="${S.pcg === g}">${g ? grpName(g) : t("all")}</button>`).join("")}</div>`;
+    basis = `<p class="note" style="margin:0">${t("pcHow")} ${t("pcEst")} ${t("pcNote")}</p>`;
+    body = S.pc ? pcList(pcRows(S.pc)) : `<div class="empty">${t("pcPickFirst")}</div>`;
   } else if (S.rtab === "buy") {
     const st = CLICKS.stats;
     const ids = avail(Object.keys(st).filter((id) => D.products[id] && st[id].people > 0 && inSec(id)))
@@ -924,6 +1005,7 @@ function vProduct() {
       ${buyBox(p)}
       ${D.mode === "real" ? `<p class="note" style="margin:0">${t("labelsNote")}</p>` : ""}
       ${p.sig && Object.keys(p.sig).length ? `<div class="card evid"><span class="lbl">${t("evidence")}</span>${Object.entries(p.sig).map(([m, rows]) => rows.map((g) => `<div class="evrow"><span class="tag">${mktName(m)}</span><span>${esc(sigLabel(g))}</span><a class="src" href="${esc(g.url)}" target="_blank" rel="noopener">${t("source")} · ${esc(g.date)}</a></div>`).join("")).join("")}</div>` : ""}
+      ${shadeCard(p)}
       <div class="profile">
         ${p.finish ? `<div><span class="lbl">${t("finish")}</span><div class="scale">${D.codebook.finish.map((k) => `<div class="${k === p.finish ? "on" : ""}">${tx("finish", k)}</div>`).join("")}</div></div>` : ""}
         <div><span class="lbl">${t("func")}</span><div class="ints">${featsFor(p).map((k) => `<span>${tx("feat", k)}</span><span class="d" aria-label="${p.int[k]}/3">${[1, 2, 3].map((i) => `<i class="${i <= p.int[k] ? "f" : ""}"></i>`).join("")}</span>`).join("")}</div></div>
@@ -1398,6 +1480,8 @@ document.addEventListener("click", (e) => {
   if (d.accg) { S.sheetOpen = S.sheetOpen === d.accg ? "" : d.accg; renderSheet(); return; }
   if (d.sheet) { S.sheet = d.sheet; S.sheetOpen = undefined; renderSheet(); return; }
   if (d.sec) { setSec(d.sec); render(); return; }
+  if (d.pc) { S.pc = S.pc === d.pc ? "" : d.pc; render(); return; }
+  if (d.pcg !== undefined) { S.pcg = d.pcg; render(); return; }
   if (d.product) { if (D.products[d.product]) S.sec = secOf(P(d.product)); LIVE.msg = ""; go("product", { pid: d.product, ptab: d.tab || "similar", origin: d.orig || "", draft: null, bmkt: "" }); return; }
   if (d.bmkt) { S.bmkt = d.bmkt; render(); return; }
   if (d.goal) { S.sec = areaSec(areaOf(d.goal)); go("goals", { goal: d.goal, area: areaOf(d.goal), gskin: "" }); return; }
@@ -1439,6 +1523,7 @@ if (S.sec === "skincare") { S.sec = "makeup"; setSec("skincare"); }
 fromHash();
 if (S.view === "product") S.sec = secOf(P(S.pid));
 if (S.view === "goals") { S.sec = areaSec(areaOf(S.goal)); }
+if (S.view === "ranking" && S.rtab === "pc") setSec("makeup");
 if (S.view !== "goals") S.area = areaOf(S.goal);
 render();
 initLive();

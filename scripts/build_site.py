@@ -30,6 +30,7 @@ from beautybridge.goals import score_goal  # noqa: E402
 from beautybridge.market import local_fit, popularity, signal_strength, trending  # noqa: E402
 from beautybridge import search as search_mod  # noqa: E402
 from beautybridge import reviews as rv  # noqa: E402
+from beautybridge import personal_color as pcol  # noqa: E402
 
 MARKETS = ["", "KR", "US", "JP", "CN"]
 
@@ -149,6 +150,16 @@ def official_sites(data_dir: Path, brands: set[str]) -> dict:
         if kind not in OFFICIAL_KINDS:
             raise SystemExit(f"brand_sites.csv: {b}/{m} kind must be one of {sorted(OFFICIAL_KINDS)}")
         out.setdefault(b, []).append({"m": m, "url": url, "q": q, "kind": kind, "at": r.get("checked", "")})
+    return out
+
+
+def shades_for_site(data_dir: Path, products: dict) -> dict:
+    """Shade-level personal colour data (data/real/shades.csv)."""
+    out = {}
+    for pid, ss in pcol.load_shades(data_dir / "shades.csv", set(products)).items():
+        out[pid] = [{"n": s.name, "l": s.name_local, "hex": s.hex, "t": s.temp, "v": s.value, "c": s.chroma,
+                     "fit": {k: round(v * 100) for k, v in s.fit.items()}, "st": sorted(s.stated_types),
+                     "stt": s.stated_text, "su": s.stated_url, "url": s.shade_url} for s in ss]
     return out
 
 
@@ -280,6 +291,8 @@ def build(engine, ds_dir) -> dict:
         "stores": stores_config(),
         "buyLinks": buy_links(data_dir, P),
         "official": official_sites(data_dir, {p.brand for p in P.values()}),
+        "shades": shades_for_site(data_dir, P),
+        "pc": {"types": list(pcol.TYPES), "good": pcol.GOOD, "ok": pcol.OK},
         "reviewPrior": {"weight": rv.PRIOR_WEIGHT, "mean": rv.DEFAULT_PRIOR_MEAN, "window": rv.TREND_WINDOW_DAYS,
                         "ages": rv.AGE_BANDS, "maxText": rv.MAX_TEXT},
         "market": {

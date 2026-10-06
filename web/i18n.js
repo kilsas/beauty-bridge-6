@@ -417,3 +417,24 @@ const T_SEC = {
   ja: { secMakeup: "メイク", secSkin: "スキンケア", secAria: "カテゴリー", banner2Hs: "ゆらぎ肌、<br>何で落ち着かせる？", banner2Ss: "鎮静と保湿で選びました" },
 };
 for (const k of Object.keys(T_SEC)) Object.assign(T[k], T_SEC[k]);
+
+/* Personal colour (퍼스널 컬러), shade level */
+const PC_TX = {
+  ko: { spring_light: "봄웜 라이트", spring_bright: "봄웜 브라이트", summer_light: "여름쿨 라이트", summer_mute: "여름쿨 뮤트", autumn_mute: "가을웜 뮤트", autumn_deep: "가을웜 딥", winter_bright: "겨울쿨 브라이트", winter_deep: "겨울쿨 딥" },
+  en: { spring_light: "Spring light", spring_bright: "Spring bright", summer_light: "Summer light", summer_mute: "Summer mute", autumn_mute: "Autumn mute", autumn_deep: "Autumn deep", winter_bright: "Winter bright", winter_deep: "Winter deep" },
+  zh: { spring_light: "春季浅暖", spring_bright: "春季净暖", summer_light: "夏季浅冷", summer_mute: "夏季柔冷", autumn_mute: "秋季柔暖", autumn_deep: "秋季深暖", winter_bright: "冬季净冷", winter_deep: "冬季深冷" },
+  ja: { spring_light: "イエベ春ライト", spring_bright: "イエベ春ブライト", summer_light: "ブルベ夏ライト", summer_mute: "ブルベ夏ミュート", autumn_mute: "イエベ秋ミュート", autumn_deep: "イエベ秋ディープ", winter_bright: "ブルベ冬ブライト", winter_deep: "ブルベ冬ディープ" },
+};
+const AX_TX = {
+  ko: { warm: "웜", neutral: "뉴트럴", cool: "쿨", light: "밝음", medium: "중간", deep: "깊음", vivid: "선명", soft: "소프트", muted: "뮤트" },
+  en: { warm: "warm", neutral: "neutral", cool: "cool", light: "light", medium: "medium", deep: "deep", vivid: "vivid", soft: "soft", muted: "muted" },
+  zh: { warm: "暖", neutral: "中性", cool: "冷", light: "浅", medium: "中", deep: "深", vivid: "鲜明", soft: "柔和", muted: "低饱和" },
+  ja: { warm: "イエベ寄り", neutral: "ニュートラル", cool: "ブルベ寄り", light: "明るい", medium: "中間", deep: "深い", vivid: "鮮やか", soft: "ソフト", muted: "くすみ" },
+};
+const T_PC = {
+  ko: { pcRank: "퍼스널컬러", pcPick: "내 퍼스널 컬러", pcPickFirst: "위에서 퍼스널 컬러를 고르면 어울리는 호수를 보여드려요.", pcPickHint: "퍼스널 컬러를 고르면 내 타입 적합도 순으로 정렬돼요.", pcGood: "잘 어울려요", pcOk: "무난해요", pcLow: "덜 어울려요", pcShades: "호수별 퍼스널 컬러", pcStated: "출처 의견", pcMine: "내 타입", pcForYou: "{t}에게 어울리는 호수", pcClear: "투명 · 모든 타입", pcHow: "호수의 따뜻함·밝기·선명함을 타입별 기준과 비교한 점수예요.", pcEst: "호수 이름은 링크된 판매 페이지 기준이고, 색 특성과 색상 견본은 설명을 바탕으로 한 추정이에요.", pcNote: "정확한 퍼스널 컬러는 드레이핑 천으로 하는 오프라인 진단을 권해요." },
+  en: { pcRank: "Personal color", pcPick: "My personal color", pcPickFirst: "Pick your personal color above to see the shades that suit it.", pcPickHint: "Pick your personal color to sort shades by how well they suit you.", pcGood: "Suits you", pcOk: "Works", pcLow: "Less flattering", pcShades: "Shades by personal color", pcStated: "Source says", pcMine: "Your type", pcForYou: "Shades for {t}", pcClear: "Clear · every type", pcHow: "Scores compare each shade's warmth, lightness and clarity with each type.", pcEst: "Shade names come from the linked shop pages; warmth/lightness/clarity and the swatches are estimates from shade descriptions.", pcNote: "For an accurate personal color, an in-person draping consultation is recommended." },
+  zh: { pcRank: "个人色彩", pcPick: "我的个人色彩", pcPickFirst: "在上方选择你的个人色彩，即可查看适合的色号。", pcPickHint: "选择个人色彩后，色号会按适合度排序。", pcGood: "很适合", pcOk: "可以", pcLow: "不太适合", pcShades: "各色号的个人色彩", pcStated: "来源观点", pcMine: "我的类型", pcForYou: "适合{t}的色号", pcClear: "透明 · 所有类型", pcHow: "按色号的冷暖、明度和纯度与各类型标准比较得出。", pcEst: "色号名称以所附页面为准；冷暖、明度、纯度和色块是根据描述的估计。", pcNote: "准确的个人色彩建议进行线下布料诊断。" },
+  ja: { pcRank: "パーソナルカラー", pcPick: "私のパーソナルカラー", pcPickFirst: "上でパーソナルカラーを選ぶと、似合う色番が表示されます。", pcPickHint: "パーソナルカラーを選ぶと、似合う順に並びます。", pcGood: "似合う", pcOk: "なじむ", pcLow: "あまり似合わない", pcShades: "色番別パーソナルカラー", pcStated: "出典の意見", pcMine: "私のタイプ", pcForYou: "{t}に似合う色番", pcClear: "クリア · 全タイプ", pcHow: "色番の黄み・明るさ・鮮やかさを各タイプの基準と比べたスコアです。", pcEst: "色番名はリンク先の販売ページに基づき、色の特性と色見本は説明からの推定です。", pcNote: "正確な診断には、ドレープを使った対面診断をおすすめします。" },
+};
+for (const k of Object.keys(T_PC)) Object.assign(T[k], T_PC[k]);

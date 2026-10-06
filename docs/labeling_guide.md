@@ -119,3 +119,16 @@ Regular (non-sale) price in the home market, in local currency, on the date
 you record in `notes`. Currency codes must exist in `config.FX_TO_USD`.
 Note package size in `notes`; if sizes differ a lot within a category,
 consider adding a price-per-gram column (planned for v0.2).
+
+
+## Shades and personal colour (`data/real/shades.csv`)
+
+One row per shade: `product_id, name, name_local, temp, value, chroma, hex, stated,
+stated_text, stated_url, shade_url`.
+- `temp`: warm / neutral / cool / clear (transparent fits every type).
+- `value`: light / medium / deep. `chroma`: vivid / soft / muted.
+- `hex`: an approximate swatch for display only.
+- `stated`: space-separated tags a source gives (e.g. `summer_mute`, `spring`, `warm`),
+  with the source's wording in `stated_text` and its link in `stated_url` (required).
+Label from the brand's colour description; when unsure between two values, use the
+middle one (neutral / medium / soft).

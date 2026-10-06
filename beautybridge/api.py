@@ -19,6 +19,7 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 from . import load_engine
+from . import personal_color as pcol
 from . import reviews as rv
 from .config import FUSION_MODES, SIMILARITY_WEIGHTS
 from .engine import NotFound
@@ -51,6 +52,8 @@ def _guard(fn, *args, **kwargs):
 
 
 SITE = Path(__file__).resolve().parents[1] / "web" / "index.html"
+_DATA_DIR = Path(os.environ.get("BEAUTYBRIDGE_DATA") or _REAL)
+shades = pcol.load_shades(_DATA_DIR / "shades.csv", set(engine.ds.products)) if _DATA_DIR.is_dir() else {}
 store = rv.ReviewStore(os.environ.get("BEAUTYBRIDGE_REVIEWS_DB")
                        or Path(__file__).resolve().parents[1] / "db" / "reviews.sqlite")
 
@@ -211,6 +214,26 @@ def goal(goal_id: str, k: int = Query(10, ge=1, le=50), market: str | None = Mar
                   skin_type=skin_type, category=category)
     return {"goal": engine.ds.goals[goal_id.replace("-", "_")].to_dict(), "market": market,
             "results": [r.to_dict() for r in recs]}
+
+
+@app.get("/personal-color/types")
+def personal_color_types():
+    return {"types": list(pcol.TYPES), "targets": pcol.TYPES, "weights": pcol.WEIGHTS}
+
+
+@app.get("/personal-color/{pc_type}")
+def personal_color(pc_type: str, k: int = Query(20, ge=1, le=100)):
+    """Shades ranked for one personal colour type (e.g. summer_mute)."""
+    rows = _guard(pcol.best_shades, shades, pc_type, k)
+    return [{"product": engine.get(s.product_id).to_dict(), "shade": s.name, "shade_local": s.name_local,
+             "fit": f, "stated": s.stated_text, "stated_url": s.stated_url} for s, f in rows]
+
+
+@app.get("/products/{product_id}/shades")
+def product_shades(product_id: str):
+    _guard(engine.get, product_id)
+    return [{"name": s.name, "name_local": s.name_local, "temp": s.temp, "value": s.value, "chroma": s.chroma,
+             "fit": s.fit, "stated": s.stated_text, "stated_url": s.stated_url} for s in shades.get(product_id, [])]
 
 
 @app.get("/market/leaders/{market}")
