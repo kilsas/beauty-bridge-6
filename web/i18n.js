@@ -474,3 +474,40 @@ const T_CASES = {
   ja: { csK: "原因分析", csH: "自国で1位、海外では苦戦した理由", csLead: "3つの事例の事実と原因を記事で確認してまとめました。各行の横のリンクが出典です。", csExit: "撤退", csShrunk: "縮小", csOngoing: "進行中", csFacts: "何があったか", csCauses: "報道された原因", csCommon: "3事例に共通する原因", csSol: "解決策", csSolLead: "解決策はこのプロジェクトの分析です。効果はユーザー調査で検証する必要があります。", csColCause: "失敗の原因", csColFix: "提案する解決策", csColBuilt: "Beauty Bridge では", csTry: "使ってみる" },
 };
 for (const k of Object.keys(T_CASES)) Object.assign(T[k], T_CASES[k]);
+
+/* "did this shade suit you?" — people check the estimated shade labels */
+const T_VOTE = {
+  ko: { vAsk: "써 보니 내 타입엔", v_suits: "잘 어울렸어요", v_okay: "무난했어요", v_not: "안 어울렸어요",
+    vStats: "{t} 사용자 {n}명: 어울림 {a} · 무난 {b} · 안 어울림 {c}", vDisagree: "추정과 다름",
+    vPickFirst: "내 타입을 고르면 호수마다 실제로 어울렸는지 남길 수 있어요.",
+    vOff: "의견 저장이 아직 연결되지 않았어요.",
+    vWhy: "호수 라벨은 추정이에요. 써 본 호수에 의견을 남기면 추정과 나란히 쌓여서 라벨이 맞는지 확인할 수 있어요.",
+    vCheck: "호수 라벨 검증", vCheckN: "사용자 의견", vCheckSide: "어울림 여부 일치", vCheckExact: "세 단계까지 일치",
+    vCheckNote: "추정 라벨(잘 어울림·무난·덜 어울림)과 실제로 써 본 사람들의 답을 비교한 비율이에요. 사람마다 판단이 달라서 100%가 정답은 아니에요.",
+    vCheckEmpty: "아직 의견이 없어요. 내 타입을 고른 뒤 제품 페이지의 호수 목록에서 남길 수 있어요." },
+  en: { vAsk: "On my type it", v_suits: "suited me", v_okay: "was okay", v_not: "didn't suit me",
+    vStats: "{n} {t} users: suited {a} · okay {b} · didn't {c}", vDisagree: "differs from estimate",
+    vPickFirst: "Pick your type to say whether each shade actually suited you.",
+    vOff: "Saving answers isn't connected yet.",
+    vWhy: "Shade labels are estimates. Answers from people who tried a shade are kept next to the estimate, so the labels can be checked.",
+    vCheck: "Checking the shade labels", vCheckN: "answers", vCheckSide: "agree on suits / doesn't", vCheckExact: "agree on all three levels",
+    vCheckNote: "How often the estimated label (suits · okay · less) matched what people who tried the shade said. People judge differently, so 100% isn't the goal.",
+    vCheckEmpty: "No answers yet. Pick your type, then answer in the shade list on a product page." },
+  zh: { vAsk: "用过后对我的类型", v_suits: "很适合", v_okay: "还可以", v_not: "不适合",
+    vStats: "{t} 用户 {n} 人：适合 {a} · 还可以 {b} · 不适合 {c}", vDisagree: "与估计不同",
+    vPickFirst: "选择你的类型后，可以为每个色号留下是否真的适合。",
+    vOff: "尚未连接意见保存。",
+    vWhy: "色号标签是估计值。用过的人留下的意见会和估计并排保存，用来检验标签是否准确。",
+    vCheck: "色号标签检验", vCheckN: "用户意见", vCheckSide: "适合与否一致", vCheckExact: "三档完全一致",
+    vCheckNote: "估计标签（适合·还可以·不太适合）与实际用过的人的回答一致的比例。每个人判断不同，100% 并不是目标。",
+    vCheckEmpty: "还没有意见。选择类型后，可在商品页的色号列表中留下。" },
+  ja: { vAsk: "使ってみて私のタイプに", v_suits: "似合った", v_okay: "まあまあ", v_not: "似合わなかった",
+    vStats: "{t} のユーザー {n}人：似合う {a} · まあまあ {b} · 似合わない {c}", vDisagree: "推定と異なる",
+    vPickFirst: "タイプを選ぶと、色番ごとに実際に似合ったかを残せます。",
+    vOff: "意見の保存はまだ接続されていません。",
+    vWhy: "色番のラベルは推定です。使った人の意見は推定と並べて保存され、ラベルが正しいか確かめられます。",
+    vCheck: "色番ラベルの検証", vCheckN: "ユーザーの意見", vCheckSide: "似合う／似合わないが一致", vCheckExact: "3段階まで一致",
+    vCheckNote: "推定ラベル（似合う・まあまあ・あまり）と、実際に使った人の答えが一致した割合です。人によって判断が違うので、100% が正解ではありません。",
+    vCheckEmpty: "まだ意見がありません。タイプを選んでから、商品ページの色番リストで答えられます。" },
+};
+for (const k of Object.keys(T_VOTE)) Object.assign(T[k], T_VOTE[k]);

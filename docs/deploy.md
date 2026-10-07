@@ -63,7 +63,14 @@ GitHub 저장소 **Settings → Secrets and variables → Actions → Variables*
 - 연구용 원자료: Supabase **Table Editor → buy_clicks → Export → CSV**
   (visitor_id, product_id, store, market, created_at). 리뷰도 같은 방법으로 내려받을 수 있어요.
 
-**판매처 바꾸기**: `data/stores.json`에서 이름과 검색 주소(`{q}` 자리에 제품명이 들어가요)를 고쳐요.
+**호수 의견(라벨 검증) 켜기 (한 번만)**: 같은 방법으로 `supabase/shade_votes.sql`을 붙여 넣고 **Run**.
+이후 '내 타입'을 고른 사람은 제품 페이지 호수 목록에서 "잘 어울렸어요 / 무난했어요 / 안 어울렸어요"를 남길 수 있고,
+랭킹 → 퍼스널컬러 탭 아래 **호수 라벨 검증** 카드에 추정 라벨과의 일치율이 나와요.
+- 한 사람당 호수 하나에 답 하나(다시 누르면 취소, 다른 답을 누르면 바뀜). 남의 답은 볼 수 없고 합계만 보여요.
+- 사용자 3명 이상이 추정과 반대로 답하면 그 호수에 "추정과 다름"이 표시돼요. 그 호수는 `shades.csv`에서 다시 확인해 보세요.
+- 원자료: **Table Editor → shade_votes → Export → CSV**.
+
+ `data/stores.json`에서 이름과 검색 주소(`{q}` 자리에 제품명이 들어가요)를 고쳐요.
 
 **제휴 링크로 바꾸기 (수수료 받기)**
 - 판매처 전체에 붙이는 방식(예: Amazon Associates): `stores.json`의 해당 판매처에

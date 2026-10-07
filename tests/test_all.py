@@ -511,6 +511,36 @@ class TestPersonalColor(unittest.TestCase):
                 self.pc.load_shades(f, {"R007"})
 
 
+    def test_votes_validate_and_count(self):
+        v = {"voter_id": "a", "product_id": "R013", "shade": "#05 Sunset Muhly", "pc_type": "autumn_mute", "verdict": "suits"}
+        self.assertEqual(self.pc.make_vote(v, self.sh)["verdict"], "suits")
+        for k, bad in (("shade", "#99 Nope"), ("pc_type", "autumn"), ("verdict", "love"), ("voter_id", ""), ("product_id", "R001x")):
+            with self.assertRaises(self.pc.ShadeError):
+                self.pc.make_vote({**v, k: bad}, self.sh)
+        rows = self.pc.vote_stats([v, {**v, "voter_id": "b", "verdict": "not"}])
+        self.assertEqual(rows, [{"product_id": "R013", "shade": "#05 Sunset Muhly", "pc_type": "autumn_mute",
+                                 "n": 2, "suits": 1, "okay": 0, "not": 1}])
+
+    def test_agreement_compares_votes_with_estimate(self):
+        # Sunset Muhly: autumn_mute fit 1.0 -> estimate "suits"; spring_light ~0.74 -> estimate "not"
+        v = {"voter_id": "a", "product_id": "R013", "shade": "#05 Sunset Muhly", "pc_type": "autumn_mute", "verdict": "suits"}
+        a = self.pc.agreement([v, {**v, "voter_id": "b", "pc_type": "spring_light", "verdict": "suits"}], self.sh)
+        self.assertEqual((a["votes"], a["exact"], a["side"]), (2, 0.5, 0.5))
+        self.assertEqual(a["disputed"], [{"product_id": "R013", "shade": "#05 Sunset Muhly", "votes_against": 1}])
+        self.assertIsNone(self.pc.agreement([], self.sh)["exact"])
+
+    def test_vote_store_one_answer_per_person(self):
+        from beautybridge import reviews as rv
+        v = {"voter_id": "a", "product_id": "R013", "shade": "#05 Sunset Muhly", "pc_type": "autumn_mute", "verdict": "suits"}
+        with tempfile.TemporaryDirectory() as d:
+            store = rv.ReviewStore(Path(d) / "r.sqlite")
+            store.upsert_vote(v)
+            store.upsert_vote({**v, "verdict": "okay"})
+            self.assertEqual([x["verdict"] for x in store.votes()], ["okay"])
+            self.assertEqual(len(store.votes("a")), 1)
+            store.delete_vote("a", "R013", "#05 Sunset Muhly")
+            self.assertEqual(store.votes(), [])
+
 class TestExpansionCases(unittest.TestCase):
     def test_cases_are_sourced_and_translated(self):
         sys.path.insert(0, str(ROOT / "scripts"))

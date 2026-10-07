@@ -107,6 +107,15 @@ a { color: inherit; }
 .shrow .pct { text-align: right; font: 700 15px var(--num); }
 .shrow .pct small { display: block; font: 500 11px var(--sans); color: var(--muted); }
 .shrow.me .pct { color: var(--accent); }
+.vote { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 6px; }
+.vote button { font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink-2); }
+.vote button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.vote .vq { font-size: 11px; color: var(--muted); margin-right: 2px; }
+.vote .vs { flex-basis: 100%; font-size: 11px; color: var(--muted); }
+.vcheck { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.vcheck div { background: var(--chip); border-radius: 12px; padding: 10px; }
+.vcheck b { display: block; font: 700 18px var(--num); }
+.vcheck span { font-size: 11px; color: var(--muted); }
 .pctag { font-size: 11px; padding: 2px 7px; border-radius: 999px; background: var(--chip); color: var(--ink-2); display: inline-flex; align-items: center; gap: 4px; }
 .prow .thumb { position: relative; }
 .thumb .swb { position: absolute; right: 4px; bottom: 4px; width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 0 2px var(--bg); }
@@ -523,9 +532,71 @@ function shadeCard(p) {
       return `<div class="shrow${f != null && f >= D.pc.good * 100 ? " me" : ""}"><span class="sw${s.t === "clear" ? " clear" : ""}" style="background:${s.hex}"></span>
         <span><span class="nm">${esc(shadeName(p, s))}</span> <span class="ax">${axisLabel(s)}</span>
           <span class="pcs">${s.t === "clear" ? "" : top(s).map((k) => `<span class="pctag"><span class="pcdot" style="background:${PC_DOT[k]}"></span>${esc(pcName(k))}</span>`).join("")}</span>
-          ${s.stt ? `<span class="note" style="display:block">${t("pcStated")}: “${esc(s.stt)}” · <a class="src" href="${esc(s.su)}" target="_blank" rel="noopener">${t("source")}</a></span>` : ""}</span>
+          ${s.stt ? `<span class="note" style="display:block">${t("pcStated")}: “${esc(s.stt)}” · <a class="src" href="${esc(s.su)}" target="_blank" rel="noopener">${t("source")}</a></span>` : ""}
+          ${voteRow(p, s)}</span>
         <span class="pct">${f != null ? `${f}%<small>${f >= D.pc.ok * 100 ? fitWord(f) : t("pcLow")}</small>` : ""}</span></div>`; }).join("")}</div>
-    <p class="note" style="margin:0">${t("pcEst")} ${t("pcNote")}</p></div>`;
+    <p class="note" style="margin:0">${t("pcEst")} ${t("pcNote")}</p>
+    <p class="note" style="margin:0">${!S.pc ? t("vPickFirst") : VOTES.status === "off" || !BACKEND.vote ? t("vOff") : t("vWhy")}</p></div>`;
+}
+
+/* ---------------- "did this shade suit you?": people check the estimated labels ---------------- */
+const VOTES = { status: "loading", stats: {}, mine: {}, sig: "" };
+const vkey = (pid, shade) => pid + "|" + shade;
+function setVoteStats(rows) {
+  const stats = {};
+  for (const r of rows || []) {
+    if (!r || !(D.shades || {})[r.product_id] || !D.pc.types.includes(r.pc_type)) continue;
+    const k = vkey(r.product_id, r.shade);
+    (stats[k] ||= {})[r.pc_type] = { n: +r.n || 0, suits: +r.suits || 0, okay: +r.okay || 0, not: +r.not || 0 };
+  }
+  const sig = JSON.stringify(stats), changed = sig !== VOTES.sig || VOTES.status !== "ready";
+  Object.assign(VOTES, { status: "ready", stats, sig });
+  if (changed && (S.view === "product" || S.view === "ranking")) render();
+}
+function setMyVotes(rows) {
+  const mine = {};
+  for (const r of rows || []) if (r && r.product_id) mine[vkey(r.product_id, r.shade)] = { pc: r.pc_type, v: r.verdict };
+  VOTES.mine = mine;
+}
+const predicted = (f) => f >= D.pc.good * 100 ? "suits" : f >= D.pc.ok * 100 ? "okay" : "not";
+function voteRow(p, s) {
+  if (!S.pc || s.t === "clear") return "";
+  const st = (VOTES.stats[vkey(p.id, s.n)] || {})[S.pc];
+  const my = VOTES.mine[vkey(p.id, s.n)];
+  const can = BACKEND.vote && LIVE.uid && VOTES.status !== "off";
+  const btns = can ? `<span class="vq">${t("vAsk")}</span>${["suits", "okay", "not"].map((v) => `<button data-vote="${v}" data-vpid="${p.id}" data-vshade="${esc(s.n)}" aria-pressed="${!!my && my.pc === S.pc && my.v === v}">${t("v_" + v)}</button>`).join("")}` : "";
+  const sum = st && st.n ? `<span class="vs">${fmt(t("vStats"), { t: esc(pcName(S.pc)), n: st.n, a: st.suits, b: st.okay, c: st.not })}${st.n >= 3 && (st.suits + st.okay > st.not) !== (predicted(s.fit[S.pc]) !== "not") ? ` · <b>${t("vDisagree")}</b>` : ""}</span>` : "";
+  return btns || sum ? `<span class="vote">${btns}${sum}</span>` : "";
+}
+async function castVote(pid, shade, verdict) {
+  if (!BACKEND.vote || !LIVE.uid || !S.pc) return;
+  const k = vkey(pid, shade), before = VOTES.mine[k];
+  const clear = before && before.pc === S.pc && before.v === verdict;
+  VOTES.mine = { ...VOTES.mine }; if (clear) delete VOTES.mine[k]; else VOTES.mine[k] = { pc: S.pc, v: verdict };
+  render();
+  try { await BACKEND.vote(pid, shade, S.pc, clear ? null : verdict); }
+  catch (e) { console.warn("shade vote not saved (run supabase/shade_votes.sql)", e); VOTES.mine = { ...VOTES.mine }; if (before) VOTES.mine[k] = before; else delete VOTES.mine[k]; VOTES.status = "off"; render(); }
+}
+/* how often the estimated labels matched what people said (same rule as personal_color.agreement) */
+function voteCheck() {
+  let n = 0, exact = 0, side = 0;
+  for (const [k, byType] of Object.entries(VOTES.stats)) {
+    const [pid, shade] = [k.slice(0, k.indexOf("|")), k.slice(k.indexOf("|") + 1)];
+    const s = ((D.shades || {})[pid] || []).find((x) => x.n === shade);
+    if (!s || s.t === "clear") continue;
+    for (const [pc, c] of Object.entries(byType)) {
+      const p = predicted(s.fit[pc]);
+      n += c.n; exact += c[p]; side += p === "not" ? c.not : c.suits + c.okay;
+    }
+  }
+  return { n, exact: n ? Math.round(exact / n * 100) : null, side: n ? Math.round(side / n * 100) : null };
+}
+function voteCheckCard() {
+  if (VOTES.status !== "ready") return "";
+  const c = voteCheck();
+  return `<div class="card"><span class="lbl">${t("vCheck")}</span>
+    ${c.n ? `<div class="vcheck"><div><b>${c.n}</b><span>${t("vCheckN")}</span></div><div><b>${c.side}%</b><span>${t("vCheckSide")}</span></div><div><b>${c.exact}%</b><span>${t("vCheckExact")}</span></div></div>` : ""}
+    <p class="note" style="margin:0">${c.n ? t("vCheckNote") : t("vCheckEmpty")}</p></div>`;
 }
 
 /* products shown in the "dupes" block and banners: makeup uses the curated list, skincare the strongest cross-country matches */
@@ -930,7 +1001,7 @@ function vRanking() {
       body = `<div class="empty">${t("noRising")}<br><br><button class="more" data-product="${secFeatured()[0]}" data-tab="reviews">${t("firstCta")} ${I.right}</button></div>`;
     }
   } else if (S.rtab === "pc" && S.sec === "makeup") {
-    body = pcBoard() + `<p class="note" style="margin:0">${t("pcHow")} ${t("pcEst")} ${t("pcNote")}</p>`;
+    body = pcBoard() + `<p class="note" style="margin:0">${t("pcHow")} ${t("pcEst")} ${t("pcNote")}</p>` + voteCheckCard();
   } else if (S.rtab === "buy") {
     const st = CLICKS.stats;
     const ids = avail(Object.keys(st).filter((id) => D.products[id] && st[id].people > 0 && inSec(id)))
@@ -1165,7 +1236,7 @@ function reviewsBody(p) {
   return `<p class="note"><span class="livedot"></span>${t("live")} · ${t("liveNote")}</p>${summary}${form}${items ? `<div class="revs">${items}</div>` : ""}`;
 }
 /* The active review storage. Each backend sets LIVE.uid, calls setReviews() and provides save(). */
-const BACKEND = { kind: "", save: null, click: null };
+const BACKEND = { kind: "", save: null, click: null, vote: null };
 function setReviews(list) { LIVE.list = list; LIVE.status = "ready"; recompute(); render(); }
 async function saveReview(del = false) {
   if (!BACKEND.save || !LIVE.uid || LIVE.saving) return;
@@ -1220,6 +1291,26 @@ async function initClaude(cl) {
     myClicks = { ...myClicks, [pid]: { n: c.n + 1, first: c.first, last: now } };
     await db.doc("clicks/" + LIVE.uid).set({ items: myClicks });
   };
+  let myVotes = {};
+  BACKEND.vote = async (pid, shade, pc, verdict) => {
+    myVotes = { ...myVotes }; const k = vkey(pid, shade);
+    if (verdict) myVotes[k] = { product_id: pid, shade, pc_type: pc, verdict }; else delete myVotes[k];
+    await db.doc("shadevotes/" + LIVE.uid).set({ items: myVotes });
+  };
+  db.collection("shadevotes").onSnapshot((snap) => {
+    const agg = {};
+    for (const doc of snap.docs) {
+      const items = (doc.data() || {}).items;
+      if (!items || typeof items !== "object") continue;
+      if (doc.id === LIVE.uid) { myVotes = items; setMyVotes(Object.values(items)); }
+      for (const v of Object.values(items)) {
+        if (!v || !["suits", "okay", "not"].includes(v.verdict)) continue;
+        const a = agg[vkey(v.product_id, v.shade) + "|" + v.pc_type] ||= { product_id: v.product_id, shade: v.shade, pc_type: v.pc_type, n: 0, suits: 0, okay: 0, not: 0 };
+        a.n += 1; a[v.verdict] += 1;
+      }
+    }
+    setVoteStats(Object.values(agg));
+  }, () => { VOTES.status = "off"; });
   db.collection("clicks").onSnapshot((snap) => {
     const agg = {}, since = Date.now() - D.reviewPrior.window * 864e5;
     for (const doc of snap.docs) {
@@ -1291,6 +1382,22 @@ async function initSupabase(rc) {
       if (error) throw error;
       await loadClicks();
     };
+    const loadVotes = async () => {
+      const { data, error } = await client.from("shade_vote_stats").select("product_id,shade,pc_type,n,suits,okay,not");
+      if (error) throw error;
+      const mine = await client.from("shade_votes").select("product_id,shade,pc_type,verdict").eq("voter_id", LIVE.uid);
+      if (mine.error) throw mine.error;
+      setMyVotes(mine.data); setVoteStats(data);
+    };
+    loadVotes().catch((e) => { VOTES.status = "off"; console.warn("shade votes unavailable (run supabase/shade_votes.sql)", e); render(); });
+    setInterval(() => loadVotes().catch(() => {}), 60000);
+    BACKEND.vote = async (pid, shade, pc, verdict) => {
+      const { error } = verdict
+        ? await client.from("shade_votes").upsert({ voter_id: LIVE.uid, product_id: pid, shade, pc_type: pc, verdict }, { onConflict: "voter_id,product_id,shade" })
+        : await client.from("shade_votes").delete().eq("voter_id", LIVE.uid).eq("product_id", pid).eq("shade", shade);
+      if (error) throw error;
+      await loadVotes();
+    };
     BACKEND.kind = "supabase";
     BACKEND.save = async (pid, review) => {
       const q = review
@@ -1335,6 +1442,20 @@ async function initApi(rc) {
       if (!r.ok) throw new Error("HTTP " + r.status);
       await loadClicks();
     };
+    const loadVotes = async () => {
+      const [a, b] = await Promise.all([fetch(base + "/shade-votes/stats"), fetch(`${base}/shade-votes/mine/${encodeURIComponent(rid)}`)]);
+      if (!a.ok || !b.ok) throw new Error("HTTP " + (a.ok ? b.status : a.status));
+      setMyVotes(await b.json()); setVoteStats(await a.json());
+    };
+    loadVotes().catch(() => { VOTES.status = "off"; render(); });
+    setInterval(() => loadVotes().catch(() => {}), 20000);
+    BACKEND.vote = async (pid, shade, pc, verdict) => {
+      const r = verdict
+        ? await fetch(base + "/shade-votes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ voter_id: rid, product_id: pid, shade, pc_type: pc, verdict }) })
+        : await fetch(`${base}/shade-votes/${encodeURIComponent(rid)}/${encodeURIComponent(pid)}/${encodeURIComponent(shade)}`, { method: "DELETE" });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      await loadVotes();
+    };
     BACKEND.kind = "api";
     BACKEND.save = async (pid, review) => {
       const res = review
@@ -1356,7 +1477,7 @@ async function initLive() {
   const rc = CFG.reviews || {};
   if (rc.backend === "supabase" && rc.supabaseUrl && rc.supabaseAnonKey && await initSupabase(rc)) return;
   if (rc.backend === "api" && rc.apiUrl && await initApi(rc)) return;
-  LIVE.status = "nodb"; CLICKS.status = "off"; render();
+  LIVE.status = "nodb"; CLICKS.status = "off"; VOTES.status = "off"; render();
 }
 
 function vGoals() {
@@ -1561,6 +1682,7 @@ document.addEventListener("click", (e) => {
   if (d.accg) { S.sheetOpen = S.sheetOpen === d.accg ? "" : d.accg; renderSheet(); return; }
   if (d.sheet) { S.sheet = d.sheet; S.sheetOpen = undefined; renderSheet(); return; }
   if (d.sec) { setSec(d.sec); render(); return; }
+  if (d.vote) { castVote(d.vpid, d.vshade, d.vote); return; }
   if (d.pc) { S.pc = S.pc === d.pc ? "" : d.pc; render(); return; }
   if (d.pcg !== undefined) { S.pcg = d.pcg; render(); return; }
   if (d.season) { S.season = d.season; S.pcType = ""; render(); return; }

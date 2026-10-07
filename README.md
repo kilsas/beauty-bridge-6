@@ -188,6 +188,14 @@ Amazon Japan, Tmall and JD in China). Clicks are stored (Supabase `buy_clicks`, 
 counts distinct people per product. Swap in affiliate links per store (`append`,
 `affiliate`) or per product (`data/real/buy_links.csv`); the page then shows a disclosure.
 
+## Checking the shade labels with users
+Shade temperature/value/chroma are estimates. People who pick their (diagnosed) type can
+answer "suited me / okay / didn't" for each shade they tried (Supabase `shade_votes`, run
+`supabase/shade_votes.sql`; or the API's `POST /shade-votes`). Answers are stored next to
+the estimate, never merged into it. `personal_color.agreement()` (API: `GET /shade-votes/agreement`,
+site: *Checking the shade labels* card) reports how often the estimate matched, and lists the
+shades people disagree with most, so those labels can be re-checked.
+
 ## ⚠️ Which data is real
 
 - `data/real/`: **real products** (92, from Korea, the USA, Japan, China and

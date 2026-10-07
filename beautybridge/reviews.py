@@ -217,6 +217,17 @@ class ReviewStore:
         created_at  TEXT NOT NULL
     )"""
 
+    VOTES = """
+    CREATE TABLE IF NOT EXISTS shade_votes (
+        voter_id    TEXT NOT NULL,
+        product_id  TEXT NOT NULL,
+        shade       TEXT NOT NULL,
+        pc_type     TEXT NOT NULL,
+        verdict     TEXT NOT NULL CHECK (verdict IN ('suits','okay','not')),
+        created_at  TEXT NOT NULL,
+        PRIMARY KEY (voter_id, product_id, shade)
+    )"""
+
     def __init__(self, path):
         import sqlite3
         from pathlib import Path
@@ -224,6 +235,7 @@ class ReviewStore:
         self.conn = sqlite3.connect(path, check_same_thread=False)
         self.conn.execute(self.SCHEMA)
         self.conn.execute(self.CLICKS)
+        self.conn.execute(self.VOTES)
         self.conn.commit()
 
     def upsert(self, r: Review) -> None:
@@ -250,3 +262,20 @@ class ReviewStore:
     def clicks(self) -> list[dict]:
         cur = self.conn.execute("SELECT visitor_id, product_id, store, market, created_at FROM buy_clicks")
         return [dict(zip(("visitor_id", "product_id", "store", "market", "created_at"), row)) for row in cur]
+
+    # shade checks: one answer per person per shade (a new answer replaces the old one)
+    def upsert_vote(self, v: dict) -> None:
+        self.conn.execute("INSERT OR REPLACE INTO shade_votes VALUES (?,?,?,?,?,?)",
+                          (v["voter_id"], v["product_id"], v["shade"], v["pc_type"], v["verdict"],
+                           datetime.now(timezone.utc).isoformat(timespec="seconds")))
+        self.conn.commit()
+
+    def delete_vote(self, voter_id: str, product_id: str, shade: str) -> None:
+        self.conn.execute("DELETE FROM shade_votes WHERE voter_id=? AND product_id=? AND shade=?",
+                          (voter_id, product_id, shade))
+        self.conn.commit()
+
+    def votes(self, voter_id: str | None = None) -> list[dict]:
+        q = "SELECT voter_id, product_id, shade, pc_type, verdict, created_at FROM shade_votes"
+        cur = self.conn.execute(q + " WHERE voter_id=?", (voter_id,)) if voter_id else self.conn.execute(q)
+        return [dict(zip(("voter_id", "product_id", "shade", "pc_type", "verdict", "created_at"), row)) for row in cur]

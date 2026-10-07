@@ -236,6 +236,47 @@ def product_shades(product_id: str):
              "fit": s.fit, "stated": s.stated_text, "stated_url": s.stated_url} for s in shades.get(product_id, [])]
 
 
+class VoteIn(BaseModel):
+    voter_id: str
+    product_id: str
+    shade: str
+    pc_type: str
+    verdict: str
+
+
+@app.post("/shade-votes", status_code=201)
+def post_vote(body: VoteIn):
+    """'Did this shade suit you?' from someone who knows their type. Replaces their earlier answer."""
+    try:
+        v = pcol.make_vote(body.model_dump(), shades)
+    except pcol.ShadeError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from None
+    store.upsert_vote(v)
+    return {"ok": True}
+
+
+@app.delete("/shade-votes/{voter_id}/{product_id}/{shade}", status_code=204)
+def delete_vote(voter_id: str, product_id: str, shade: str):
+    store.delete_vote(voter_id, product_id, shade)
+
+
+@app.get("/shade-votes/stats")
+def vote_stats():
+    """Counts per product, shade and personal colour type (no voter ids)."""
+    return pcol.vote_stats(store.votes())
+
+
+@app.get("/shade-votes/mine/{voter_id}")
+def my_votes(voter_id: str):
+    return [{k: v[k] for k in ("product_id", "shade", "pc_type", "verdict")} for v in store.votes(voter_id)]
+
+
+@app.get("/shade-votes/agreement")
+def vote_agreement():
+    """How often the estimated shade labels matched what people said."""
+    return pcol.agreement(store.votes(), shades)
+
+
 @app.get("/market/leaders/{market}")
 def market_leaders(market: str, category: str | None = None):
     """Sourced market leaders (awards, bestseller reports) for one country."""

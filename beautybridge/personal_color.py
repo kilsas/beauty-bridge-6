@@ -133,3 +133,79 @@ def best_shades(shades: dict[str, list[Shade]], pc_type: str, k: int = 20) -> li
     rows = [(s, s.fit[pc_type]) for ss in shades.values() for s in ss if s.fit[pc_type] >= OK]
     rows.sort(key=lambda x: (x[0].temp == "clear", -x[1], -len(x[0].stated_types & {pc_type}), x[0].product_id, x[0].name))
     return rows[:k]
+
+
+# ---------------------------------------------------------------------------
+# User checks of the shade labels
+#
+# temp/value/chroma for each shade are estimates from shade descriptions. People
+# who know their own (diagnosed) type can say whether a shade actually suited
+# them. Votes are kept next to the estimate, never merged into it, so the two
+# can be compared: agreement() measures how often the estimate was right.
+# ---------------------------------------------------------------------------
+VERDICTS = ("suits", "okay", "not")
+
+
+def predicted(fit: float) -> str:
+    """What the estimate says for one type: suits / okay / not (same thresholds as the site)."""
+    return "suits" if fit >= GOOD else "okay" if fit >= OK else "not"
+
+
+def make_vote(data: dict, shades: dict[str, list[Shade]]) -> dict:
+    """Validate one vote: {voter_id, product_id, shade, pc_type, verdict}."""
+    vid = str(data.get("voter_id", "")).strip()
+    if not vid or len(vid) > 128:
+        raise ShadeError("voter_id is required")
+    pid = str(data.get("product_id", "")).strip()
+    names = {s.name for s in shades.get(pid, [])}
+    if not names:
+        raise ShadeError(f"product '{pid}' has no shades")
+    shade = str(data.get("shade", "")).strip()
+    if shade not in names:
+        raise ShadeError(f"unknown shade '{shade}' for {pid}")
+    pc = str(data.get("pc_type", "")).strip()
+    if pc not in TYPES:
+        raise ShadeError(f"unknown personal colour type '{pc}'")
+    verdict = str(data.get("verdict", "")).strip()
+    if verdict not in VERDICTS:
+        raise ShadeError("verdict must be suits, okay or not")
+    return {"voter_id": vid, "product_id": pid, "shade": shade, "pc_type": pc, "verdict": verdict}
+
+
+def vote_stats(votes: list[dict]) -> list[dict]:
+    """Counts per (product, shade, type). One row per voter per shade is enforced by storage."""
+    agg: dict[tuple, dict] = {}
+    for v in votes:
+        key = (v["product_id"], v["shade"], v["pc_type"])
+        row = agg.setdefault(key, {"product_id": key[0], "shade": key[1], "pc_type": key[2],
+                                   "n": 0, "suits": 0, "okay": 0, "not": 0})
+        row["n"] += 1
+        row[v["verdict"]] += 1
+    return sorted(agg.values(), key=lambda r: (r["product_id"], r["shade"], r["pc_type"]))
+
+
+def agreement(votes: list[dict], shades: dict[str, list[Shade]]) -> dict:
+    """How often the estimated label matched what people said.
+
+    exact  = estimate and voter gave the same answer (suits / okay / not)
+    side   = both on the same side of 'works for me' (suits+okay vs not)
+    Clear shades are skipped: they fit everyone by definition."""
+    by = {(pid, s.name): s for pid, ss in shades.items() for s in ss}
+    n = exact = side = 0
+    wrong: dict[tuple, int] = {}
+    for v in votes:
+        s = by.get((v["product_id"], v["shade"]))
+        if s is None or s.temp == "clear":
+            continue
+        p = predicted(s.fit[v["pc_type"]])
+        n += 1
+        exact += p == v["verdict"]
+        same = (p == "not") == (v["verdict"] == "not")
+        side += same
+        if not same:
+            wrong[(v["product_id"], v["shade"])] = wrong.get((v["product_id"], v["shade"]), 0) + 1
+    worst = sorted(wrong.items(), key=lambda x: (-x[1], x[0]))[:10]
+    return {"votes": n,
+            "exact": round(exact / n, 3) if n else None,
+            "side": round(side / n, 3) if n else None,
+            "disputed": [{"product_id": k[0], "shade": k[1], "votes_against": c} for k, c in worst]}
