@@ -163,6 +163,29 @@ def shades_for_site(data_dir: Path, products: dict) -> dict:
     return out
 
 
+def expansion_cases() -> dict:
+    """Why retailers that lead at home struggle abroad (data/market/expansion_cases.json).
+    Every fact and cause must carry its source link."""
+    path = MARKET_DIR / "expansion_cases.json"
+    if not path.exists():
+        return {}
+    d = json.loads(path.read_text(encoding="utf-8"))
+    langs = {"ko", "en", "zh", "ja"}
+    def check(obj, where):
+        for k in ("text", "title", "cause", "fix", "built"):
+            if k in obj and set(obj[k]) != langs:
+                raise SystemExit(f"expansion_cases.json: {where} '{k}' needs ko/en/zh/ja")
+    for c in d["cases"]:
+        check(c, c["id"])
+        for item in c["facts"] + c["causes"]:
+            check(item, c["id"])
+            if not item.get("url", "").startswith(("https://", "http://")):
+                raise SystemExit(f"expansion_cases.json: {c['id']} item without a source link")
+    for x in d["common"] + d["solutions"]:
+        check(x, "common/solutions")
+    return {k: d[k] for k in ("cases", "common", "solutions")}
+
+
 def build(engine, ds_dir) -> dict:
     ds = engine.ds
     P = ds.products
@@ -299,6 +322,7 @@ def build(engine, ds_dir) -> dict:
             "financials": read_csv(MARKET_DIR / "company_financials.csv"),
             "events": read_csv(MARKET_DIR / "company_events.csv"),
             "facts": read_csv(MARKET_DIR / "company_facts.csv"),
+            "cases": expansion_cases(),
         },
         "config": {"weights": SIMILARITY_WEIGHTS, "modes": FUSION_MODES,
                    "fx": FX_TO_USD, "fxNote": FX_RATES_NOTE},

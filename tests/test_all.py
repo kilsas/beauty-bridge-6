@@ -511,5 +511,19 @@ class TestPersonalColor(unittest.TestCase):
                 self.pc.load_shades(f, {"R007"})
 
 
+class TestExpansionCases(unittest.TestCase):
+    def test_cases_are_sourced_and_translated(self):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import build_site
+        d = build_site.expansion_cases()
+        self.assertEqual([c["id"] for c in d["cases"]], ["sephora_kr", "oliveyoung_cn", "oliveyoung_us"])
+        for c in d["cases"]:
+            self.assertTrue(c["facts"] and c["causes"])
+            for item in c["facts"] + c["causes"]:
+                self.assertTrue(item["url"].startswith("http"))
+                self.assertEqual(set(item["text"]), {"ko", "en", "zh", "ja"})
+        self.assertGreaterEqual(len(d["solutions"]), 5)
+
+
 if __name__ == "__main__":
     unittest.main()

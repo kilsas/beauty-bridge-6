@@ -249,7 +249,7 @@ const EVENT_TX = {
 /* Longer copy for the insight and method pages. */
 const PROSE = {
   ko: {
-    iTitle: "세포라코리아와 올리브영", iLead: "세포라는 2019년 10월 한국에 첫 매장을 열고 2024년 3월 철수를 발표했어요. 같은 기간 올리브영의 매출은 약 2.8배로 늘었어요. 아래는 보도된 사실이고, 이유에 대한 분석은 연구에서 다뤄요.",
+    iTitle: "세포라코리아와 올리브영", iLead: "세포라는 2019년 10월 한국에 첫 매장을 열고 2024년 3월 철수를 발표했어요. 같은 기간 올리브영의 매출은 약 2.8배로 늘었어요. 아래는 보도된 사실과, 기사로 확인한 원인 분석, 그리고 이 프로젝트가 제안하는 해결책이에요.",
     iWarn: "감사보고서를 인용한 언론 보도 기준 수치예요. 인용 전 DART 공시로 확인하세요.",
     sepT: "세포라코리아 영업손실", sepN: "적자가 매년 커졌고, 2022년 순손실 202억 원에 완전자본잠식 상태였어요. 매출은 보도마다 달라 DART 확인 전까지 비워 뒀어요.",
     oyT: "올리브영 매출", oyN: "2025년 5조 8,335억 원(+21.8%), 영업이익 7,447억 원. 연도·출처별로 별도/연결 기준이 달라요.",
@@ -266,7 +266,7 @@ const PROSE = {
     modes: { similarity_only: "모델 A · 유사도만", similarity_price: "모델 B · +가격", similarity_price_local: "모델 C · +가격·현지", similar: "비슷한 제품", cheaper: "저렴한 대체품", goal: "뷰티 목표" },
   },
   en: {
-    iTitle: "Sephora Korea and Olive Young", iLead: "Sephora opened its first Korean store in October 2019 and announced its exit in March 2024. Over the same period Olive Young's revenue grew about 2.8 times. Below are reported facts; the analysis of why belongs to the research.",
+    iTitle: "Sephora Korea and Olive Young", iLead: "Sephora opened its first Korean store in October 2019 and announced its exit in March 2024. Over the same period Olive Young's revenue grew about 2.8 times. Below are the reported facts, the causes as reported by the press, and the fixes this project proposes.",
     iWarn: "Figures are from press reports of audit filings. Verify against DART before citing.",
     sepT: "Sephora Korea operating loss", sepN: "Losses widened every year; 2022 net loss ₩20.2bn with full capital impairment. Revenue is blank because press reports conflict.",
     oyT: "Olive Young revenue", oyN: "2025: ₩5.83tn (+21.8%), operating profit ₩744.7bn. Basis differs between years and sources.",
@@ -283,7 +283,7 @@ const PROSE = {
     modes: { similarity_only: "Model A · similarity only", similarity_price: "Model B · + price", similarity_price_local: "Model C · + price, local", similar: "Similar", cheaper: "Cheaper twins", goal: "Beauty goal" },
   },
   zh: {
-    iTitle: "丝芙兰韩国与 Olive Young", iLead: "丝芙兰于 2019 年 10 月在韩国开出首店，2024 年 3 月宣布退出。同期 Olive Young 的营收增长约 2.8 倍。以下是已报道的事实，原因分析属于研究部分。",
+    iTitle: "丝芙兰韩国与 Olive Young", iLead: "丝芙兰于 2019 年 10 月在韩国开出首店，2024 年 3 月宣布退出。同期 Olive Young 的营收增长约 2.8 倍。以下是已报道的事实、经报道确认的原因分析，以及本项目提出的解决方案。",
     iWarn: "数据来自引用审计报告的新闻报道，引用前请以 DART 公告核实。",
     sepT: "丝芙兰韩国营业亏损", sepN: "亏损逐年扩大，2022 年净亏损 202 亿韩元，资本完全侵蚀。各报道的营收数字不一致，核实前暂不填写。",
     oyT: "Olive Young 营收", oyN: "2025 年 5.83 万亿韩元（+21.8%），营业利润 7,447 亿韩元。不同年份和来源的口径（单体/合并）不同。",
@@ -300,7 +300,7 @@ const PROSE = {
     modes: { similarity_only: "模型 A · 仅相似度", similarity_price: "模型 B · +价格", similarity_price_local: "模型 C · +价格·本地", similar: "相似产品", cheaper: "平替", goal: "美妆目标" },
   },
   ja: {
-    iTitle: "セフォラ韓国とオリーブヤング", iLead: "セフォラは2019年10月に韓国1号店を開き、2024年3月に撤退を発表しました。同じ期間にオリーブヤングの売上は約2.8倍に伸びました。以下は報道された事実で、理由の分析は研究で扱います。",
+    iTitle: "セフォラ韓国とオリーブヤング", iLead: "セフォラは2019年10月に韓国1号店を開き、2024年3月に撤退を発表しました。同じ期間にオリーブヤングの売上は約2.8倍に伸びました。以下は報道された事実、記事で確認した原因分析、そしてこのプロジェクトが提案する解決策です。",
     iWarn: "監査報告書を引用した報道に基づく数値です。引用する前に DART の公示で確認してください。",
     sepT: "セフォラ韓国の営業損失", sepN: "赤字は毎年拡大し、2022年は純損失202億ウォンで完全資本蚕食の状態でした。売上は報道ごとに異なるため、DART で確認するまで空欄にしています。",
     oyT: "オリーブヤングの売上", oyN: "2025年は5兆8,335億ウォン（+21.8%）、営業利益7,447億ウォン。年や出典によって単体・連結の基準が異なります。",
@@ -465,3 +465,12 @@ const SUB_TX = {
   zh: { light: "浅色", bright: "净色", mute: "柔色", deep: "深色" },
   ja: { light: "ライト", bright: "ブライト", mute: "ミュート", deep: "ディープ" },
 };
+
+/* Insight: why home leaders struggle abroad */
+const T_CASES = {
+  ko: { csK: "원인 분석", csH: "자국 1위, 해외에선 고전한 이유", csLead: "세 사례의 사실과 원인을 기사로 확인해 정리했어요. 원인 옆 링크가 출처예요.", csExit: "철수", csShrunk: "축소", csOngoing: "진행 중", csFacts: "무슨 일이 있었나", csCauses: "보도된 원인", csCommon: "세 사례의 공통 원인", csSol: "해결책", csSolLead: "해결책은 이 프로젝트의 분석이에요. 효과는 유저 스터디로 검증해야 해요.", csColCause: "실패 원인", csColFix: "제안하는 해결책", csColBuilt: "Beauty Bridge에서", csTry: "써 보기" },
+  en: { csK: "Analysis", csH: "Leaders at home, struggling abroad: why", csLead: "Facts and causes for three cases, each checked against the press. The link beside each line is its source.", csExit: "Exited", csShrunk: "Scaled back", csOngoing: "Ongoing", csFacts: "What happened", csCauses: "Reported causes", csCommon: "Causes the three cases share", csSol: "Fixes", csSolLead: "The fixes are this project's analysis; their effect still has to be tested in the user study.", csColCause: "Cause", csColFix: "Proposed fix", csColBuilt: "In Beauty Bridge", csTry: "Try it" },
+  zh: { csK: "原因分析", csH: "本国第一，海外受挫：为什么", csLead: "三个案例的事实与原因均经新闻报道核实，每条旁的链接即为出处。", csExit: "退出", csShrunk: "收缩", csOngoing: "进行中", csFacts: "发生了什么", csCauses: "报道的原因", csCommon: "三个案例的共同原因", csSol: "解决方案", csSolLead: "解决方案是本项目的分析，效果仍需通过用户研究验证。", csColCause: "失败原因", csColFix: "建议的解决方案", csColBuilt: "在 Beauty Bridge 中", csTry: "试一试" },
+  ja: { csK: "原因分析", csH: "自国で1位、海外では苦戦した理由", csLead: "3つの事例の事実と原因を記事で確認してまとめました。各行の横のリンクが出典です。", csExit: "撤退", csShrunk: "縮小", csOngoing: "進行中", csFacts: "何があったか", csCauses: "報道された原因", csCommon: "3事例に共通する原因", csSol: "解決策", csSolLead: "解決策はこのプロジェクトの分析です。効果はユーザー調査で検証する必要があります。", csColCause: "失敗の原因", csColFix: "提案する解決策", csColBuilt: "Beauty Bridge では", csTry: "使ってみる" },
+};
+for (const k of Object.keys(T_CASES)) Object.assign(T[k], T_CASES[k]);

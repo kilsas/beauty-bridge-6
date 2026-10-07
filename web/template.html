@@ -299,6 +299,24 @@ svg.chart line { stroke: var(--line); }
 .src { font-size: 12px; color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
 .prose p { margin: 0 0 10px; color: var(--ink-2); font-size: 14px; line-height: 1.7; }
 .warn { font-size: 12px; color: var(--up); }
+.cases, .sols { display: grid; gap: 12px; }
+.case, .sol { align-content: start; }
+.case ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; color: var(--ink-2); line-height: 1.55; }
+.case .src, .common .src { font-size: 12px; margin-left: 4px; }
+.case-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.case-h h3 { margin: 0; }
+.cbadge { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.cbadge.up { color: var(--up); background: color-mix(in srgb, var(--up) 12%, transparent); }
+.cbadge.warnb { color: var(--star); background: color-mix(in srgb, var(--star) 14%, transparent); }
+.cbadge.goodb { color: var(--good); background: color-mix(in srgb, var(--good) 12%, transparent); }
+.commons { display: grid; gap: 12px; }
+.common b { font-size: 15px; }
+.common p { margin: 4px 0 0; font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+.sol { gap: 4px; }
+.sol .lbl { margin-top: 6px; }
+.sol .lbl:first-child { margin-top: 0; }
+.sol span:not(.lbl) { font-size: 14px; line-height: 1.55; color: var(--ink-2); }
+@media (min-width: 720px) { .cases { grid-template-columns: repeat(3, minmax(0, 1fr)); } .sols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 /* search */
 .sbox { display: flex; align-items: center; gap: 8px; background: var(--chip); border-radius: 12px; padding: 0 6px 0 14px; }
@@ -1435,6 +1453,30 @@ function barChart({ labels, values, max, ticks, fmtv, neg = false, color }) {
   });
   return s + `</svg>`;
 }
+/* why retailers that lead at home struggle abroad: sourced cases, common causes, proposed fixes */
+const GO_ATTR = { "ranking-market": 'data-go="ranking" data-rtab="market"', "ranking-skin": 'data-go="ranking" data-rtab="skin"', "ranking-buy": 'data-go="ranking" data-rtab="buy"', home: 'data-go="home"', method: 'data-go="method"' };
+function casesBlock() {
+  const C = D.market.cases;
+  if (!C || !C.cases) return "";
+  const L = (o) => o[S.lang] || o.en;
+  const src = (x) => x.url ? ` <a class="src" href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.src || t("source"))}</a>` : "";
+  const badge = { exit: ["up", t("csExit")], shrunk: ["warnb", t("csShrunk")], ongoing: ["goodb", t("csOngoing")] };
+  return `<section class="sec">
+      <div><span class="eyebrow">${t("csK")}</span><h2 style="margin:4px 0 0;font-size:20px">${t("csH")}</h2><p class="note" style="margin:6px 0 0">${t("csLead")}</p></div>
+      <div class="cases">${C.cases.map((c) => `<div class="card case"><div class="case-h"><h3>${esc(L(c.title))}</h3><span class="cbadge ${badge[c.status][0]}">${badge[c.status][1]}</span></div>
+        <div><span class="lbl">${t("csFacts")}</span><ul>${c.facts.map((f) => `<li>${esc(L(f.text))}${src(f)}</li>`).join("")}</ul></div>
+        <div><span class="lbl">${t("csCauses")}</span><ul>${c.causes.map((f) => `<li>${esc(L(f.text))}${src(f)}</li>`).join("")}</ul></div></div>`).join("")}</div>
+    </section>
+    <section class="sec">${secHead(t("csCommon"))}
+      <div class="commons">${C.common.map((x, i) => `<div class="common"><b>${i + 1}. ${esc(L(x.title))}</b><p>${esc(L(x.text))}${src(x)}</p></div>`).join("")}</div>
+    </section>
+    <section class="sec">${secHead(t("csSol"))}<p class="note" style="margin:0">${t("csSolLead")}</p>
+      <div class="sols">${C.solutions.map((x) => `<div class="card sol"><span class="lbl">${t("csColCause")}</span><b>${esc(L(x.cause))}</b>
+        <span class="lbl">${t("csColFix")}</span><span>${esc(L(x.fix))}</span>
+        <span class="lbl">${t("csColBuilt")}</span><span>${esc(L(x.built))}</span>
+        ${GO_ATTR[x.go] ? `<button class="more" ${GO_ATTR[x.go]} style="width:auto;justify-self:start;padding:8px 14px">${t("csTry")} ${I.right}</button>` : ""}</div>`).join("")}</div>
+    </section>`;
+}
 function vInsight() {
   const X = PROSE[S.lang], F = D.market.financials, E = D.market.events, Fa = D.market.facts;
   const co = (c) => F.filter((r) => r.company === c).sort((a, b) => a.fiscal_year - b.fiscal_year);
@@ -1462,6 +1504,7 @@ function vInsight() {
       <div><h3 style="margin:0 0 10px">${X.names.cj_olive_young}</h3><div class="tbl"><table><tbody>${factRows("cj_olive_young")}</tbody></table></div></div>
     </div></section>
     <section class="sec">${secHead(X.tl)}<div class="tl">${E.slice().sort((a, b) => a.event_date.localeCompare(b.event_date)).map((e) => `<div class="ev"><time>${d(e)}</time><span><span class="co ${e.company}">${X.names[e.company]}</span>${esc(evName(e))} <a class="src" href="${esc(e.source_url)}" target="_blank" rel="noopener">${host(e.source_url)}</a></span></div>`).join("")}</div></section>
+    ${casesBlock()}
     <section class="sec">${secHead(X.fin)}<div class="tbl"><table><thead><tr><th>${X.co}</th><th class="n">${X.yr}</th><th class="n">${X.rev}</th><th class="n">${X.op}</th><th class="n">${X.ni}</th><th class="n">${X.st}</th><th>${X.src}</th></tr></thead><tbody>
       ${F.map((r) => `<tr><td>${X.names[r.company]}</td><td class="n">${r.fiscal_year}</td><td class="n">${bigWon(r.revenue_krw)}</td><td class="n">${bigWon(r.operating_profit_krw)}</td><td class="n">${bigWon(r.net_income_krw)}</td><td class="n">${r.store_count ? fmtNum(r.store_count) : "–"}</td><td><a class="src" href="${esc(r.source_url)}" target="_blank" rel="noopener">${esc(r.source_document)}</a>${r.notes ? `<div class="note">${esc(r.notes)}</div>` : ""}</td></tr>`).join("")}</tbody></table></div></section>
     <section class="sec prose">${secHead(X.link)}<p>${X.p1}</p><p>${X.p2}</p>
