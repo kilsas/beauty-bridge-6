@@ -517,9 +517,15 @@ class TestPersonalColor(unittest.TestCase):
         for k, bad in (("shade", "#99 Nope"), ("pc_type", "autumn"), ("verdict", "love"), ("voter_id", ""), ("product_id", "R001x")):
             with self.assertRaises(self.pc.ShadeError):
                 self.pc.make_vote({**v, k: bad}, self.sh)
-        rows = self.pc.vote_stats([v, {**v, "voter_id": "b", "verdict": "not"}])
+        rows = self.pc.vote_stats([self.pc.make_vote(v, self.sh), self.pc.make_vote({**v, "voter_id": "b", "verdict": "not"}, self.sh)])
         self.assertEqual(rows, [{"product_id": "R013", "shade": "#05 Sunset Muhly", "pc_type": "autumn_mute",
-                                 "n": 2, "suits": 1, "okay": 0, "not": 1}])
+                                 "skin_type": None, "n": 2, "suits": 1, "okay": 0, "not": 1}])
+        # optional skin type: validated, and counted separately
+        self.assertEqual(self.pc.make_vote({**v, "skin_type": "dry"}, self.sh)["skin_type"], "dry")
+        with self.assertRaises(self.pc.ShadeError):
+            self.pc.make_vote({**v, "skin_type": "shiny"}, self.sh)
+        rows = self.pc.vote_stats([self.pc.make_vote({**v, "skin_type": "dry"}, self.sh), self.pc.make_vote(v, self.sh)])
+        self.assertEqual([(r["skin_type"], r["n"]) for r in rows], [(None, 1), ("dry", 1)])
 
     def test_agreement_compares_votes_with_estimate(self):
         # Sunset Muhly: autumn_mute fit 1.0 -> estimate "suits"; spring_light ~0.74 -> estimate "not"
@@ -540,6 +546,32 @@ class TestPersonalColor(unittest.TestCase):
             self.assertEqual(len(store.votes("a")), 1)
             store.delete_vote("a", "R013", "#05 Sunset Muhly")
             self.assertEqual(store.votes(), [])
+            store.upsert_vote({**v, "skin_type": "oily"})
+            self.assertEqual(store.votes("a")[0]["skin_type"], "oily")
+
+    def test_category_reports(self):
+        from beautybridge import reviews as rv
+        cats = {"R013": "eyeshadow", "R001": "cushion"}
+        allc = ["eyeshadow", "cushion", "blush", "contour", "bronzer"]
+        r = rv.make_category_report({"reporter_id": "a", "product_id": "R013", "suggested": "blush", "note": " x " * 100}, cats, allc)
+        self.assertEqual((r["suggested"], len(r["note"]) <= 200), ("blush", True))
+        for bad in ({"reporter_id": "", "product_id": "R013", "suggested": "blush"},
+                    {"reporter_id": "a", "product_id": "NOPE", "suggested": "blush"},
+                    {"reporter_id": "a", "product_id": "R013", "suggested": "lipstick?"},
+                    {"reporter_id": "a", "product_id": "R013", "suggested": "eyeshadow"}):
+            with self.assertRaises(rv.ReviewError):
+                rv.make_category_report(bad, cats, allc)
+        reps = [{"product_id": "R013", "suggested": "blush"}] * 3 + [{"product_id": "R013", "suggested": "contour"}]
+        st = rv.category_report_stats(reps)
+        self.assertEqual(st[0], {"product_id": "R013", "suggested": "blush", "n": 3, "review": True})
+        self.assertFalse(st[1]["review"])
+        with tempfile.TemporaryDirectory() as d:
+            store = rv.ReviewStore(Path(d) / "r.sqlite")
+            store.upsert_category_report(r)
+            store.upsert_category_report({**r, "suggested": "contour"})
+            self.assertEqual([x["suggested"] for x in store.category_reports("a")], ["contour"])
+            store.delete_category_report("a", "R013")
+            self.assertEqual(store.category_reports(), [])
 
 class TestExpansionCases(unittest.TestCase):
     def test_cases_are_sourced_and_translated(self):

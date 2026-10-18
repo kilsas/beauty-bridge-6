@@ -25,6 +25,8 @@ import csv
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .codebook import SKIN_TYPES
+
 TEMP = {"warm": 1.0, "neutral": 0.5, "cool": 0.0}
 VALUE = {"light": 1.0, "medium": 0.5, "deep": 0.0}
 CHROMA = {"vivid": 1.0, "soft": 0.5, "muted": 0.0}
@@ -152,7 +154,7 @@ def predicted(fit: float) -> str:
 
 
 def make_vote(data: dict, shades: dict[str, list[Shade]]) -> dict:
-    """Validate one vote: {voter_id, product_id, shade, pc_type, verdict}."""
+    """Validate one vote: {voter_id, product_id, shade, pc_type, verdict, skin_type (optional)}."""
     vid = str(data.get("voter_id", "")).strip()
     if not vid or len(vid) > 128:
         raise ShadeError("voter_id is required")
@@ -169,19 +171,23 @@ def make_vote(data: dict, shades: dict[str, list[Shade]]) -> dict:
     verdict = str(data.get("verdict", "")).strip()
     if verdict not in VERDICTS:
         raise ShadeError("verdict must be suits, okay or not")
-    return {"voter_id": vid, "product_id": pid, "shade": shade, "pc_type": pc, "verdict": verdict}
+    skin = (data.get("skin_type") or None)
+    if skin is not None and skin not in SKIN_TYPES:
+        raise ShadeError(f"skin_type must be one of {', '.join(SKIN_TYPES)}")
+    return {"voter_id": vid, "product_id": pid, "shade": shade, "pc_type": pc, "verdict": verdict, "skin_type": skin}
 
 
 def vote_stats(votes: list[dict]) -> list[dict]:
-    """Counts per (product, shade, type). One row per voter per shade is enforced by storage."""
+    """Counts per (product, shade, personal-colour type, skin type). skin_type is None when the
+    voter didn't give one. One row per voter per shade is enforced by storage."""
     agg: dict[tuple, dict] = {}
     for v in votes:
-        key = (v["product_id"], v["shade"], v["pc_type"])
-        row = agg.setdefault(key, {"product_id": key[0], "shade": key[1], "pc_type": key[2],
+        key = (v["product_id"], v["shade"], v["pc_type"], v.get("skin_type"))
+        row = agg.setdefault(key, {"product_id": key[0], "shade": key[1], "pc_type": key[2], "skin_type": key[3],
                                    "n": 0, "suits": 0, "okay": 0, "not": 0})
         row["n"] += 1
         row[v["verdict"]] += 1
-    return sorted(agg.values(), key=lambda r: (r["product_id"], r["shade"], r["pc_type"]))
+    return sorted(agg.values(), key=lambda r: (r["product_id"], r["shade"], r["pc_type"], r["skin_type"] or ""))
 
 
 def agreement(votes: list[dict], shades: dict[str, list[Shade]]) -> dict:

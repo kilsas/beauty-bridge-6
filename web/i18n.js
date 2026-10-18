@@ -511,3 +511,28 @@ const T_VOTE = {
     vCheckEmpty: "まだ意見がありません。タイプを選んでから、商品ページの色番リストで答えられます。" },
 };
 for (const k of Object.keys(T_VOTE)) Object.assign(T[k], T_VOTE[k]);
+
+/* skin type on shade answers + "wrong category" reports */
+const T_CAT = {
+  ko: { vSkin: "내 피부 타입 (선택)", vSkinStats: "그중 {s} 피부 {n}명: 어울림 {a} · 무난 {b} · 안 어울림 {c}",
+    cRTitle: "제품 분류가 맞나요?", cRNow: "지금 분류: {c}", cRAsk: "다른 분류에 더 가까워요",
+    cRPick: "더 가까운 분류 고르기", cRNote: "이유 (선택, 200자)", cRSend: "보내기", cRCancel: "취소",
+    cRStats: "{n}명이 '{c}'에 더 가깝다고 했어요", cRReview: "분류 재검토 중",
+    cRMine: "내 의견: {c}", cRUndo: "취소하기" },
+  en: { vSkin: "My skin type (optional)", vSkinStats: "Of them, {n} with {s} skin: suited {a} · okay {b} · didn't {c}",
+    cRTitle: "Is this product in the right category?", cRNow: "Current category: {c}", cRAsk: "It's closer to another category",
+    cRPick: "Pick a closer category", cRNote: "Why (optional, 200 chars)", cRSend: "Send", cRCancel: "Cancel",
+    cRStats: "{n} people said it's closer to '{c}'", cRReview: "Category under review",
+    cRMine: "Your suggestion: {c}", cRUndo: "Undo" },
+  zh: { vSkin: "我的肤质（可选）", vSkinStats: "其中{s}肌肤 {n} 人：适合 {a} · 还可以 {b} · 不适合 {c}",
+    cRTitle: "这个产品的分类对吗？", cRNow: "当前分类：{c}", cRAsk: "更接近其他分类",
+    cRPick: "选择更接近的分类", cRNote: "原因（可选，200字）", cRSend: "提交", cRCancel: "取消",
+    cRStats: "{n} 人认为更接近“{c}”", cRReview: "分类复核中",
+    cRMine: "我的意见：{c}", cRUndo: "撤回" },
+  ja: { vSkin: "私の肌タイプ（任意）", vSkinStats: "そのうち{s}肌 {n}人：似合う {a} · まあまあ {b} · 似合わない {c}",
+    cRTitle: "この製品の分類は合っていますか？", cRNow: "現在の分類：{c}", cRAsk: "別の分類に近い",
+    cRPick: "より近い分類を選ぶ", cRNote: "理由（任意・200字）", cRSend: "送信", cRCancel: "キャンセル",
+    cRStats: "{n}人が「{c}」に近いと回答", cRReview: "分類を再確認中",
+    cRMine: "あなたの意見：{c}", cRUndo: "取り消す" },
+};
+for (const k of Object.keys(T_CAT)) Object.assign(T[k], T_CAT[k]);

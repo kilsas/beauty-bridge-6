@@ -112,6 +112,13 @@ a { color: inherit; }
 .vote button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .vote .vq { font-size: 11px; color: var(--muted); margin-right: 2px; }
 .vote .vs { flex-basis: 100%; font-size: 11px; color: var(--muted); }
+.catform { display: grid; gap: 8px; }
+.catform select, .catform input { width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; }
+.catform .row { display: flex; gap: 8px; }
+.catform .row button, .catbtn { font-size: 13px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink); }
+.catform .row button.pri { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.catstat { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; }
+.catstat b.rev { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--accent); color: var(--bg); }
 .vcheck { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .vcheck div { background: var(--chip); border-radius: 12px; padding: 10px; }
 .vcheck b { display: block; font: 700 18px var(--num); }
@@ -422,8 +429,9 @@ try {
   if (saved.lang in LANGS) S.lang = saved.lang;
   if (saved.sec === "skincare" || saved.sec === "makeup") S.sec = saved.sec;
   if (D.pc && D.pc.types.includes(saved.pc)) S.pc = saved.pc;
+  if (D.codebook.skin.includes(saved.vskin)) S.vskin = saved.vskin;
 } catch (e) {}
-const persist = () => { try { localStorage.setItem("bb3", JSON.stringify({ market: S.market, lang: S.lang, sec: S.sec, pc: S.pc })); } catch (e) {} };
+const persist = () => { try { localStorage.setItem("bb3", JSON.stringify({ market: S.market, lang: S.lang, sec: S.sec, pc: S.pc, vskin: S.vskin || "" })); } catch (e) {} };
 const MARKETS = ["", "KR", "US", "JP", "CN"];
 const areaOf = (g) => D.goals[g].meta.area;
 
@@ -536,26 +544,30 @@ function shadeCard(p) {
           ${voteRow(p, s)}</span>
         <span class="pct">${f != null ? `${f}%<small>${f >= D.pc.ok * 100 ? fitWord(f) : t("pcLow")}</small>` : ""}</span></div>`; }).join("")}</div>
     <p class="note" style="margin:0">${t("pcEst")} ${t("pcNote")}</p>
+    ${S.pc && BACKEND.vote && LIVE.uid && VOTES.status !== "off" ? `<div class="vote"><span class="vq">${t("vSkin")}</span>${D.codebook.skin.map((k) => `<button data-vskin="${k}" aria-pressed="${S.vskin === k}">${esc(skinName(k))}</button>`).join("")}</div>` : ""}
     <p class="note" style="margin:0">${!S.pc ? t("vPickFirst") : VOTES.status === "off" || !BACKEND.vote ? t("vOff") : t("vWhy")}</p></div>`;
 }
 
 /* ---------------- "did this shade suit you?": people check the estimated labels ---------------- */
-const VOTES = { status: "loading", stats: {}, mine: {}, sig: "" };
+const VOTES = { status: "loading", stats: {}, bySkin: {}, mine: {}, sig: "" };
 const vkey = (pid, shade) => pid + "|" + shade;
 function setVoteStats(rows) {
-  const stats = {};
+  const stats = {}, bySkin = {};
+  const add = (o, r) => { o.n += +r.n || 0; o.suits += +r.suits || 0; o.okay += +r.okay || 0; o.not += +r.not || 0; };
+  const zero = () => ({ n: 0, suits: 0, okay: 0, not: 0 });
   for (const r of rows || []) {
     if (!r || !(D.shades || {})[r.product_id] || !D.pc.types.includes(r.pc_type)) continue;
     const k = vkey(r.product_id, r.shade);
-    (stats[k] ||= {})[r.pc_type] = { n: +r.n || 0, suits: +r.suits || 0, okay: +r.okay || 0, not: +r.not || 0 };
+    add((stats[k] ||= {})[r.pc_type] ||= zero(), r);
+    if (D.codebook.skin.includes(r.skin_type)) add(((bySkin[k] ||= {})[r.pc_type] ||= {})[r.skin_type] ||= zero(), r);
   }
-  const sig = JSON.stringify(stats), changed = sig !== VOTES.sig || VOTES.status !== "ready";
-  Object.assign(VOTES, { status: "ready", stats, sig });
+  const sig = JSON.stringify([stats, bySkin]), changed = sig !== VOTES.sig || VOTES.status !== "ready";
+  Object.assign(VOTES, { status: "ready", stats, bySkin, sig });
   if (changed && (S.view === "product" || S.view === "ranking")) render();
 }
 function setMyVotes(rows) {
   const mine = {};
-  for (const r of rows || []) if (r && r.product_id) mine[vkey(r.product_id, r.shade)] = { pc: r.pc_type, v: r.verdict };
+  for (const r of rows || []) if (r && r.product_id) mine[vkey(r.product_id, r.shade)] = { pc: r.pc_type, v: r.verdict, skin: r.skin_type || "" };
   VOTES.mine = mine;
 }
 const predicted = (f) => f >= D.pc.good * 100 ? "suits" : f >= D.pc.ok * 100 ? "okay" : "not";
@@ -565,18 +577,62 @@ function voteRow(p, s) {
   const my = VOTES.mine[vkey(p.id, s.n)];
   const can = BACKEND.vote && LIVE.uid && VOTES.status !== "off";
   const btns = can ? `<span class="vq">${t("vAsk")}</span>${["suits", "okay", "not"].map((v) => `<button data-vote="${v}" data-vpid="${p.id}" data-vshade="${esc(s.n)}" aria-pressed="${!!my && my.pc === S.pc && my.v === v}">${t("v_" + v)}</button>`).join("")}` : "";
-  const sum = st && st.n ? `<span class="vs">${fmt(t("vStats"), { t: esc(pcName(S.pc)), n: st.n, a: st.suits, b: st.okay, c: st.not })}${st.n >= 3 && (st.suits + st.okay > st.not) !== (predicted(s.fit[S.pc]) !== "not") ? ` · <b>${t("vDisagree")}</b>` : ""}</span>` : "";
+  const sk = S.vskin ? (((VOTES.bySkin[vkey(p.id, s.n)] || {})[S.pc] || {})[S.vskin]) : null;
+  const sum = st && st.n ? `<span class="vs">${fmt(t("vStats"), { t: esc(pcName(S.pc)), n: st.n, a: st.suits, b: st.okay, c: st.not })}${st.n >= 3 && (st.suits + st.okay > st.not) !== (predicted(s.fit[S.pc]) !== "not") ? ` · <b>${t("vDisagree")}</b>` : ""}${sk && sk.n ? `<br>${fmt(t("vSkinStats"), { s: esc(skinName(S.vskin)), n: sk.n, a: sk.suits, b: sk.okay, c: sk.not })}` : ""}</span>` : "";
   return btns || sum ? `<span class="vote">${btns}${sum}</span>` : "";
 }
 async function castVote(pid, shade, verdict) {
   if (!BACKEND.vote || !LIVE.uid || !S.pc) return;
   const k = vkey(pid, shade), before = VOTES.mine[k];
   const clear = before && before.pc === S.pc && before.v === verdict;
-  VOTES.mine = { ...VOTES.mine }; if (clear) delete VOTES.mine[k]; else VOTES.mine[k] = { pc: S.pc, v: verdict };
+  VOTES.mine = { ...VOTES.mine }; if (clear) delete VOTES.mine[k]; else VOTES.mine[k] = { pc: S.pc, v: verdict, skin: S.vskin || "" };
   render();
-  try { await BACKEND.vote(pid, shade, S.pc, clear ? null : verdict); }
+  try { await BACKEND.vote(pid, shade, S.pc, clear ? null : verdict, S.vskin || null); }
   catch (e) { console.warn("shade vote not saved (run supabase/shade_votes.sql)", e); VOTES.mine = { ...VOTES.mine }; if (before) VOTES.mine[k] = before; else delete VOTES.mine[k]; VOTES.status = "off"; render(); }
 }
+/* ---------------- "this product belongs in another category": people correct the classification ---------------- */
+const CATS = { status: "loading", stats: {}, mine: {}, sig: "" };
+const CAT_REVIEW_AT = 3;
+const allCats = () => Object.values(D.codebook.groups).flat();
+function setCatStats(rows) {
+  const stats = {};
+  for (const r of rows || []) if (r && D.products[r.product_id] && allCats().includes(r.suggested)) (stats[r.product_id] ||= []).push({ c: r.suggested, n: +r.n || 0 });
+  for (const k in stats) stats[k].sort((a, b) => b.n - a.n || a.c.localeCompare(b.c));
+  const sig = JSON.stringify(stats), changed = sig !== CATS.sig || CATS.status !== "ready";
+  Object.assign(CATS, { status: "ready", stats, sig });
+  if (changed && S.view === "product") render();
+}
+function setMyCats(rows) {
+  const mine = {};
+  for (const r of rows || []) if (r && r.product_id) mine[r.product_id] = { c: r.suggested, note: r.note || "" };
+  CATS.mine = mine;
+}
+function catCard(p) {
+  const st = CATS.stats[p.id] || [], my = CATS.mine[p.id];
+  const can = BACKEND.cat && LIVE.uid && CATS.status !== "off";
+  if (!can && !st.length) return "";
+  const lines = st.map((x) => `<div class="catstat">${fmt(t("cRStats"), { n: x.n, c: esc(catName(x.c)) })}${x.n >= CAT_REVIEW_AT ? ` <b class="rev">${t("cRReview")}</b>` : ""}</div>`).join("");
+  let body = "";
+  if (my) body = `<div class="catstat">${fmt(t("cRMine"), { c: esc(catName(my.c)) })} <button class="catbtn" data-catundo="${p.id}">${t("cRUndo")}</button></div>`;
+  else if (can && S.catOpen === p.id) {
+    const pick = S.catPick && S.catPick !== p.cat ? S.catPick : "";
+    body = `<div class="catform">
+      <select id="catsel" aria-label="${t("cRPick")}"><option value="">${t("cRPick")}</option>${Object.entries(D.codebook.groups).map(([g, cs]) => `<optgroup label="${esc(grpName(g))}">${cs.filter((c) => c !== p.cat).map((c) => `<option value="${c}"${c === pick ? " selected" : ""}>${esc(catName(c))}</option>`).join("")}</optgroup>`).join("")}</select>
+      <input id="catnote" maxlength="200" placeholder="${t("cRNote")}" value="${esc(S.catNote || "")}">
+      <div class="row"><button class="pri" data-catsend="${p.id}"${pick ? "" : " disabled"}>${t("cRSend")}</button><button data-catcancel="1">${t("cRCancel")}</button></div></div>`;
+  } else if (can) body = `<button class="catbtn" data-catopen="${p.id}">${t("cRAsk")}</button>`;
+  return `<div class="card"><span class="lbl">${t("cRTitle")}</span>
+    <p class="note" style="margin:0">${fmt(t("cRNow"), { c: esc(catName(p.cat)) })}</p>${lines}${body}</div>`;
+}
+async function sendCat(pid, cat, note) {
+  if (!BACKEND.cat || !LIVE.uid) return;
+  const before = CATS.mine[pid];
+  CATS.mine = { ...CATS.mine }; if (cat) CATS.mine[pid] = { c: cat, note }; else delete CATS.mine[pid];
+  S.catOpen = ""; S.catPick = ""; S.catNote = ""; render();
+  try { await BACKEND.cat(pid, cat, note); }
+  catch (e) { console.warn("category report not saved (run supabase/update_2026_10_18.sql)", e); CATS.mine = { ...CATS.mine }; if (before) CATS.mine[pid] = before; else delete CATS.mine[pid]; CATS.status = "off"; render(); }
+}
+
 /* how often the estimated labels matched what people said (same rule as personal_color.agreement) */
 function voteCheck() {
   let n = 0, exact = 0, side = 0;
@@ -1133,6 +1189,7 @@ function vProduct() {
       ${D.mode === "real" ? `<p class="note" style="margin:0">${t("labelsNote")}</p>` : ""}
       ${p.sig && Object.keys(p.sig).length ? `<div class="card evid"><span class="lbl">${t("evidence")}</span>${Object.entries(p.sig).map(([m, rows]) => rows.map((g) => `<div class="evrow"><span class="tag">${mktName(m)}</span><span>${esc(sigLabel(g))}</span><a class="src" href="${esc(g.url)}" target="_blank" rel="noopener">${t("source")} · ${esc(g.date)}</a></div>`).join("")).join("")}</div>` : ""}
       ${shadeCard(p)}
+      ${catCard(p)}
       <div class="profile">
         ${p.finish ? `<div><span class="lbl">${t("finish")}</span><div class="scale">${D.codebook.finish.map((k) => `<div class="${k === p.finish ? "on" : ""}">${tx("finish", k)}</div>`).join("")}</div></div>` : ""}
         <div><span class="lbl">${t("func")}</span><div class="ints">${featsFor(p).map((k) => `<span>${tx("feat", k)}</span><span class="d" aria-label="${p.int[k]}/3">${[1, 2, 3].map((i) => `<i class="${i <= p.int[k] ? "f" : ""}"></i>`).join("")}</span>`).join("")}</div></div>
@@ -1236,7 +1293,7 @@ function reviewsBody(p) {
   return `<p class="note"><span class="livedot"></span>${t("live")} · ${t("liveNote")}</p>${summary}${form}${items ? `<div class="revs">${items}</div>` : ""}`;
 }
 /* The active review storage. Each backend sets LIVE.uid, calls setReviews() and provides save(). */
-const BACKEND = { kind: "", save: null, click: null, vote: null };
+const BACKEND = { kind: "", save: null, click: null, vote: null, cat: null };
 function setReviews(list) { LIVE.list = list; LIVE.status = "ready"; recompute(); render(); }
 async function saveReview(del = false) {
   if (!BACKEND.save || !LIVE.uid || LIVE.saving) return;
@@ -1292,11 +1349,27 @@ async function initClaude(cl) {
     await db.doc("clicks/" + LIVE.uid).set({ items: myClicks });
   };
   let myVotes = {};
-  BACKEND.vote = async (pid, shade, pc, verdict) => {
+  BACKEND.vote = async (pid, shade, pc, verdict, skin) => {
     myVotes = { ...myVotes }; const k = vkey(pid, shade);
-    if (verdict) myVotes[k] = { product_id: pid, shade, pc_type: pc, verdict }; else delete myVotes[k];
+    if (verdict) myVotes[k] = { product_id: pid, shade, pc_type: pc, verdict, skin_type: skin || null }; else delete myVotes[k];
     await db.doc("shadevotes/" + LIVE.uid).set({ items: myVotes });
   };
+  let myCats = {};
+  BACKEND.cat = async (pid, cat, note) => {
+    myCats = { ...myCats };
+    if (cat) myCats[pid] = { product_id: pid, suggested: cat, note }; else delete myCats[pid];
+    await db.doc("catreports/" + LIVE.uid).set({ items: myCats });
+  };
+  db.collection("catreports").onSnapshot((snap) => {
+    const agg = {};
+    for (const doc of snap.docs) {
+      const items = (doc.data() || {}).items;
+      if (!items || typeof items !== "object") continue;
+      if (doc.id === LIVE.uid) { myCats = items; setMyCats(Object.values(items)); }
+      for (const r of Object.values(items)) { if (!r || !r.suggested) continue; const a = agg[r.product_id + "|" + r.suggested] ||= { product_id: r.product_id, suggested: r.suggested, n: 0 }; a.n += 1; }
+    }
+    setCatStats(Object.values(agg));
+  }, () => { CATS.status = "off"; });
   db.collection("shadevotes").onSnapshot((snap) => {
     const agg = {};
     for (const doc of snap.docs) {
@@ -1305,7 +1378,7 @@ async function initClaude(cl) {
       if (doc.id === LIVE.uid) { myVotes = items; setMyVotes(Object.values(items)); }
       for (const v of Object.values(items)) {
         if (!v || !["suits", "okay", "not"].includes(v.verdict)) continue;
-        const a = agg[vkey(v.product_id, v.shade) + "|" + v.pc_type] ||= { product_id: v.product_id, shade: v.shade, pc_type: v.pc_type, n: 0, suits: 0, okay: 0, not: 0 };
+        const a = agg[vkey(v.product_id, v.shade) + "|" + v.pc_type + "|" + (v.skin_type || "")] ||= { product_id: v.product_id, shade: v.shade, pc_type: v.pc_type, skin_type: v.skin_type || null, n: 0, suits: 0, okay: 0, not: 0 };
         a.n += 1; a[v.verdict] += 1;
       }
     }
@@ -1383,20 +1456,40 @@ async function initSupabase(rc) {
       await loadClicks();
     };
     const loadVotes = async () => {
-      const { data, error } = await client.from("shade_vote_stats").select("product_id,shade,pc_type,n,suits,okay,not");
+      let { data, error } = await client.from("shade_vote_stats").select("product_id,shade,pc_type,skin_type,n,suits,okay,not");
+      if (error) ({ data, error } = await client.from("shade_vote_stats").select("product_id,shade,pc_type,n,suits,okay,not"));   // before update_2026_10_18.sql
       if (error) throw error;
-      const mine = await client.from("shade_votes").select("product_id,shade,pc_type,verdict").eq("voter_id", LIVE.uid);
+      let mine = await client.from("shade_votes").select("product_id,shade,pc_type,verdict,skin_type").eq("voter_id", LIVE.uid);
+      if (mine.error) mine = await client.from("shade_votes").select("product_id,shade,pc_type,verdict").eq("voter_id", LIVE.uid);
       if (mine.error) throw mine.error;
       setMyVotes(mine.data); setVoteStats(data);
     };
     loadVotes().catch((e) => { VOTES.status = "off"; console.warn("shade votes unavailable (run supabase/shade_votes.sql)", e); render(); });
     setInterval(() => loadVotes().catch(() => {}), 60000);
-    BACKEND.vote = async (pid, shade, pc, verdict) => {
+    BACKEND.vote = async (pid, shade, pc, verdict, skin) => {
+      const row = { voter_id: LIVE.uid, product_id: pid, shade, pc_type: pc, verdict };
+      if (skin) row.skin_type = skin;
       const { error } = verdict
-        ? await client.from("shade_votes").upsert({ voter_id: LIVE.uid, product_id: pid, shade, pc_type: pc, verdict }, { onConflict: "voter_id,product_id,shade" })
+        ? await client.from("shade_votes").upsert(row, { onConflict: "voter_id,product_id,shade" })
         : await client.from("shade_votes").delete().eq("voter_id", LIVE.uid).eq("product_id", pid).eq("shade", shade);
       if (error) throw error;
       await loadVotes();
+    };
+    const loadCats = async () => {
+      const { data, error } = await client.from("category_report_stats").select("product_id,suggested,n");
+      if (error) throw error;
+      const mine = await client.from("category_reports").select("product_id,suggested,note").eq("reporter_id", LIVE.uid);
+      if (mine.error) throw mine.error;
+      setMyCats(mine.data); setCatStats(data);
+    };
+    loadCats().catch((e) => { CATS.status = "off"; console.warn("category reports unavailable (run supabase/update_2026_10_18.sql)", e); render(); });
+    setInterval(() => loadCats().catch(() => {}), 60000);
+    BACKEND.cat = async (pid, cat, note) => {
+      const { error } = cat
+        ? await client.from("category_reports").upsert({ reporter_id: LIVE.uid, product_id: pid, suggested: cat, note: note || null }, { onConflict: "reporter_id,product_id" })
+        : await client.from("category_reports").delete().eq("reporter_id", LIVE.uid).eq("product_id", pid);
+      if (error) throw error;
+      await loadCats();
     };
     BACKEND.kind = "supabase";
     BACKEND.save = async (pid, review) => {
@@ -1449,12 +1542,26 @@ async function initApi(rc) {
     };
     loadVotes().catch(() => { VOTES.status = "off"; render(); });
     setInterval(() => loadVotes().catch(() => {}), 20000);
-    BACKEND.vote = async (pid, shade, pc, verdict) => {
+    BACKEND.vote = async (pid, shade, pc, verdict, skin) => {
       const r = verdict
-        ? await fetch(base + "/shade-votes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ voter_id: rid, product_id: pid, shade, pc_type: pc, verdict }) })
+        ? await fetch(base + "/shade-votes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ voter_id: rid, product_id: pid, shade, pc_type: pc, verdict, skin_type: skin || null }) })
         : await fetch(`${base}/shade-votes/${encodeURIComponent(rid)}/${encodeURIComponent(pid)}/${encodeURIComponent(shade)}`, { method: "DELETE" });
       if (!r.ok) throw new Error("HTTP " + r.status);
       await loadVotes();
+    };
+    const loadCats = async () => {
+      const [a, b] = await Promise.all([fetch(base + "/category-reports/stats"), fetch(`${base}/category-reports/mine/${encodeURIComponent(rid)}`)]);
+      if (!a.ok || !b.ok) throw new Error("HTTP " + (a.ok ? b.status : a.status));
+      setMyCats(await b.json()); setCatStats(await a.json());
+    };
+    loadCats().catch(() => { CATS.status = "off"; render(); });
+    setInterval(() => loadCats().catch(() => {}), 20000);
+    BACKEND.cat = async (pid, cat, note) => {
+      const r = cat
+        ? await fetch(base + "/category-reports", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ reporter_id: rid, product_id: pid, suggested: cat, note }) })
+        : await fetch(`${base}/category-reports/${encodeURIComponent(rid)}/${encodeURIComponent(pid)}`, { method: "DELETE" });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      await loadCats();
     };
     BACKEND.kind = "api";
     BACKEND.save = async (pid, review) => {
@@ -1477,7 +1584,7 @@ async function initLive() {
   const rc = CFG.reviews || {};
   if (rc.backend === "supabase" && rc.supabaseUrl && rc.supabaseAnonKey && await initSupabase(rc)) return;
   if (rc.backend === "api" && rc.apiUrl && await initApi(rc)) return;
-  LIVE.status = "nodb"; CLICKS.status = "off"; VOTES.status = "off"; render();
+  LIVE.status = "nodb"; CLICKS.status = "off"; VOTES.status = "off"; CATS.status = "off"; render();
 }
 
 function vGoals() {
@@ -1683,6 +1790,11 @@ document.addEventListener("click", (e) => {
   if (d.sheet) { S.sheet = d.sheet; S.sheetOpen = undefined; renderSheet(); return; }
   if (d.sec) { setSec(d.sec); render(); return; }
   if (d.vote) { castVote(d.vpid, d.vshade, d.vote); return; }
+  if (d.vskin) { S.vskin = S.vskin === d.vskin ? "" : d.vskin; render(); return; }
+  if (d.catopen) { S.catOpen = d.catopen; S.catPick = ""; S.catNote = ""; render(); return; }
+  if (d.catcancel) { S.catOpen = ""; render(); return; }
+  if (d.catsend) { if (S.catPick) sendCat(d.catsend, S.catPick, (S.catNote || "").trim().slice(0, 200)); return; }
+  if (d.catundo) { sendCat(d.catundo, null, ""); return; }
   if (d.pc) { S.pc = S.pc === d.pc ? "" : d.pc; render(); return; }
   if (d.pcg !== undefined) { S.pcg = d.pcg; render(); return; }
   if (d.season) { S.season = d.season; S.pcType = ""; render(); return; }
@@ -1716,11 +1828,12 @@ document.addEventListener("click", (e) => {
 });
 document.addEventListener("click", (e) => { const a = e.target.closest("a[data-buy]"); if (a) recordClick(S.pid, a.dataset.buy, a.dataset.bm); });
 document.addEventListener("toggle", (e) => { const el = e.target; if (el.matches && el.matches("details.res")) S.open[el.dataset.key] = el.open; }, true);
-document.addEventListener("input", (e) => { if (e.target.id === "rtext" && S.draft) S.draft.text = e.target.value; });
+document.addEventListener("input", (e) => { if (e.target.id === "rtext" && S.draft) S.draft.text = e.target.value; if (e.target.id === "catnote") S.catNote = e.target.value; });
 document.addEventListener("submit", (e) => { if (e.target.id !== "sform") return; e.preventDefault(); go("search", { q: document.getElementById("sq").value }); });
 document.addEventListener("change", (e) => {
   if (e.target.id === "mkt") { S.market = e.target.value; render(); }
   if (e.target.id === "lang") { S.lang = e.target.value; render(); }
+  if (e.target.id === "catsel") { S.catPick = e.target.value; render(); }
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && S.sheet) { S.sheet = false; renderSheet(); } });
 

@@ -242,6 +242,7 @@ class VoteIn(BaseModel):
     shade: str
     pc_type: str
     verdict: str
+    skin_type: str | None = None
 
 
 @app.post("/shade-votes", status_code=201)
@@ -268,13 +269,51 @@ def vote_stats():
 
 @app.get("/shade-votes/mine/{voter_id}")
 def my_votes(voter_id: str):
-    return [{k: v[k] for k in ("product_id", "shade", "pc_type", "verdict")} for v in store.votes(voter_id)]
+    return [{k: v[k] for k in ("product_id", "shade", "pc_type", "verdict", "skin_type")} for v in store.votes(voter_id)]
 
 
 @app.get("/shade-votes/agreement")
 def vote_agreement():
     """How often the estimated shade labels matched what people said."""
     return pcol.agreement(store.votes(), shades)
+
+
+class CategoryReportIn(BaseModel):
+    reporter_id: str
+    product_id: str
+    suggested: str
+    note: str = ""
+
+
+def _product_categories() -> dict[str, str]:
+    return {pid: p.category for pid, p in engine.ds.products.items()}
+
+
+@app.post("/category-reports", status_code=201)
+def post_category_report(body: CategoryReportIn):
+    """'This product belongs in another category.' Replaces the person's earlier suggestion."""
+    from .codebook import CATEGORIES
+    try:
+        r = rv.make_category_report(body.model_dump(), _product_categories(), CATEGORIES)
+    except rv.ReviewError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from None
+    store.upsert_category_report(r)
+    return {"ok": True}
+
+
+@app.delete("/category-reports/{reporter_id}/{product_id}", status_code=204)
+def delete_category_report(reporter_id: str, product_id: str):
+    store.delete_category_report(reporter_id, product_id)
+
+
+@app.get("/category-reports/stats")
+def category_report_stats():
+    return rv.category_report_stats(store.category_reports())
+
+
+@app.get("/category-reports/mine/{reporter_id}")
+def my_category_reports(reporter_id: str):
+    return [{k: r[k] for k in ("product_id", "suggested", "note")} for r in store.category_reports(reporter_id)]
 
 
 @app.get("/market/leaders/{market}")

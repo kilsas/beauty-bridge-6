@@ -196,6 +196,11 @@ the estimate, never merged into it. `personal_color.agreement()` (API: `GET /sha
 site: *Checking the shade labels* card) reports how often the estimate matched, and lists the
 shades people disagree with most, so those labels can be re-checked.
 
+Answers can carry an optional skin type, so readers see how a shade worked for people with the same
+coloring *and* skin. People can also flag a product as belonging in another category (Supabase
+`category_reports`, run `supabase/update_2026_10_18.sql`; API `POST /category-reports`); three matching
+suggestions mark the product "under review".
+
 ## ⚠️ Which data is real
 
 - `data/real/`: **real products** (92, from Korea, the USA, Japan, China and

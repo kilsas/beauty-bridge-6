@@ -192,6 +192,35 @@ def make_click(data: dict, known_products: set[str]) -> dict:
             "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
 
 
+REVIEW_AT = 3          # people suggesting the same category before the site says "under review"
+
+
+def make_category_report(data: dict, product_categories: dict[str, str], categories: list[str]) -> dict:
+    """'This product belongs in another category.' product_categories: product_id -> current category."""
+    rid = str(data.get("reporter_id", "")).strip()
+    if not rid or len(rid) > 128:
+        raise ReviewError("reporter_id is required")
+    pid = str(data.get("product_id", "")).strip()
+    if pid not in product_categories:
+        raise ReviewError(f"unknown product '{pid}'")
+    sug = str(data.get("suggested", "")).strip()
+    if sug not in categories:
+        raise ReviewError(f"unknown category '{sug}'")
+    if sug == product_categories[pid]:
+        raise ReviewError("that is already the product's category")
+    note = str(data.get("note") or "").strip()[:200]
+    return {"reporter_id": rid, "product_id": pid, "suggested": sug, "note": note}
+
+
+def category_report_stats(reports: list[dict]) -> list[dict]:
+    """People per (product, suggested category); no reporter ids or notes."""
+    agg: dict[tuple, int] = defaultdict(int)
+    for r in reports:
+        agg[(r["product_id"], r["suggested"])] += 1
+    return [{"product_id": p, "suggested": s, "n": n, "review": n >= REVIEW_AT}
+            for (p, s), n in sorted(agg.items(), key=lambda x: (x[0][0], -x[1], x[0][1]))]
+
+
 class ReviewStore:
     """SQLite-backed review storage for the API (one row per reviewer x product)."""
 
@@ -225,7 +254,18 @@ class ReviewStore:
         pc_type     TEXT NOT NULL,
         verdict     TEXT NOT NULL CHECK (verdict IN ('suits','okay','not')),
         created_at  TEXT NOT NULL,
+        skin_type   TEXT,
         PRIMARY KEY (voter_id, product_id, shade)
+    )"""
+
+    CATEGORY = """
+    CREATE TABLE IF NOT EXISTS category_reports (
+        reporter_id TEXT NOT NULL,
+        product_id  TEXT NOT NULL,
+        suggested   TEXT NOT NULL,
+        note        TEXT,
+        created_at  TEXT NOT NULL,
+        PRIMARY KEY (reporter_id, product_id)
     )"""
 
     def __init__(self, path):
@@ -236,6 +276,10 @@ class ReviewStore:
         self.conn.execute(self.SCHEMA)
         self.conn.execute(self.CLICKS)
         self.conn.execute(self.VOTES)
+        self.conn.execute(self.CATEGORY)
+        cols = {r[1] for r in self.conn.execute("PRAGMA table_info(shade_votes)")}
+        if "skin_type" not in cols:      # databases created before skin types were added
+            self.conn.execute("ALTER TABLE shade_votes ADD COLUMN skin_type TEXT")
         self.conn.commit()
 
     def upsert(self, r: Review) -> None:
@@ -265,9 +309,11 @@ class ReviewStore:
 
     # shade checks: one answer per person per shade (a new answer replaces the old one)
     def upsert_vote(self, v: dict) -> None:
-        self.conn.execute("INSERT OR REPLACE INTO shade_votes VALUES (?,?,?,?,?,?)",
-                          (v["voter_id"], v["product_id"], v["shade"], v["pc_type"], v["verdict"],
-                           datetime.now(timezone.utc).isoformat(timespec="seconds")))
+        self.conn.execute(
+            "INSERT OR REPLACE INTO shade_votes (voter_id, product_id, shade, pc_type, verdict, created_at, skin_type)"
+            " VALUES (?,?,?,?,?,?,?)",
+            (v["voter_id"], v["product_id"], v["shade"], v["pc_type"], v["verdict"],
+             datetime.now(timezone.utc).isoformat(timespec="seconds"), v.get("skin_type")))
         self.conn.commit()
 
     def delete_vote(self, voter_id: str, product_id: str, shade: str) -> None:
@@ -276,6 +322,24 @@ class ReviewStore:
         self.conn.commit()
 
     def votes(self, voter_id: str | None = None) -> list[dict]:
-        q = "SELECT voter_id, product_id, shade, pc_type, verdict, created_at FROM shade_votes"
+        cols = ("voter_id", "product_id", "shade", "pc_type", "verdict", "created_at", "skin_type")
+        q = "SELECT " + ", ".join(cols) + " FROM shade_votes"
         cur = self.conn.execute(q + " WHERE voter_id=?", (voter_id,)) if voter_id else self.conn.execute(q)
-        return [dict(zip(("voter_id", "product_id", "shade", "pc_type", "verdict", "created_at"), row)) for row in cur]
+        return [dict(zip(cols, row)) for row in cur]
+
+    # "this product is in the wrong category": one suggestion per person per product
+    def upsert_category_report(self, r: dict) -> None:
+        self.conn.execute("INSERT OR REPLACE INTO category_reports VALUES (?,?,?,?,?)",
+                          (r["reporter_id"], r["product_id"], r["suggested"], r["note"],
+                           datetime.now(timezone.utc).isoformat(timespec="seconds")))
+        self.conn.commit()
+
+    def delete_category_report(self, reporter_id: str, product_id: str) -> None:
+        self.conn.execute("DELETE FROM category_reports WHERE reporter_id=? AND product_id=?", (reporter_id, product_id))
+        self.conn.commit()
+
+    def category_reports(self, reporter_id: str | None = None) -> list[dict]:
+        cols = ("reporter_id", "product_id", "suggested", "note", "created_at")
+        q = "SELECT " + ", ".join(cols) + " FROM category_reports"
+        cur = self.conn.execute(q + " WHERE reporter_id=?", (reporter_id,)) if reporter_id else self.conn.execute(q)
+        return [dict(zip(cols, row)) for row in cur]
