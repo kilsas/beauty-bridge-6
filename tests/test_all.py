@@ -573,6 +573,57 @@ class TestPersonalColor(unittest.TestCase):
             store.delete_category_report("a", "R013")
             self.assertEqual(store.category_reports(), [])
 
+
+class TestClimate(unittest.TestCase):
+    def setUp(self):
+        from beautybridge import climate as cl
+        self.cl = cl
+        self.P = load_engine(ROOT / "data" / "real").ds.products
+
+    def test_hold_only_for_worn_products(self):
+        cl, P = self.cl, self.P
+        for p in P.values():
+            h = cl.hold(p)
+            if p.category_group == "skincare" and p.category != "sunscreen" or p.category == "lip_balm":
+                self.assertIsNone(h, p.product_id)
+            elif h is not None:
+                self.assertIn(h, (0, 1, 2, 3))
+        self.assertTrue(cl.claims(P["U013"]))          # "Waterproof" in the name
+        self.assertEqual(cl.hold(P["R003"]), 3)        # 24H longwear, oil control 2
+
+    def test_humid_climate_prefers_matte_over_dewy_sunscreen(self):
+        cl, P = self.cl, self.P
+        matte, dewy = cl.fit(P["U034"], "hot_humid"), cl.fit(P["J004"], "hot_humid")
+        self.assertGreater(matte[0], dewy[0])
+        self.assertEqual(cl.verdict(matte[0]), "good")
+        self.assertIn("-matte", dewy[1])
+        # and the other way round when it's cold and dry
+        self.assertGreater(cl.fit(P["R035"], "cold_dry")[0], cl.fit(P["U034"], "cold_dry")[0])
+
+    def test_no_score_when_climate_does_not_constrain(self):
+        cl, P = self.cl, self.P
+        self.assertIsNone(cl.fit(P["U034"], "temperate"))
+        self.assertIsNone(cl.fit(P["U013"], "cold_dry"))   # eyeliner isn't dried out by cold air
+        with self.assertRaises(ValueError):
+            cl.fit(P["U034"], "rainy")
+
+    def test_similarity_unchanged(self):
+        from beautybridge import codebook as cb
+        self.assertEqual(len(cb.INTENSITY_FEATURES), 13)   # climate is separate from the 13 features
+
+    def test_reviews_accept_singapore_and_climate(self):
+        from beautybridge import reviews as rv
+        base = {"reviewer_id": "a", "product_id": "U034", "rating": 5}
+        r = rv.make_review({**base, "market": "sg", "climate": "hot_humid"}, set(self.P))
+        self.assertEqual((r.market, r.climate), ("SG", "hot_humid"))
+        for bad in ({"market": "XX"}, {"climate": "rainy"}):
+            with self.assertRaises(rv.ReviewError):
+                rv.make_review({**base, **bad}, set(self.P))
+        with tempfile.TemporaryDirectory() as d:
+            store = rv.ReviewStore(Path(d) / "r.sqlite")
+            store.upsert(r)
+            self.assertEqual(store.all()[0].climate, "hot_humid")
+
 class TestExpansionCases(unittest.TestCase):
     def test_cases_are_sourced_and_translated(self):
         sys.path.insert(0, str(ROOT / "scripts"))

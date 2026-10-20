@@ -112,6 +112,12 @@ a { color: inherit; }
 .vote button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .vote .vq { font-size: 11px; color: var(--muted); margin-right: 2px; }
 .vote .vs { flex-basis: 100%; font-size: 11px; color: var(--muted); }
+.cbadge { display: inline-block; margin-top: 3px; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--chip); color: var(--ink-2); }
+.cb-good { color: #1f7a4d; } .cbadge.cb-good { background: rgba(31,122,77,.12); }
+.cb-weak { color: #b0412e; } .cbadge.cb-weak { background: rgba(176,65,46,.12); }
+.climv { display: flex; align-items: baseline; gap: 8px; font-size: 15px; }
+.climv span { font: 700 18px var(--num); }
+.tag.neg { color: #b0412e; }
 .catform { display: grid; gap: 8px; }
 .catform select, .catform input { width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; }
 .catform .row { display: flex; gap: 8px; }
@@ -430,8 +436,9 @@ try {
   if (saved.sec === "skincare" || saved.sec === "makeup") S.sec = saved.sec;
   if (D.pc && D.pc.types.includes(saved.pc)) S.pc = saved.pc;
   if (D.codebook.skin.includes(saved.vskin)) S.vskin = saved.vskin;
+  if (D.codebook.climates.includes(saved.cl)) S.climate = saved.cl;
 } catch (e) {}
-const persist = () => { try { localStorage.setItem("bb3", JSON.stringify({ market: S.market, lang: S.lang, sec: S.sec, pc: S.pc, vskin: S.vskin || "" })); } catch (e) {} };
+const persist = () => { try { localStorage.setItem("bb3", JSON.stringify({ market: S.market, lang: S.lang, sec: S.sec, pc: S.pc, vskin: S.vskin || "", cl: S.climate || "" })); } catch (e) {} };
 const MARKETS = ["", "KR", "US", "JP", "CN"];
 const areaOf = (g) => D.goals[g].meta.area;
 
@@ -590,6 +597,38 @@ async function castVote(pid, shade, verdict) {
   try { await BACKEND.vote(pid, shade, S.pc, clear ? null : verdict, S.vskin || null); }
   catch (e) { console.warn("shade vote not saved (run supabase/shade_votes.sql)", e); VOTES.mine = { ...VOTES.mine }; if (before) VOTES.mine[k] = before; else delete VOTES.mine[k]; VOTES.status = "off"; render(); }
 }
+/* ---------------- climate: where you live, and how a product is likely to hold up there ---------------- */
+const climName = (c) => t("cl_" + c);
+const climFit = (p, c = S.climate) => (c && p.cl && p.cl.cf && p.cl.cf[c]) || null;          // [pct, reasons]
+const climVerdict = (pct) => pct >= D.codebook.climateCut[0] ? "good" : pct >= D.codebook.climateCut[1] ? "ok" : "weak";
+const climChips = () => `<div class="chips">${D.codebook.climates.map((c) => `<button class="chip" data-clim="${c}" aria-pressed="${S.climate === c}">${esc(climName(c))}</button>`).join("")}</div>`;
+function climBadge(p) {
+  const f = climFit(p);
+  if (!f) return "";
+  const v = climVerdict(f[0]);
+  return `<span class="cbadge cb-${v}">${esc(climName(S.climate))} · ${t("cv_" + v)}</span>`;
+}
+function climateCard(p) {
+  const h = p.cl ? p.cl.hold : null, f = climFit(p);
+  const reasons = f ? f[1].slice(0, 3).map((r) => `<span class="tag${r[0] === "+" ? "" : " neg"}">${r[0] === "+" ? "↑" : "↓"} ${esc(t("cr_" + r.slice(1)))}</span>`).join(" ") : "";
+  let verdict;
+  if (!S.climate) verdict = `<p class="note" style="margin:0">${t("clPick")}</p>`;
+  else if (S.climate === "temperate") verdict = `<p class="note" style="margin:0">${t("clTemperate")}</p>`;
+  else if (!f) verdict = `<p class="note" style="margin:0">${t("clNone")}</p>`;
+  else { const v = climVerdict(f[0]); verdict = `<div class="climv cb-${v}"><b>${esc(climName(S.climate))}: ${t("cv_" + v)}</b><span>${f[0]}%</span></div>${reasons ? `<div class="tags">${reasons}</div>` : ""}`; }
+  return `<div class="card"><span class="lbl">${t("clTitle")}</span>
+    ${h != null ? `<div class="ints" style="margin-top:0"><span>${t("holdTag")}</span><span class="d" aria-label="${h}/3">${[1, 2, 3].map((i) => `<i class="${i <= h ? "f" : ""}"></i>`).join("")}</span></div>${p.cl.claim ? `<p class="note" style="margin:0">${t("holdClaim")}</p>` : ""}` : ""}
+    <div><span class="note">${t("clAsk")}</span>${climChips()}</div>
+    ${verdict}
+    <p class="note" style="margin:0">${t("clEst")}</p></div>`;
+}
+/* products of the current section that should hold up best in the chosen climate */
+function climIds(n = 10) {
+  if (!S.climate) return [];
+  return Object.keys(D.products).filter((id) => inSec(id) && available(P(id)) && climFit(P(id)))
+    .sort((a, b) => climFit(P(b))[0] - climFit(P(a))[0] || a.localeCompare(b)).slice(0, n);
+}
+
 /* ---------------- "this product belongs in another category": people correct the classification ---------------- */
 const CATS = { status: "loading", stats: {}, mine: {}, sig: "" };
 const CAT_REVIEW_AT = 3;
@@ -995,6 +1034,14 @@ function vHome() {
     </section>` : ""}
 
     <section class="sec">
+      ${secHead(S.climate && S.climate !== "temperate" ? fmt(t("clHomeH"), { c: `<em>${esc(climName(S.climate))}</em>` }) : t("clHomeH0"))}
+      ${climChips()}
+      ${(() => { const ids = S.climate && S.climate !== "temperate" ? climIds() : [];
+        return ids.length ? `<div class="hscroll">${ids.map((id) => { const p = P(id); return `<button class="pcard" data-product="${id}"><span class="thumb${p.img ? " photo" : ""}">${pic(p)}</span>${nameLine(p)}${climBadge(p)}</button>`; }).join("")}</div><p class="note" style="margin:0">${t("clEst")}</p>`
+          : `<p class="note" style="margin:0">${S.climate === "temperate" ? t("clTemperate") : t("clPick")}</p>`; })()}
+    </section>
+
+    <section class="sec">
       ${secHead(t("dupes"))}
       <div style="display:grid;gap:10px">${pairs.map(({ ref, r }) => { const a = P(ref), b = P(r.id); return `<button class="pair" data-product="${ref}" data-tab="similar">
         <span class="side">${thumb(a)}${nameLine(a)}<span class="note">${mktName(a.origin)} · ${usd(a.usd)}</span></span>
@@ -1138,7 +1185,7 @@ function resultRows(list, kind, ref) {
     const fuse = Object.entries(r.w).map(([k, w]) => `${tx("comp", k)} <b>${(r.c[k] ?? 0).toFixed(2)}</b>×${Math.round(w * 100)}%`).join(" + ");
     return `<details class="res" data-key="${key}" ${open ? "open" : ""}><summary class="prow">
         <span class="rk">${i < 3 ? medal(i + 1) : `<b>${i + 1}</b>`}</span>${thumb(p)}
-        <span class="pinfo">${nameLine(p)}${rateLine(p)}<span class="whybtn">${t("why")} ${I.chev}</span></span>
+        <span class="pinfo">${nameLine(p)}${rateLine(p)}${kind === "sim" ? climBadge(p) : ""}<span class="whybtn">${t("why")} ${I.chev}</span></span>
         <span class="metric"><b>${r.pct}%</b><small>${kind === "goal" ? t("fit") : t("match")} · ${t("overall")} ${Math.round(r.f * 100)}</small>${r.save > 0 ? `<span class="save">${usd(r.save)} ${t("save")}</span>` : ""}</span></summary>
       <div class="why"><div class="bars">${bars}</div>
         <div class="fuse">${t("finalScore")} ${r.f.toFixed(3)} = ${fuse}${r.ev < 0.6 ? ` · ${t("lowConf")}` : ""}</div>
@@ -1155,11 +1202,14 @@ function vProduct() {
   const p = P(S.pid);
   const nRev = (liveStats()[S.pid] || {}).n || 0;
   const tabs = [["similar", t("similar")], ["cheaper", t("cheaper")], ["reviews", `${t("reviews")}${nRev ? " " + nRev : ""}`], ["prices", t("prices")], ["fits", t("fits")]];
-  const tagv = [catName(p.cat), p.tex && tx("texture", p.tex) !== catName(p.cat) && tx("texture", p.tex), p.cov && fmt(t("coverageOf"), { v: tx("coverage", p.cov) }), p.shade && tx("shade", p.shade), p.tone && tx("tone", p.tone), p.skin.length && (p.skin.length === 5 ? t("allSkin") : p.skin.map(skinName).join(" · "))].filter(Boolean);
+  const tagv = [catName(p.cat), p.tex && tx("texture", p.tex) !== catName(p.cat) && tx("texture", p.tex), p.cov && fmt(t("coverageOf"), { v: tx("coverage", p.cov) }), p.shade && tx("shade", p.shade), p.tone && tx("tone", p.tone), p.skin.length && (p.skin.length === 5 ? t("allSkin") : p.skin.map(skinName).join(" · ")), (p.int.longevity || 0) >= 3 && t("tagLong"), p.cl && p.cl.hold >= 2 && t("tagHold")].filter(Boolean);
   let body = "";
   if (S.ptab === "similar" || S.ptab === "cheaper") {
-    const list = (D[S.ptab][S.pid][S.market] || []).filter((r) => !S.origin || P(r.id).origin === S.origin).slice(0, 8);
+    let list = (D[S.ptab][S.pid][S.market] || []).filter((r) => !S.origin || P(r.id).origin === S.origin).slice(0, 8);
+    const canSort = S.climate && S.climate !== "temperate" && list.some((r) => climFit(P(r.id)));
+    if (canSort && S.csort) { const rk = { good: 0, ok: 1, weak: 2 }; const v = (r) => { const f = climFit(P(r.id)); return f ? rk[climVerdict(f[0])] : 1; }; list = list.map((r, i) => [r, i]).sort((a, b) => v(a[0]) - v(b[0]) || a[1] - b[1]).map((x) => x[0]); }
     body = `<div class="chips"><span class="eyebrow" style="align-self:center;margin-right:4px">${t("madeIn")}</span>${MARKETS.map((o) => `<button class="chip" data-origin="${o}" aria-pressed="${S.origin === o}">${o ? mktName(o) : t("all")}</button>`).join("")}</div>
+      ${canSort ? `<div class="chips"><button class="chip" data-csort="1" aria-pressed="${!!S.csort}">${fmt(t("clSort"), { c: esc(climName(S.climate)) })}</button></div>` : ""}
       <div class="note">${S.ptab === "cheaper" ? t("cheapNote") : t("simNote")}${S.market ? " · " + fmt(t("soldIn"), { m: mktName(S.market) }) : ""}</div>
       <div>${resultRows(list, "sim", p)}</div>`;
   } else if (S.ptab === "reviews") {
@@ -1189,6 +1239,7 @@ function vProduct() {
       ${D.mode === "real" ? `<p class="note" style="margin:0">${t("labelsNote")}</p>` : ""}
       ${p.sig && Object.keys(p.sig).length ? `<div class="card evid"><span class="lbl">${t("evidence")}</span>${Object.entries(p.sig).map(([m, rows]) => rows.map((g) => `<div class="evrow"><span class="tag">${mktName(m)}</span><span>${esc(sigLabel(g))}</span><a class="src" href="${esc(g.url)}" target="_blank" rel="noopener">${t("source")} · ${esc(g.date)}</a></div>`).join("")).join("")}</div>` : ""}
       ${shadeCard(p)}
+      ${climateCard(p)}
       ${catCard(p)}
       <div class="profile">
         ${p.finish ? `<div><span class="lbl">${t("finish")}</span><div class="scale">${D.codebook.finish.map((k) => `<div class="${k === p.finish ? "on" : ""}">${tx("finish", k)}</div>`).join("")}</div></div>` : ""}
@@ -1257,12 +1308,12 @@ async function recordClick(pid, store, market) {
 
 function myItems() {
   const out = {};
-  for (const r of LIVE.list) if (r.reviewer_id === LIVE.uid) out[r.product_id] = { rating: r.rating, skin_type: r.skin_type || null, age_band: r.age_band || null, market: r.market || null, text: r.text || "", created_at: r.created_at };
+  for (const r of LIVE.list) if (r.reviewer_id === LIVE.uid) out[r.product_id] = { rating: r.rating, skin_type: r.skin_type || null, age_band: r.age_band || null, market: r.market || null, climate: r.climate || null, text: r.text || "", created_at: r.created_at };
   return out;
 }
 function draftFor(pid) {
   const mine = myItems()[pid];
-  return mine ? { ...mine } : { rating: 0, skin_type: null, age_band: null, market: S.market || P(pid).origin, text: "" };
+  return mine ? { ...mine } : { rating: 0, skin_type: null, age_band: null, market: S.market || P(pid).origin, climate: S.climate || null, text: "" };
 }
 const starRow = (v, size = 16) => `<span class="stars" style="--s:${size}px" aria-label="${v.toFixed(1)}/5">${[1, 2, 3, 4, 5].map((i) => `<i class="${v >= i - 0.25 ? "f" : v >= i - 0.75 ? "h" : ""}"></i>`).join("")}</span>`;
 function reviewsBody(p) {
@@ -1283,13 +1334,14 @@ function reviewsBody(p) {
       <div><span class="lbl">${t("yourRating")}</span><div class="starpick" role="radiogroup" aria-label="${t("yourRating")}">${[1, 2, 3, 4, 5].map((i) => `<button type="button" data-rstar="${i}" role="radio" aria-checked="${d.rating === i}" aria-label="${i}"><i class="${d.rating >= i ? "f" : ""}"></i></button>`).join("")}</div></div>
       <div><span class="lbl">${t("skinQ")}</span><div class="chips" style="margin-top:6px">${D.codebook.skin.map((x) => `<button type="button" class="chip" data-rskin="${x}" aria-pressed="${d.skin_type === x}">${skinName(x)}</button>`).join("")}</div></div>
       <div><span class="lbl">${t("ageQ")}</span><div class="chips" style="margin-top:6px">${D.reviewPrior.ages.map((a) => `<button type="button" class="chip" data-rage="${a}" aria-pressed="${d.age_band === a}">${t("ageName")[a]}</button>`).join("")}</div></div>
-      <div><span class="lbl">${t("marketQ")}</span><div class="chips" style="margin-top:6px">${["KR", "US", "JP", "CN"].map((m) => `<button type="button" class="chip" data-rmkt="${m}" aria-pressed="${d.market === m}">${mktName(m)}</button>`).join("")}</div></div>
+      <div><span class="lbl">${t("marketQ")}</span><div class="chips" style="margin-top:6px">${["KR", "US", "JP", "CN", "SG"].map((m) => `<button type="button" class="chip" data-rmkt="${m}" aria-pressed="${d.market === m}">${mktName(m)}</button>`).join("")}</div></div>
+      <div><span class="lbl">${t("climQ")}</span><div class="chips" style="margin-top:6px">${D.codebook.climates.map((c) => `<button type="button" class="chip" data-rclim="${c}" aria-pressed="${d.climate === c}">${esc(climName(c))}</button>`).join("")}</div></div>
       <textarea id="rtext" maxlength="${D.reviewPrior.maxText}" rows="3" placeholder="${esc(t("textPh"))}">${esc(d.text)}</textarea>
       <div class="rbtns"><button class="btn-primary" data-rsubmit="1" ${!d.rating || LIVE.saving ? "disabled" : ""}>${LIVE.saving ? t("saving") : mine ? t("update") : t("submit")}</button>${mine ? `<button class="more" data-rdelete="1" style="width:auto;padding:10px 16px">${t("del")}</button>` : ""}</div>
       ${LIVE.msg ? `<p class="note" role="status">${esc(LIVE.msg)}</p>` : ""}</div>`;
   }
   const list = LIVE.list.filter((r) => r.product_id === p.id).sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 30);
-  const items = list.map((r) => `<div class="rev"><div class="rev-h">${starRow(r.rating, 13)}<span class="note">${r.reviewer_id === LIVE.uid ? t("myReview") : t("anon")} · ${[r.skin_type && skinName(r.skin_type), r.age_band && t("ageName")[r.age_band], r.market && fmt(t("reviewedIn"), { m: mktName(r.market) })].filter(Boolean).join(" · ")} · ${dateFmt(r.created_at.slice(0, 10))}</span></div>${r.text ? `<p>${esc(r.text)}</p>` : ""}</div>`).join("");
+  const items = list.map((r) => `<div class="rev"><div class="rev-h">${starRow(r.rating, 13)}<span class="note">${r.reviewer_id === LIVE.uid ? t("myReview") : t("anon")} · ${[r.skin_type && skinName(r.skin_type), r.age_band && t("ageName")[r.age_band], r.market && fmt(t("reviewedIn"), { m: mktName(r.market) }), r.climate && climName(r.climate)].filter(Boolean).join(" · ")} · ${dateFmt(r.created_at.slice(0, 10))}</span></div>${r.text ? `<p>${esc(r.text)}</p>` : ""}</div>`).join("");
   return `<p class="note"><span class="livedot"></span>${t("live")} · ${t("liveNote")}</p>${summary}${form}${items ? `<div class="revs">${items}</div>` : ""}`;
 }
 /* The active review storage. Each backend sets LIVE.uid, calls setReviews() and provides save(). */
@@ -1301,7 +1353,7 @@ async function saveReview(del = false) {
   let review = null;
   if (!del) {
     if (!(d.rating >= 1 && d.rating <= 5)) return;
-    review = { rating: d.rating, skin_type: d.skin_type, age_band: d.age_band, market: d.market, text: String(d.text || "").slice(0, D.reviewPrior.maxText), created_at: new Date().toISOString() };
+    review = { rating: d.rating, skin_type: d.skin_type, age_band: d.age_band, market: d.market, climate: d.climate || null, text: String(d.text || "").slice(0, D.reviewPrior.maxText), created_at: new Date().toISOString() };
   }
   LIVE.saving = true; LIVE.msg = ""; render();
   try {
@@ -1322,7 +1374,8 @@ function cleanReview(pid, r, uid) {
   return { reviewer_id: uid, product_id: pid, rating, created_at: created,
     skin_type: D.codebook.skin.includes(r.skin_type) ? r.skin_type : null,
     age_band: D.reviewPrior.ages.includes(r.age_band) ? r.age_band : null,
-    market: ["KR", "US", "JP", "CN"].includes(r.market) ? r.market : null,
+    market: ["KR", "US", "JP", "CN", "SG"].includes(r.market) ? r.market : null,
+    climate: D.codebook.climates.includes(r.climate) ? r.climate : null,
     text: typeof r.text === "string" ? r.text.slice(0, D.reviewPrior.maxText) : "" };
 }
 /* 1) claude.ai viewer: the page's own shared database. One document per reviewer. */
@@ -1427,11 +1480,15 @@ async function initSupabase(rc) {
       session = r.data.session;
     }
     LIVE.uid = session.user.id; LIVE.canWrite = true;
-    const cols = "reviewer_id,product_id,rating,skin_type,age_band,market,text,created_at";
+    let cols = "reviewer_id,product_id,rating,skin_type,age_band,market,text,created_at,climate";
     const fetchAll = async () => {
       const out = [];
       for (let from = 0; ; from += 1000) {
-        const { data, error } = await client.from("reviews").select(cols).range(from, from + 999);
+        let { data, error } = await client.from("reviews").select(cols).range(from, from + 999);
+        if (error && cols.endsWith(",climate")) {      // before supabase/update_2026_10_20.sql
+          cols = cols.slice(0, -",climate".length);
+          ({ data, error } = await client.from("reviews").select(cols).range(from, from + 999));
+        }
         if (error) throw error;
         for (const r of data) { const c = cleanReview(r.product_id, r, r.reviewer_id); if (c) out.push(c); }
         if (data.length < 1000) break;
@@ -1493,8 +1550,10 @@ async function initSupabase(rc) {
     };
     BACKEND.kind = "supabase";
     BACKEND.save = async (pid, review) => {
-      const q = review
-        ? client.from("reviews").upsert({ reviewer_id: LIVE.uid, product_id: pid, ...review }, { onConflict: "reviewer_id,product_id" })
+      const row = review ? { reviewer_id: LIVE.uid, product_id: pid, ...review } : null;
+      if (row && !cols.endsWith(",climate")) delete row.climate;
+      const q = row
+        ? client.from("reviews").upsert(row, { onConflict: "reviewer_id,product_id" })
         : client.from("reviews").delete().eq("reviewer_id", LIVE.uid).eq("product_id", pid);
       const { error } = await q;
       if (error) throw { forbidden: error.code === "42501", error };
@@ -1795,6 +1854,9 @@ document.addEventListener("click", (e) => {
   if (d.catcancel) { S.catOpen = ""; render(); return; }
   if (d.catsend) { if (S.catPick) sendCat(d.catsend, S.catPick, (S.catNote || "").trim().slice(0, 200)); return; }
   if (d.catundo) { sendCat(d.catundo, null, ""); return; }
+  if (d.clim) { S.climate = S.climate === d.clim ? "" : d.clim; if (S.draft) S.draft.climate = S.draft.climate || S.climate || null; render(); return; }
+  if (d.csort) { S.csort = !S.csort; render(); return; }
+  if (d.rclim) { S.draft.climate = S.draft.climate === d.rclim ? null : d.rclim; render(); return; }
   if (d.pc) { S.pc = S.pc === d.pc ? "" : d.pc; render(); return; }
   if (d.pcg !== undefined) { S.pcg = d.pcg; render(); return; }
   if (d.season) { S.season = d.season; S.pcType = ""; render(); return; }

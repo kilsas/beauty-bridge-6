@@ -201,6 +201,15 @@ coloring *and* skin. People can also flag a product as belonging in another cate
 `category_reports`, run `supabase/update_2026_10_18.sql`; API `POST /category-reports`); three matching
 suggestions mark the product "under review".
 
+## Climate fit
+`beautybridge/climate.py` estimates how a product holds up where someone lives (hot & humid,
+hot & dry, mild, cold & dry). Makeup and sunscreen get a 0-3 **sweat / oil / humidity resistance**
+tag derived by a fixed rule from labels the product already has (longevity, oil control, finish,
+texture) plus explicit name claims ("waterproof", "longwear", "24H"). It is shown as an estimate
+and is kept separate from the 13 similarity features, so similarity scores are unchanged.
+Reviews can record the climate a product was used in, and Singapore is a review country
+(`supabase/update_2026_10_20.sql`; API `GET /climate/{product_id}`).
+
 ## ⚠️ Which data is real
 
 - `data/real/`: **real products** (92, from Korea, the USA, Japan, China and

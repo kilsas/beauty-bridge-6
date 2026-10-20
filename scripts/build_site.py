@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from beautybridge import codebook as cb, load_engine  # noqa: E402
+from beautybridge import climate as climate_mod  # noqa: E402
 from beautybridge.config import FUSION_MODES, FX_RATES_NOTE, FX_TO_USD, SIMILARITY_WEIGHTS  # noqa: E402
 from beautybridge.db import MARKET_DIR  # noqa: E402
 from beautybridge.goals import score_goal  # noqa: E402
@@ -218,7 +219,7 @@ def build(engine, ds_dir) -> dict:
             "finish": d["finish"], "cov": d["coverage"], "tex": d["texture"], "tone": d["undertone"],
             "int": d["intensities"], "skin": d["skin_types"], "price": d["price"],
             "cur": d["currency"], "usd": d["price_usd"], "origin": d["country_origin"],
-            "list": listings, "fits": fits[:4],
+            "list": listings, "fits": fits[:4], "cl": climate_mod.for_site(p),
             "bko": brands.get(p.brand, {}).get("brand_ko", p.brand),
             "bcol": brands.get(p.brand, {}).get("color", "#6c6676"),
         }
@@ -328,7 +329,8 @@ def build(engine, ds_dir) -> dict:
                    "fx": FX_TO_USD, "fxNote": FX_RATES_NOTE},
         "codebook": {"finish": list(cb.FINISH_SCALE), "coverage": list(cb.COVERAGE_SCALE),
                      "intensity": cb.INTENSITY_FEATURES, "groups": cb.CATEGORY_GROUPS,
-                     "skin": cb.SKIN_TYPES},
+                     "skin": cb.SKIN_TYPES, "climates": cb.CLIMATES,
+                     "climateCut": [round(climate_mod.GOOD * 100), round(climate_mod.OK * 100)]},
         "query": {"intent": search_mod.INTENT_WORDS, "origin": search_mod.ORIGIN_WORDS,
                   "market": search_mod.MARKET_WORDS, "category": search_mod.CATEGORY_WORDS},
         "stats": {"products": len(P), "brands": len({p.brand for p in P.values()}),

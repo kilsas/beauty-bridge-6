@@ -96,6 +96,9 @@ SHADE_FAMILIES: list[str] = [
 
 SKIN_TYPES: list[str] = ["oily", "dry", "combination", "normal", "sensitive"]
 
+# where a person lives / uses a product (see climate.py)
+CLIMATES: list[str] = ["hot_humid", "hot_dry", "temperate", "cold_dry"]
+
 # ---------------------------------------------------------------------------
 # Intensity attributes: labeled 0-3, stored normalized to 0..1
 #   0 = none / not a claim, 1 = slight, 2 = clear, 3 = primary purpose

@@ -166,8 +166,8 @@ const MKT_TX = {
   ja: { "": "すべての国", KR: "韓国", US: "アメリカ", JP: "日本", CN: "中国" },
 };
 const ORIGIN_TX = {
-  ko: { FR: "프랑스", CA: "캐나다" }, en: { FR: "France", CA: "Canada" },
-  zh: { FR: "法国", CA: "加拿大" }, ja: { FR: "フランス", CA: "カナダ" },
+  ko: { FR: "프랑스", CA: "캐나다", SG: "싱가포르" }, en: { FR: "France", CA: "Canada", SG: "Singapore" },
+  zh: { FR: "法国", CA: "加拿大", SG: "新加坡" }, ja: { FR: "フランス", CA: "カナダ", SG: "シンガポール" },
 };
 const AREA_TX = {
   ko: { skin: "피부", eye: "눈", lip: "입술", contour: "컨투어", moist: "보습·진정", clear: "트러블·모공", tone: "톤·탄력", sun: "선케어" },
@@ -536,3 +536,56 @@ const T_CAT = {
     cRMine: "あなたの意見：{c}", cRUndo: "取り消す" },
 };
 for (const k of Object.keys(T_CAT)) Object.assign(T[k], T_CAT[k]);
+
+/* climate: where you live and how a product holds up there */
+const T_CLIM = {
+  ko: { cl_hot_humid: "덥고 습함", cl_hot_dry: "덥고 건조함", cl_temperate: "온화함", cl_cold_dry: "춥고 건조함",
+    cv_good: "잘 버텨요", cv_ok: "무난해요", cv_weak: "무너지기 쉬워요",
+    cr_hold: "땀·피지·습도 견딤", cr_oil: "피지 조절", cr_matte: "매트한 마무리", cr_light: "가벼운 제형",
+    cr_hydr: "보습", cr_dewy: "촉촉한 마무리", cr_rich: "리치한 제형",
+    clTitle: "내 날씨에서는?", clAsk: "내가 사는 곳 날씨", holdTag: "땀·피지 견딤 (추정)",
+    holdClaim: "제품 이름에 워터프루프·롱웨어 같은 표시가 있어요.",
+    clPick: "사는 곳 날씨를 고르면, 그 날씨에서 잘 버틸지 알려 드려요. 예: 싱가포르·한국 여름은 '덥고 습함'.",
+    clTemperate: "온화한 날씨에서는 특별히 무너지거나 건조해질 걱정이 적어요.",
+    clNone: "이 제품은 날씨 영향을 판단할 정보가 부족해요.",
+    clEst: "날씨 적합도는 지속력·피지 조절·마무리감·제형 라벨로 계산한 추정이에요. 써 본 날씨를 리뷰에 남기면 확인할 수 있어요.",
+    clSort: "{c}에 맞는 것 먼저", clHomeH: "{c} 날씨에 강한 제품", clHomeH0: "내 날씨에 맞는 제품",
+    climQ: "사용한 곳 날씨", tagLong: "오래 지속", tagHold: "땀·피지에 강함 (추정)" },
+  en: { cl_hot_humid: "Hot & humid", cl_hot_dry: "Hot & dry", cl_temperate: "Mild", cl_cold_dry: "Cold & dry",
+    cv_good: "holds up well", cv_ok: "okay", cv_weak: "may break down",
+    cr_hold: "sweat/oil/humidity resistance", cr_oil: "oil control", cr_matte: "matte finish", cr_light: "light texture",
+    cr_hydr: "hydration", cr_dewy: "dewy finish", cr_rich: "rich texture",
+    clTitle: "In my climate?", clAsk: "Where I live", holdTag: "Sweat & oil resistance (est.)",
+    holdClaim: "The product name claims waterproof / longwear.",
+    clPick: "Pick your climate to see how this holds up there. Singapore or a Korean summer is 'Hot & humid'.",
+    clTemperate: "In a mild climate there's little risk of melting or drying out.",
+    clNone: "Not enough information to judge climate for this product.",
+    clEst: "Climate fit is estimated from the longevity, oil-control, finish and texture labels. Add the climate you used it in to your review so it can be checked.",
+    clSort: "Best for {c} first", clHomeH: "Holds up in {c}", clHomeH0: "Made for your climate",
+    climQ: "Climate where you used it", tagLong: "Long-lasting", tagHold: "Sweat & oil resistant (est.)" },
+  zh: { cl_hot_humid: "炎热潮湿", cl_hot_dry: "炎热干燥", cl_temperate: "温和", cl_cold_dry: "寒冷干燥",
+    cv_good: "很持妆", cv_ok: "还可以", cv_weak: "容易脱妆",
+    cr_hold: "耐汗·耐油·耐湿", cr_oil: "控油", cr_matte: "哑光妆效", cr_light: "轻薄质地",
+    cr_hydr: "保湿", cr_dewy: "水润妆效", cr_rich: "滋润质地",
+    clTitle: "在我的气候下？", clAsk: "我所在地的气候", holdTag: "耐汗·耐油（估计）",
+    holdClaim: "产品名称标有防水·持久等字样。",
+    clPick: "选择你所在地的气候，看看它是否持妆。新加坡或韩国夏天属于“炎热潮湿”。",
+    clTemperate: "温和气候下不太需要担心脱妆或干燥。",
+    clNone: "信息不足，无法判断气候影响。",
+    clEst: "气候适配度根据持久度·控油·妆效·质地标签估算。在评价中留下使用时的气候即可验证。",
+    clSort: "优先显示适合{c}的", clHomeH: "适合{c}的持妆产品", clHomeH0: "适合你所在气候的产品",
+    climQ: "使用时的气候", tagLong: "持久", tagHold: "耐汗耐油（估计）" },
+  ja: { cl_hot_humid: "高温多湿", cl_hot_dry: "高温乾燥", cl_temperate: "穏やか", cl_cold_dry: "寒冷乾燥",
+    cv_good: "崩れにくい", cv_ok: "まあまあ", cv_weak: "崩れやすい",
+    cr_hold: "汗・皮脂・湿気への強さ", cr_oil: "皮脂コントロール", cr_matte: "マットな仕上がり", cr_light: "軽い質感",
+    cr_hydr: "保湿", cr_dewy: "ツヤのある仕上がり", cr_rich: "リッチな質感",
+    clTitle: "私の気候では？", clAsk: "住んでいる場所の気候", holdTag: "汗・皮脂への強さ（推定）",
+    holdClaim: "製品名にウォータープルーフ・ロングウェアなどの表示があります。",
+    clPick: "気候を選ぶと、その気候で崩れにくいかを表示します。シンガポールや韓国の夏は「高温多湿」。",
+    clTemperate: "穏やかな気候では崩れや乾燥の心配は少なめです。",
+    clNone: "気候の影響を判断する情報が足りません。",
+    clEst: "気候適合度は持続力・皮脂コントロール・仕上がり・質感のラベルから計算した推定です。使った気候をレビューに残すと確認できます。",
+    clSort: "{c}向けを先に", clHomeH: "{c}で崩れにくい製品", clHomeH0: "あなたの気候に合う製品",
+    climQ: "使った場所の気候", tagLong: "長持ち", tagHold: "汗・皮脂に強い（推定）" },
+};
+for (const k of Object.keys(T_CLIM)) Object.assign(T[k], T_CLIM[k]);

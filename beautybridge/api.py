@@ -66,6 +66,7 @@ class ReviewIn(BaseModel):
     age_band: str | None = None
     market: str | None = None
     text: str = ""
+    climate: str | None = None
 
 
 @app.post("/reviews", status_code=201)
@@ -314,6 +315,16 @@ def category_report_stats():
 @app.get("/category-reports/mine/{reporter_id}")
 def my_category_reports(reporter_id: str):
     return [{k: r[k] for k in ("product_id", "suggested", "note")} for r in store.category_reports(reporter_id)]
+
+
+@app.get("/climate/{product_id}")
+def product_climate(product_id: str):
+    """Estimated sweat/oil resistance (0-3) and fit per climate (0-100, with reasons)."""
+    from . import climate as cl
+    p = engine.ds.products.get(product_id)
+    if p is None:
+        raise HTTPException(status_code=404, detail=f"unknown product '{product_id}'")
+    return cl.for_site(p)
 
 
 @app.get("/market/leaders/{market}")

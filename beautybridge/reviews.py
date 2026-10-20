@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 
 from . import codebook as cb
+from .codebook import CLIMATES
 
 PRIOR_WEIGHT = 5
 DEFAULT_PRIOR_MEAN = 3.8        # used only when there are no reviews at all
@@ -38,6 +39,10 @@ class ReviewError(ValueError):
     pass
 
 
+# countries a reviewer can say they bought/used the product in (Singapore added 2026-10)
+REVIEW_MARKETS = ("KR", "US", "JP", "CN", "SG")
+
+
 @dataclass(frozen=True)
 class Review:
     reviewer_id: str
@@ -48,6 +53,7 @@ class Review:
     age_band: str | None = None
     market: str | None = None
     text: str = ""
+    climate: str | None = None        # where the reviewer uses it (see climate.CLIMATES)
 
     def to_dict(self) -> dict:
         return self.__dict__.copy()
@@ -74,6 +80,11 @@ def make_review(data: dict, known_products: set[str]) -> Review:
     if age is not None and age not in AGE_BANDS:
         raise ReviewError(f"age_band must be one of {AGE_BANDS}")
     market = (data.get("market") or "").upper() or None
+    if market is not None and market not in REVIEW_MARKETS:
+        raise ReviewError(f"market must be one of {', '.join(REVIEW_MARKETS)}")
+    climate = data.get("climate") or None
+    if climate is not None and climate not in CLIMATES:
+        raise ReviewError(f"climate must be one of {', '.join(CLIMATES)}")
     text = str(data.get("text") or "").strip()
     if len(text) > MAX_TEXT:
         raise ReviewError(f"text is limited to {MAX_TEXT} characters")
@@ -82,7 +93,7 @@ def make_review(data: dict, known_products: set[str]) -> Review:
         datetime.fromisoformat(str(created).replace("Z", "+00:00"))
     except ValueError:
         raise ReviewError("created_at must be ISO 8601") from None
-    return Review(rid, pid, rating, str(created), skin, age, market, text)
+    return Review(rid, pid, rating, str(created), skin, age, market, text, climate)
 
 
 def latest_per_reviewer(reviews: list[Review]) -> list[Review]:
@@ -234,6 +245,7 @@ class ReviewStore:
         market      TEXT,
         text        TEXT,
         created_at  TEXT NOT NULL,
+        climate     TEXT,
         PRIMARY KEY (reviewer_id, product_id)
     )"""
 
@@ -280,12 +292,15 @@ class ReviewStore:
         cols = {r[1] for r in self.conn.execute("PRAGMA table_info(shade_votes)")}
         if "skin_type" not in cols:      # databases created before skin types were added
             self.conn.execute("ALTER TABLE shade_votes ADD COLUMN skin_type TEXT")
+        if "climate" not in {r[1] for r in self.conn.execute("PRAGMA table_info(reviews)")}:
+            self.conn.execute("ALTER TABLE reviews ADD COLUMN climate TEXT")
         self.conn.commit()
 
     def upsert(self, r: Review) -> None:
         self.conn.execute(
-            "INSERT OR REPLACE INTO reviews VALUES (?,?,?,?,?,?,?,?)",
-            (r.reviewer_id, r.product_id, r.rating, r.skin_type, r.age_band, r.market, r.text, r.created_at),
+            "INSERT OR REPLACE INTO reviews (reviewer_id, product_id, rating, skin_type, age_band, market, text,"
+            " created_at, climate) VALUES (?,?,?,?,?,?,?,?,?)",
+            (r.reviewer_id, r.product_id, r.rating, r.skin_type, r.age_band, r.market, r.text, r.created_at, r.climate),
         )
         self.conn.commit()
 
@@ -295,8 +310,8 @@ class ReviewStore:
 
     def all(self) -> list[Review]:
         cur = self.conn.execute(
-            "SELECT reviewer_id, product_id, rating, created_at, skin_type, age_band, market, text FROM reviews")
-        return [Review(*row[:4], row[4], row[5], row[6], row[7] or "") for row in cur]
+            "SELECT reviewer_id, product_id, rating, created_at, skin_type, age_band, market, text, climate FROM reviews")
+        return [Review(*row[:4], row[4], row[5], row[6], row[7] or "", row[8]) for row in cur]
 
     def add_click(self, c: dict) -> None:
         self.conn.execute("INSERT INTO buy_clicks VALUES (?,?,?,?,?)",
