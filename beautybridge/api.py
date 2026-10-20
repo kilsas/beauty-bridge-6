@@ -67,6 +67,7 @@ class ReviewIn(BaseModel):
     market: str | None = None
     text: str = ""
     climate: str | None = None
+    skin_depth: str | None = None
 
 
 @app.post("/reviews", status_code=201)
@@ -81,11 +82,18 @@ def post_review(body: ReviewIn):
 
 
 @app.get("/reviews")
-def all_reviews():
+def all_reviews(skin_depth: str | None = None):
     """Every current review, for the website. Reviewer ids are replaced by a
-    one-way key so visitors can't act as someone else."""
+    one-way key so visitors can't act as someone else. ?skin_depth=tan keeps only
+    reviewers with the same or a neighbouring skin depth."""
+    from .skin_depth import DEPTHS
+    rows = rv.latest_per_reviewer(store.all())
+    if skin_depth:
+        if skin_depth not in DEPTHS:
+            raise HTTPException(status_code=400, detail=f"skin_depth must be one of {', '.join(DEPTHS)}")
+        rows = rv.similar_depth(rows, skin_depth)
     out = []
-    for r in rv.latest_per_reviewer(store.all()):
+    for r in rows:
         d = r.to_dict()
         d["reviewer_key"] = rv.reviewer_key(d.pop("reviewer_id"))
         out.append(d)

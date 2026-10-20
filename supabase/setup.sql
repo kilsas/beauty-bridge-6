@@ -157,3 +157,9 @@ alter table public.reviews add column if not exists climate text;
 alter table public.reviews drop constraint if exists reviews_climate_check;
 alter table public.reviews add constraint reviews_climate_check
   check (climate is null or climate in ('hot_humid','hot_dry','temperate','cold_dry'));
+
+-- 2026-10-20 update, part 3 (skin depth): also in supabase/update_2026_10_20.sql.
+alter table public.reviews add column if not exists skin_depth text;
+alter table public.reviews drop constraint if exists reviews_skin_depth_check;
+alter table public.reviews add constraint reviews_skin_depth_check
+  check (skin_depth is null or skin_depth in ('fair','light','medium','tan','deep'));

@@ -112,6 +112,7 @@ a { color: inherit; }
 .vote button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .vote .vq { font-size: 11px; color: var(--muted); margin-right: 2px; }
 .vote .vs { flex-basis: 100%; font-size: 11px; color: var(--muted); }
+.dpdot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; border: 1px solid rgba(0,0,0,.12); }
 .cbadge { display: inline-block; margin-top: 3px; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--chip); color: var(--ink-2); }
 .cb-good { color: #1f7a4d; } .cbadge.cb-good { background: rgba(31,122,77,.12); }
 .cb-weak { color: #b0412e; } .cbadge.cb-weak { background: rgba(176,65,46,.12); }
@@ -437,8 +438,9 @@ try {
   if (D.pc && D.pc.types.includes(saved.pc)) S.pc = saved.pc;
   if (D.codebook.skin.includes(saved.vskin)) S.vskin = saved.vskin;
   if (D.codebook.climates.includes(saved.cl)) S.climate = saved.cl;
+  if (D.codebook.depths.includes(saved.dp)) S.depth = saved.dp;
 } catch (e) {}
-const persist = () => { try { localStorage.setItem("bb3", JSON.stringify({ market: S.market, lang: S.lang, sec: S.sec, pc: S.pc, vskin: S.vskin || "", cl: S.climate || "" })); } catch (e) {} };
+const persist = () => { try { localStorage.setItem("bb3", JSON.stringify({ market: S.market, lang: S.lang, sec: S.sec, pc: S.pc, vskin: S.vskin || "", cl: S.climate || "", dp: S.depth || "" })); } catch (e) {} };
 const MARKETS = ["", "KR", "US", "JP", "CN"];
 const areaOf = (g) => D.goals[g].meta.area;
 
@@ -543,11 +545,13 @@ function shadeCard(p) {
   const top = (s) => D.pc.types.filter((k) => s.fit[k] >= D.pc.good * 100).sort((a, b) => s.fit[b] - s.fit[a]).slice(0, 3);
   return `<div class="card"><div class="sec-h" style="margin:0"><span class="lbl">${t("pcShades")}</span><button class="go" data-go="ranking" data-rtab="pc" aria-label="${t("pcRank")}">${I.right}</button></div>
     ${S.pc ? `<p class="note" style="margin:0"><span class="pcdot" style="display:inline-block;background:${PC_DOT[S.pc]}"></span> ${t("pcMine")}: <b>${esc(pcName(S.pc))}</b></p>` : `<p class="note" style="margin:0">${t("pcPickHint")}</p>`}
+    <div><span class="note">${t("dpAsk")}</span>${depthChips()}</div>
     <div class="shades">${rows.map(({ s }) => { const f = S.pc ? s.fit[S.pc] : null;
       return `<div class="shrow${f != null && f >= D.pc.good * 100 ? " me" : ""}"><span class="sw${s.t === "clear" ? " clear" : ""}" style="background:${s.hex}"></span>
         <span><span class="nm">${esc(shadeName(p, s))}</span> <span class="ax">${axisLabel(s)}</span>
           <span class="pcs">${s.t === "clear" ? "" : top(s).map((k) => `<span class="pctag"><span class="pcdot" style="background:${PC_DOT[k]}"></span>${esc(pcName(k))}</span>`).join("")}</span>
           ${s.stt ? `<span class="note" style="display:block">${t("pcStated")}: “${esc(s.stt)}” · <a class="src" href="${esc(s.su)}" target="_blank" rel="noopener">${t("source")}</a></span>` : ""}
+          ${S.depth ? `<span style="display:block">${payBadge(s)}</span>` : ""}
           ${voteRow(p, s)}</span>
         <span class="pct">${f != null ? `${f}%<small>${f >= D.pc.ok * 100 ? fitWord(f) : t("pcLow")}</small>` : ""}</span></div>`; }).join("")}</div>
     <p class="note" style="margin:0">${t("pcEst")} ${t("pcNote")}</p>
@@ -597,6 +601,39 @@ async function castVote(pid, shade, verdict) {
   try { await BACKEND.vote(pid, shade, S.pc, clear ? null : verdict, S.vskin || null); }
   catch (e) { console.warn("shade vote not saved (run supabase/shade_votes.sql)", e); VOTES.mine = { ...VOTES.mine }; if (before) VOTES.mine[k] = before; else delete VOTES.mine[k]; VOTES.status = "off"; render(); }
 }
+/* ---------------- skin depth: does a shade show up on my skin? ---------------- */
+const depthName = (d) => t("dp_" + d);
+const depthChips = (attr = "data-depth", cur = S.depth) => `<div class="chips">${D.codebook.depths.map((d) => `<button type="button" class="chip" ${attr}="${d}" aria-pressed="${cur === d}"><span class="dpdot" style="background:${DEPTH_DOT[d]}"></span>${esc(depthName(d))}</button>`).join("")}</div>`;
+const DEPTH_DOT = { fair: "#f3dccb", light: "#e6c2a4", medium: "#c99872", tan: "#a06f4c", deep: "#6b4530" };
+const shPay = (s, d = S.depth) => (d && s.dp && s.dp[d]) || null;              // [pct, verdict, reason]
+const payWord = (x) => x[1] === "good" ? t("pv_good") : x[2] === "show" ? t("pv_ok") : t("pv_" + x[2]);
+const payBadge = (s) => { const x = shPay(s); return x ? `<span class="cbadge cb-${x[1]}">${esc(depthName(S.depth))} · ${esc(payWord(x))}</span>` : ""; };
+const depthNear = (a, b) => Math.abs(D.codebook.depths.indexOf(a) - D.codebook.depths.indexOf(b)) <= 1;
+/* every shade that shows up well on the chosen depth, across countries */
+function toneRows() {
+  const out = [];
+  for (const [pid, ss] of Object.entries(D.shades || {})) {
+    const p = P(pid);
+    if (!available(p) || (S.toneGrp && p.grp !== S.toneGrp) || (S.toneOrigin && p.origin !== S.toneOrigin)) continue;
+    for (const s of ss) { const x = shPay(s); if (x && x[1] === "good") out.push({ pid, s, x }); }
+  }
+  return out.sort((a, b) => b.x[0] - a.x[0] || a.pid.localeCompare(b.pid));
+}
+function toneBoard() {
+  const origins = [...new Set(Object.keys(D.shades || {}).map((id) => P(id).origin))].sort();
+  const rows = S.depth ? toneRows() : [];
+  const head = `<div class="card"><span class="lbl">${t("dpAsk")}</span>${depthChips()}
+    <div class="chips">${[["", t("all")], ["lip", grpName("lip")], ["cheek", grpName("cheek")], ["eye", grpName("eye")]].map(([g, l]) => `<button class="chip" data-tgrp="${g}" aria-pressed="${(S.toneGrp || "") === g}">${esc(l)}</button>`).join("")}</div>
+    <div class="chips"><span class="eyebrow" style="align-self:center;margin-right:4px">${t("madeIn")}</span>${["", ...origins].map((o) => `<button class="chip" data-torigin="${o}" aria-pressed="${(S.toneOrigin || "") === o}">${o ? mktName(o) : t("all")}</button>`).join("")}</div></div>`;
+  if (!S.depth) return head + `<p class="note" style="margin:0">${t("dpPick")}</p>`;
+  const list = rows.length ? `<div class="shades">${rows.slice(0, 40).map(({ pid, s, x }) => { const p = P(pid);
+      return `<button class="shrow" data-product="${pid}" style="text-align:left;width:100%;background:none;border:0;padding:8px 0"><span class="sw" style="background:${s.hex}"></span>
+        <span><span class="nm">${esc(shadeName(p, s))}</span> <span class="note">${esc(brandName(p))} ${esc(prodName(p))} · ${esc(catName(p.cat))} · ${t("madeIn")} ${esc(mktName(p.origin))}</span><span style="display:block">${payBadge(s)}</span></span>
+        <span class="pct">${x[0]}%</span></button>`; }).join("")}</div>`
+    : `<div class="empty">${t("dpNone")}</div>`;
+  return head + `<p class="note" style="margin:0">${fmt(t("dpCount"), { n: rows.length, d: esc(depthName(S.depth)) })}</p>` + list + `<p class="note" style="margin:0">${t("dpEst")}</p>`;
+}
+
 /* ---------------- climate: where you live, and how a product is likely to hold up there ---------------- */
 const climName = (c) => t("cl_" + c);
 const climFit = (p, c = S.climate) => (c && p.cl && p.cl.cf && p.cl.cf[c]) || null;          // [pct, reasons]
@@ -952,7 +989,7 @@ const goalChips = (attr, area, cur) => `<div class="chips">${goalsIn(area).map((
 function header() {
   const tabs = [["home", t("home")], ["ranking", t("ranking")], ["goals", t("goals")], ["insight", t("insight")]];
   const cur = ["product", "search", "method"].includes(S.view) ? "" : S.view;
-  const subs = [["market", t("marketRank")], ["rising", t("rising")], ["buy", t("buyRank")], ...(S.sec === "makeup" ? [["pc", t("pcRank")]] : []), ["category", t("byCat")], ["skin", t("bySkin")], ["age", t("byAge")], ["goal", t("byGoal")], ["brand", t("byBrand")]];
+  const subs = [["market", t("marketRank")], ["rising", t("rising")], ["buy", t("buyRank")], ...(S.sec === "makeup" ? [["pc", t("pcRank")], ["tone", t("toneRank")]] : []), ["category", t("byCat")], ["skin", t("bySkin")], ["age", t("byAge")], ["goal", t("byGoal")], ["brand", t("byBrand")]];
   const hdr = document.getElementById("hdr");
   hdr.className = "hdr" + (S.view === "ranking" || S.view === "goals" ? "" : " flat");
   let sub = "";
@@ -1076,7 +1113,7 @@ function brandBlock(b, n, k) {
 }
 
 function vRanking() {
-  if (S.rtab === "pc" && S.sec !== "makeup") S.rtab = "market";
+  if ((S.rtab === "pc" || S.rtab === "tone") && S.sec !== "makeup") S.rtab = "market";
   const date = D.chartDates[1] ? `<div class="updated">${dateFmt(D.chartDates[1])} ${t("updated")}</div>` : "";
   const avail = (ids) => ids.filter((id) => available(P(id)));
   // segment metric: that segment's own average and count (the row's stars show the overall rating)
@@ -1103,6 +1140,8 @@ function vRanking() {
     } else {
       body = `<div class="empty">${t("noRising")}<br><br><button class="more" data-product="${secFeatured()[0]}" data-tab="reviews">${t("firstCta")} ${I.right}</button></div>`;
     }
+  } else if (S.rtab === "tone" && S.sec === "makeup") {
+    body = toneBoard();
   } else if (S.rtab === "pc" && S.sec === "makeup") {
     body = pcBoard() + `<p class="note" style="margin:0">${t("pcHow")} ${t("pcEst")} ${t("pcNote")}</p>` + voteCheckCard();
   } else if (S.rtab === "buy") {
@@ -1308,12 +1347,12 @@ async function recordClick(pid, store, market) {
 
 function myItems() {
   const out = {};
-  for (const r of LIVE.list) if (r.reviewer_id === LIVE.uid) out[r.product_id] = { rating: r.rating, skin_type: r.skin_type || null, age_band: r.age_band || null, market: r.market || null, climate: r.climate || null, text: r.text || "", created_at: r.created_at };
+  for (const r of LIVE.list) if (r.reviewer_id === LIVE.uid) out[r.product_id] = { rating: r.rating, skin_type: r.skin_type || null, age_band: r.age_band || null, market: r.market || null, climate: r.climate || null, skin_depth: r.skin_depth || null, text: r.text || "", created_at: r.created_at };
   return out;
 }
 function draftFor(pid) {
   const mine = myItems()[pid];
-  return mine ? { ...mine } : { rating: 0, skin_type: null, age_band: null, market: S.market || P(pid).origin, climate: S.climate || null, text: "" };
+  return mine ? { ...mine } : { rating: 0, skin_type: null, age_band: null, market: S.market || P(pid).origin, climate: S.climate || null, skin_depth: S.depth || null, text: "" };
 }
 const starRow = (v, size = 16) => `<span class="stars" style="--s:${size}px" aria-label="${v.toFixed(1)}/5">${[1, 2, 3, 4, 5].map((i) => `<i class="${v >= i - 0.25 ? "f" : v >= i - 0.75 ? "h" : ""}"></i>`).join("")}</span>`;
 function reviewsBody(p) {
@@ -1335,14 +1374,22 @@ function reviewsBody(p) {
       <div><span class="lbl">${t("skinQ")}</span><div class="chips" style="margin-top:6px">${D.codebook.skin.map((x) => `<button type="button" class="chip" data-rskin="${x}" aria-pressed="${d.skin_type === x}">${skinName(x)}</button>`).join("")}</div></div>
       <div><span class="lbl">${t("ageQ")}</span><div class="chips" style="margin-top:6px">${D.reviewPrior.ages.map((a) => `<button type="button" class="chip" data-rage="${a}" aria-pressed="${d.age_band === a}">${t("ageName")[a]}</button>`).join("")}</div></div>
       <div><span class="lbl">${t("marketQ")}</span><div class="chips" style="margin-top:6px">${["KR", "US", "JP", "CN", "SG"].map((m) => `<button type="button" class="chip" data-rmkt="${m}" aria-pressed="${d.market === m}">${mktName(m)}</button>`).join("")}</div></div>
+      <div><span class="lbl">${t("dpQ")}</span><div style="margin-top:6px">${depthChips("data-rdepth", d.skin_depth)}</div></div>
       <div><span class="lbl">${t("climQ")}</span><div class="chips" style="margin-top:6px">${D.codebook.climates.map((c) => `<button type="button" class="chip" data-rclim="${c}" aria-pressed="${d.climate === c}">${esc(climName(c))}</button>`).join("")}</div></div>
       <textarea id="rtext" maxlength="${D.reviewPrior.maxText}" rows="3" placeholder="${esc(t("textPh"))}">${esc(d.text)}</textarea>
       <div class="rbtns"><button class="btn-primary" data-rsubmit="1" ${!d.rating || LIVE.saving ? "disabled" : ""}>${LIVE.saving ? t("saving") : mine ? t("update") : t("submit")}</button>${mine ? `<button class="more" data-rdelete="1" style="width:auto;padding:10px 16px">${t("del")}</button>` : ""}</div>
       ${LIVE.msg ? `<p class="note" role="status">${esc(LIVE.msg)}</p>` : ""}</div>`;
   }
-  const list = LIVE.list.filter((r) => r.product_id === p.id).sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 30);
-  const items = list.map((r) => `<div class="rev"><div class="rev-h">${starRow(r.rating, 13)}<span class="note">${r.reviewer_id === LIVE.uid ? t("myReview") : t("anon")} · ${[r.skin_type && skinName(r.skin_type), r.age_band && t("ageName")[r.age_band], r.market && fmt(t("reviewedIn"), { m: mktName(r.market) }), r.climate && climName(r.climate)].filter(Boolean).join(" · ")} · ${dateFmt(r.created_at.slice(0, 10))}</span></div>${r.text ? `<p>${esc(r.text)}</p>` : ""}</div>`).join("");
-  return `<p class="note"><span class="livedot"></span>${t("live")} · ${t("liveNote")}</p>${summary}${form}${items ? `<div class="revs">${items}</div>` : ""}`;
+  const all = LIVE.list.filter((r) => r.product_id === p.id);
+  const simOn = S.depth && S.rsim;
+  const shown = simOn ? all.filter((r) => r.skin_depth && depthNear(r.skin_depth, S.depth)) : all;
+  const list = shown.slice().sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 30);
+  const simAvg = shown.length ? shown.reduce((a, r) => a + r.rating, 0) / shown.length : null;
+  const simBar = S.depth ? `<div class="chips"><button class="chip" data-rsim="0" aria-pressed="${!simOn}">${t("all")}</button><button class="chip" data-rsim="1" aria-pressed="${!!simOn}">${fmt(t("rSim"), { d: esc(depthName(S.depth)) })}</button></div>
+      ${simOn ? `<p class="note" style="margin:0">${shown.length ? fmt(t("rSimN"), { n: shown.length, a: simAvg.toFixed(1) }) : t("rSimNone")}</p>` : ""}`
+    : `<p class="note" style="margin:0">${t("rSimPick")}</p>`;
+  const items = list.map((r) => `<div class="rev"><div class="rev-h">${starRow(r.rating, 13)}<span class="note">${r.reviewer_id === LIVE.uid ? t("myReview") : t("anon")} · ${[r.skin_type && skinName(r.skin_type), r.age_band && t("ageName")[r.age_band], r.skin_depth && depthName(r.skin_depth), r.market && fmt(t("reviewedIn"), { m: mktName(r.market) }), r.climate && climName(r.climate)].filter(Boolean).join(" · ")} · ${dateFmt(r.created_at.slice(0, 10))}</span></div>${r.text ? `<p>${esc(r.text)}</p>` : ""}</div>`).join("");
+  return `<p class="note"><span class="livedot"></span>${t("live")} · ${t("liveNote")}</p>${summary}${form}${all.length ? simBar : ""}${items ? `<div class="revs">${items}</div>` : ""}`;
 }
 /* The active review storage. Each backend sets LIVE.uid, calls setReviews() and provides save(). */
 const BACKEND = { kind: "", save: null, click: null, vote: null, cat: null };
@@ -1353,7 +1400,7 @@ async function saveReview(del = false) {
   let review = null;
   if (!del) {
     if (!(d.rating >= 1 && d.rating <= 5)) return;
-    review = { rating: d.rating, skin_type: d.skin_type, age_band: d.age_band, market: d.market, climate: d.climate || null, text: String(d.text || "").slice(0, D.reviewPrior.maxText), created_at: new Date().toISOString() };
+    review = { rating: d.rating, skin_type: d.skin_type, age_band: d.age_band, market: d.market, climate: d.climate || null, skin_depth: d.skin_depth || null, text: String(d.text || "").slice(0, D.reviewPrior.maxText), created_at: new Date().toISOString() };
   }
   LIVE.saving = true; LIVE.msg = ""; render();
   try {
@@ -1376,6 +1423,7 @@ function cleanReview(pid, r, uid) {
     age_band: D.reviewPrior.ages.includes(r.age_band) ? r.age_band : null,
     market: ["KR", "US", "JP", "CN", "SG"].includes(r.market) ? r.market : null,
     climate: D.codebook.climates.includes(r.climate) ? r.climate : null,
+    skin_depth: D.codebook.depths.includes(r.skin_depth) ? r.skin_depth : null,
     text: typeof r.text === "string" ? r.text.slice(0, D.reviewPrior.maxText) : "" };
 }
 /* 1) claude.ai viewer: the page's own shared database. One document per reviewer. */
@@ -1480,14 +1528,15 @@ async function initSupabase(rc) {
       session = r.data.session;
     }
     LIVE.uid = session.user.id; LIVE.canWrite = true;
-    let cols = "reviewer_id,product_id,rating,skin_type,age_band,market,text,created_at,climate";
+    const baseCols = "reviewer_id,product_id,rating,skin_type,age_band,market,text,created_at";
+    let extra = ["climate", "skin_depth"];          // columns added by supabase/update_2026_10_20.sql
     const fetchAll = async () => {
       const out = [];
       for (let from = 0; ; from += 1000) {
-        let { data, error } = await client.from("reviews").select(cols).range(from, from + 999);
-        if (error && cols.endsWith(",climate")) {      // before supabase/update_2026_10_20.sql
-          cols = cols.slice(0, -",climate".length);
-          ({ data, error } = await client.from("reviews").select(cols).range(from, from + 999));
+        let { data, error } = await client.from("reviews").select([baseCols, ...extra].join(",")).range(from, from + 999);
+        while (error && extra.length) {             // the update SQL hasn't been run yet
+          extra = extra.slice(0, -1);
+          ({ data, error } = await client.from("reviews").select([baseCols, ...extra].join(",")).range(from, from + 999));
         }
         if (error) throw error;
         for (const r of data) { const c = cleanReview(r.product_id, r, r.reviewer_id); if (c) out.push(c); }
@@ -1551,7 +1600,7 @@ async function initSupabase(rc) {
     BACKEND.kind = "supabase";
     BACKEND.save = async (pid, review) => {
       const row = review ? { reviewer_id: LIVE.uid, product_id: pid, ...review } : null;
-      if (row && !cols.endsWith(",climate")) delete row.climate;
+      if (row) for (const k of ["climate", "skin_depth"]) if (!extra.includes(k)) delete row[k];
       const q = row
         ? client.from("reviews").upsert(row, { onConflict: "reviewer_id,product_id" })
         : client.from("reviews").delete().eq("reviewer_id", LIVE.uid).eq("product_id", pid);
@@ -1854,6 +1903,11 @@ document.addEventListener("click", (e) => {
   if (d.catcancel) { S.catOpen = ""; render(); return; }
   if (d.catsend) { if (S.catPick) sendCat(d.catsend, S.catPick, (S.catNote || "").trim().slice(0, 200)); return; }
   if (d.catundo) { sendCat(d.catundo, null, ""); return; }
+  if (d.depth) { S.depth = S.depth === d.depth ? "" : d.depth; if (S.draft && !S.draft.skin_depth) S.draft.skin_depth = S.depth || null; render(); return; }
+  if (d.tgrp !== undefined) { S.toneGrp = d.tgrp; render(); return; }
+  if (d.torigin !== undefined) { S.toneOrigin = d.torigin; render(); return; }
+  if (d.rdepth) { S.draft.skin_depth = S.draft.skin_depth === d.rdepth ? null : d.rdepth; render(); return; }
+  if (d.rsim !== undefined) { S.rsim = d.rsim === "1"; render(); return; }
   if (d.clim) { S.climate = S.climate === d.clim ? "" : d.clim; if (S.draft) S.draft.climate = S.draft.climate || S.climate || null; render(); return; }
   if (d.csort) { S.csort = !S.csort; render(); return; }
   if (d.rclim) { S.draft.climate = S.draft.climate === d.rclim ? null : d.rclim; render(); return; }
@@ -1904,7 +1958,7 @@ if (S.sec === "skincare") { S.sec = "makeup"; setSec("skincare"); }
 fromHash();
 if (S.view === "product") S.sec = secOf(P(S.pid));
 if (S.view === "goals") { S.sec = areaSec(areaOf(S.goal)); }
-if (S.view === "ranking" && S.rtab === "pc") setSec("makeup");
+if (S.view === "ranking" && (S.rtab === "pc" || S.rtab === "tone")) setSec("makeup");
 if (S.view !== "goals") S.area = areaOf(S.goal);
 render();
 initLive();

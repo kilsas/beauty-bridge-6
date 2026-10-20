@@ -25,6 +25,7 @@ sys.path.insert(0, str(ROOT))
 
 from beautybridge import codebook as cb, load_engine  # noqa: E402
 from beautybridge import climate as climate_mod  # noqa: E402
+from beautybridge import skin_depth as depth_mod  # noqa: E402
 from beautybridge.config import FUSION_MODES, FX_RATES_NOTE, FX_TO_USD, SIMILARITY_WEIGHTS  # noqa: E402
 from beautybridge.db import MARKET_DIR  # noqa: E402
 from beautybridge.goals import score_goal  # noqa: E402
@@ -160,7 +161,8 @@ def shades_for_site(data_dir: Path, products: dict) -> dict:
     for pid, ss in pcol.load_shades(data_dir / "shades.csv", set(products)).items():
         out[pid] = [{"n": s.name, "l": s.name_local, "hex": s.hex, "t": s.temp, "v": s.value, "c": s.chroma,
                      "fit": {k: round(v * 100) for k, v in s.fit.items()}, "st": sorted(s.stated_types),
-                     "stt": s.stated_text, "su": s.stated_url, "url": s.shade_url} for s in ss]
+                     "stt": s.stated_text, "su": s.stated_url, "url": s.shade_url,
+                     "dp": depth_mod.for_site(products[pid].category, s.hex)} for s in ss]
     return out
 
 
@@ -329,7 +331,7 @@ def build(engine, ds_dir) -> dict:
                    "fx": FX_TO_USD, "fxNote": FX_RATES_NOTE},
         "codebook": {"finish": list(cb.FINISH_SCALE), "coverage": list(cb.COVERAGE_SCALE),
                      "intensity": cb.INTENSITY_FEATURES, "groups": cb.CATEGORY_GROUPS,
-                     "skin": cb.SKIN_TYPES, "climates": cb.CLIMATES,
+                     "skin": cb.SKIN_TYPES, "climates": cb.CLIMATES, "depths": depth_mod.DEPTHS,
                      "climateCut": [round(climate_mod.GOOD * 100), round(climate_mod.OK * 100)]},
         "query": {"intent": search_mod.INTENT_WORDS, "origin": search_mod.ORIGIN_WORDS,
                   "market": search_mod.MARKET_WORDS, "category": search_mod.CATEGORY_WORDS},

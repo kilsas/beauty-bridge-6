@@ -624,6 +624,36 @@ class TestClimate(unittest.TestCase):
             store.upsert(r)
             self.assertEqual(store.all()[0].climate, "hot_humid")
 
+
+class TestSkinDepth(unittest.TestCase):
+    def test_contour_must_be_darker_than_skin(self):
+        from beautybridge import skin_depth as sd
+        light_contour = "#a8988b"                     # a light grey-brown contour
+        self.assertEqual(sd.payoff("contour", light_contour, "fair")[1], "good")
+        self.assertEqual(sd.payoff("contour", light_contour, "deep")[2], "vanish")
+        self.assertEqual(sd.payoff("contour", "#4f3529", "deep")[1] in ("ok", "good"), True)
+
+    def test_light_muted_colour_reads_ashy_on_deep_skin(self):
+        from beautybridge import skin_depth as sd
+        self.assertEqual(sd.payoff("lip_tint", "#c98a9a", "deep")[2], "ashy")
+        self.assertEqual(sd.payoff("lip_tint", "#b0606e", "fair")[1], "good")
+        self.assertIsNone(sd.payoff("lip_balm", "#c98a9a", "deep"))
+        with self.assertRaises(ValueError):
+            sd.payoff("lip_tint", "#c98a9a", "olive")
+
+    def test_reviews_filter_by_similar_depth(self):
+        from beautybridge import reviews as rv
+        ids = {"U034"}
+        mk = lambda who, d: rv.make_review({"reviewer_id": who, "product_id": "U034", "rating": 4, "skin_depth": d}, ids)
+        rs = [mk("a", "tan"), mk("b", "deep"), mk("c", "fair"), mk("d", None)]
+        self.assertEqual(sorted(r.reviewer_id for r in rv.similar_depth(rs, "deep")), ["a", "b"])
+        with self.assertRaises(rv.ReviewError):
+            mk("e", "olive")
+        with tempfile.TemporaryDirectory() as d:
+            store = rv.ReviewStore(Path(d) / "r.sqlite")
+            store.upsert(rs[0])
+            self.assertEqual(store.all()[0].skin_depth, "tan")
+
 class TestExpansionCases(unittest.TestCase):
     def test_cases_are_sourced_and_translated(self):
         sys.path.insert(0, str(ROOT / "scripts"))

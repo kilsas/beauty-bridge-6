@@ -210,6 +210,15 @@ and is kept separate from the 13 similarity features, so similarity scores are u
 Reviews can record the climate a product was used in, and Singapore is a review country
 (`supabase/update_2026_10_20.sql`; API `GET /climate/{product_id}`).
 
+## Skin depth and colour payoff
+`beautybridge/skin_depth.py` estimates whether a shade shows up on five skin depths (fair to deep)
+by comparing its swatch with an average skin colour for that depth (CIELAB): contour/bronzer must
+be darker than the skin, highlighter slightly lighter, and lip/blush/eye colours clearly different
+(light, low-chroma shades are flagged as possibly ashy). The site's *Payoff by skin depth* tab lists
+shades from every country that show up well on a chosen depth, and reviews can record the
+reviewer's skin depth so readers can filter to people with similar skin (API `GET /reviews?skin_depth=`).
+Swatches are themselves estimates and base products have no shade data, so this is an estimate.
+
 ## ⚠️ Which data is real
 
 - `data/real/`: **real products** (92, from Korea, the USA, Japan, China and
