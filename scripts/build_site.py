@@ -332,6 +332,7 @@ def build(engine, ds_dir) -> dict:
         "codebook": {"finish": list(cb.FINISH_SCALE), "coverage": list(cb.COVERAGE_SCALE),
                      "intensity": cb.INTENSITY_FEATURES, "groups": cb.CATEGORY_GROUPS,
                      "skin": cb.SKIN_TYPES, "climates": cb.CLIMATES, "depths": depth_mod.DEPTHS,
+                     "hosu": {n: depth_mod.hosu_to_depth(n) for n in depth_mod.HOSU},
                      "climateCut": [round(climate_mod.GOOD * 100), round(climate_mod.OK * 100)]},
         "query": {"intent": search_mod.INTENT_WORDS, "origin": search_mod.ORIGIN_WORDS,
                   "market": search_mod.MARKET_WORDS, "category": search_mod.CATEGORY_WORDS},

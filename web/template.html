@@ -112,6 +112,8 @@ a { color: inherit; }
 .vote button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .vote .vq { font-size: 11px; color: var(--muted); margin-right: 2px; }
 .vote .vs { flex-basis: 100%; font-size: 11px; color: var(--muted); }
+.hosu { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.hosu select { padding: 6px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; font-size: 13px; }
 .dpdot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; border: 1px solid rgba(0,0,0,.12); }
 .cbadge { display: inline-block; margin-top: 3px; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--chip); color: var(--ink-2); }
 .cb-good { color: #1f7a4d; } .cbadge.cb-good { background: rgba(31,122,77,.12); }
@@ -439,8 +441,9 @@ try {
   if (D.codebook.skin.includes(saved.vskin)) S.vskin = saved.vskin;
   if (D.codebook.climates.includes(saved.cl)) S.climate = saved.cl;
   if (D.codebook.depths.includes(saved.dp)) S.depth = saved.dp;
+  if (D.codebook.hosu[saved.hs]) S.hosu = String(saved.hs);
 } catch (e) {}
-const persist = () => { try { localStorage.setItem("bb3", JSON.stringify({ market: S.market, lang: S.lang, sec: S.sec, pc: S.pc, vskin: S.vskin || "", cl: S.climate || "", dp: S.depth || "" })); } catch (e) {} };
+const persist = () => { try { localStorage.setItem("bb3", JSON.stringify({ market: S.market, lang: S.lang, sec: S.sec, pc: S.pc, vskin: S.vskin || "", cl: S.climate || "", dp: S.depth || "", hs: S.hosu || "" })); } catch (e) {} };
 const MARKETS = ["", "KR", "US", "JP", "CN"];
 const areaOf = (g) => D.goals[g].meta.area;
 
@@ -545,7 +548,7 @@ function shadeCard(p) {
   const top = (s) => D.pc.types.filter((k) => s.fit[k] >= D.pc.good * 100).sort((a, b) => s.fit[b] - s.fit[a]).slice(0, 3);
   return `<div class="card"><div class="sec-h" style="margin:0"><span class="lbl">${t("pcShades")}</span><button class="go" data-go="ranking" data-rtab="pc" aria-label="${t("pcRank")}">${I.right}</button></div>
     ${S.pc ? `<p class="note" style="margin:0"><span class="pcdot" style="display:inline-block;background:${PC_DOT[S.pc]}"></span> ${t("pcMine")}: <b>${esc(pcName(S.pc))}</b></p>` : `<p class="note" style="margin:0">${t("pcPickHint")}</p>`}
-    <div><span class="note">${t("dpAsk")}</span>${depthChips()}</div>
+    <div><span class="note">${t("dpAsk")}</span>${depthChips()}${hosuPicker()}</div>
     <div class="shades">${rows.map(({ s }) => { const f = S.pc ? s.fit[S.pc] : null;
       return `<div class="shrow${f != null && f >= D.pc.good * 100 ? " me" : ""}"><span class="sw${s.t === "clear" ? " clear" : ""}" style="background:${s.hex}"></span>
         <span><span class="nm">${esc(shadeName(p, s))}</span> <span class="ax">${axisLabel(s)}</span>
@@ -604,6 +607,10 @@ async function castVote(pid, shade, verdict) {
 /* ---------------- skin depth: does a shade show up on my skin? ---------------- */
 const depthName = (d) => t("dp_" + d);
 const depthChips = (attr = "data-depth", cur = S.depth) => `<div class="chips">${D.codebook.depths.map((d) => `<button type="button" class="chip" ${attr}="${d}" aria-pressed="${cur === d}"><span class="dpdot" style="background:${DEPTH_DOT[d]}"></span>${esc(depthName(d))}</button>`).join("")}</div>`;
+/* pick by Korean foundation shade number (호수) instead: a rough guide, brands differ */
+const hosuPicker = () => `<label class="hosu"><span class="note">${t("hsAsk")}</span>
+  <select id="hosu" aria-label="${t("hsAsk")}"><option value="">${t("hsNone")}</option>${Object.keys(D.codebook.hosu).map((n) => `<option value="${n}"${S.hosu === n ? " selected" : ""}>${fmt(t("hsN"), { n })} → ${esc(depthName(D.codebook.hosu[n]))}</option>`).join("")}</select></label>
+  ${S.hosu ? `<p class="note" style="margin:0">${t("hsNote")}</p>` : ""}`;
 const DEPTH_DOT = { fair: "#f3dccb", light: "#e6c2a4", medium: "#c99872", tan: "#a06f4c", deep: "#6b4530" };
 const shPay = (s, d = S.depth) => (d && s.dp && s.dp[d]) || null;              // [pct, verdict, reason]
 const payWord = (x) => x[1] === "good" ? t("pv_good") : x[2] === "show" ? t("pv_ok") : t("pv_" + x[2]);
@@ -622,7 +629,7 @@ function toneRows() {
 function toneBoard() {
   const origins = [...new Set(Object.keys(D.shades || {}).map((id) => P(id).origin))].sort();
   const rows = S.depth ? toneRows() : [];
-  const head = `<div class="card"><span class="lbl">${t("dpAsk")}</span>${depthChips()}
+  const head = `<div class="card"><span class="lbl">${t("dpAsk")}</span>${depthChips()}${hosuPicker()}
     <div class="chips">${[["", t("all")], ["lip", grpName("lip")], ["cheek", grpName("cheek")], ["eye", grpName("eye")]].map(([g, l]) => `<button class="chip" data-tgrp="${g}" aria-pressed="${(S.toneGrp || "") === g}">${esc(l)}</button>`).join("")}</div>
     <div class="chips"><span class="eyebrow" style="align-self:center;margin-right:4px">${t("madeIn")}</span>${["", ...origins].map((o) => `<button class="chip" data-torigin="${o}" aria-pressed="${(S.toneOrigin || "") === o}">${o ? mktName(o) : t("all")}</button>`).join("")}</div></div>`;
   if (!S.depth) return head + `<p class="note" style="margin:0">${t("dpPick")}</p>`;
@@ -1903,7 +1910,7 @@ document.addEventListener("click", (e) => {
   if (d.catcancel) { S.catOpen = ""; render(); return; }
   if (d.catsend) { if (S.catPick) sendCat(d.catsend, S.catPick, (S.catNote || "").trim().slice(0, 200)); return; }
   if (d.catundo) { sendCat(d.catundo, null, ""); return; }
-  if (d.depth) { S.depth = S.depth === d.depth ? "" : d.depth; if (S.draft && !S.draft.skin_depth) S.draft.skin_depth = S.depth || null; render(); return; }
+  if (d.depth) { S.depth = S.depth === d.depth ? "" : d.depth; S.hosu = ""; if (S.draft && !S.draft.skin_depth) S.draft.skin_depth = S.depth || null; render(); return; }
   if (d.tgrp !== undefined) { S.toneGrp = d.tgrp; render(); return; }
   if (d.torigin !== undefined) { S.toneOrigin = d.torigin; render(); return; }
   if (d.rdepth) { S.draft.skin_depth = S.draft.skin_depth === d.rdepth ? null : d.rdepth; render(); return; }
@@ -1950,6 +1957,7 @@ document.addEventListener("change", (e) => {
   if (e.target.id === "mkt") { S.market = e.target.value; render(); }
   if (e.target.id === "lang") { S.lang = e.target.value; render(); }
   if (e.target.id === "catsel") { S.catPick = e.target.value; render(); }
+  if (e.target.id === "hosu") { S.hosu = e.target.value; if (S.hosu) S.depth = D.codebook.hosu[S.hosu]; if (S.draft && !S.draft.skin_depth && S.depth) S.draft.skin_depth = S.depth; render(); }
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && S.sheet) { S.sheet = false; renderSheet(); } });
 

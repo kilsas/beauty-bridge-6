@@ -641,6 +641,11 @@ class TestSkinDepth(unittest.TestCase):
         with self.assertRaises(ValueError):
             sd.payoff("lip_tint", "#c98a9a", "olive")
 
+    def test_hosu_maps_to_depth(self):
+        from beautybridge import skin_depth as sd
+        self.assertEqual([sd.hosu_to_depth(n) for n in (13, 21, 23, 25, 29)], ["fair", "light", "medium", "tan", "deep"])
+        self.assertTrue(all(sd.hosu_to_depth(n) in sd.DEPTHS for n in sd.HOSU))
+
     def test_reviews_filter_by_similar_depth(self):
         from beautybridge import reviews as rv
         ids = {"U034"}

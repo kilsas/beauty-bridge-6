@@ -91,6 +91,23 @@ def for_site(category: str, hex_colour: str) -> dict:
     return out
 
 
+# Korean foundation shade numbers (호수, larger = deeper) -> depth level. A rough guide:
+# brands differ, and the same number can be lighter or deeper from brand to brand.
+HOSU: list[int] = [13, 15, 17, 19, 20, 21, 22, 23, 24, 25, 27, 29]
+
+
+def hosu_to_depth(n: int) -> str:
+    if n <= 17:
+        return "fair"
+    if n <= 21:
+        return "light"
+    if n <= 23:
+        return "medium"
+    if n <= 25:
+        return "tan"
+    return "deep"
+
+
 def similar(a: str, b: str) -> bool:
     """Depths count as similar when they are the same or next to each other."""
     return abs(DEPTHS.index(a) - DEPTHS.index(b)) <= 1
