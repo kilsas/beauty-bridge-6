@@ -634,3 +634,36 @@ const T_DEPTH = {
     rSimPick: "肌の明るさを選ぶと、近い肌のユーザーのレビューだけを見られます。" },
 };
 for (const k of Object.keys(T_DEPTH)) Object.assign(T[k], T_DEPTH[k]);
+
+/* "did it hold at noon?" logs */
+const T_HOLD = {
+  ko: { hlBasis: "사용자 정오 기록 기준이에요. 아래 태그는 라벨로 추정한 이유예요.", hlLabel: "라벨 추정", hlUsers: "사용자 기록 (정오에 버틴 비율)", hlN: "기록 {n}개", hlNone: "아직 기록 없음",
+    hlAsk: "{c}에서 오늘 정오까지", hl_held: "버텼어요", hl_partly: "조금 무너졌어요", hl_broke: "무너졌어요",
+    hlOff: "기록 저장이 아직 연결되지 않았어요.",
+    hlPeriod: "{a} ~ {b} · 버팀 {h} · 조금 {p} · 무너짐 {x}", hlRanked: "기록이 충분해서 사용자 기록으로 순위를 매겨요",
+    hlNeed: "기록 {k}개가 모이면 라벨 대신 사용자 기록으로 순위를 매겨요", hlByUsers: "사용자 기록",
+    hlCheck: "{c}에서 라벨 3점 제품 중 기록이 충분한 {n}개 가운데 {b}개가 사용자 기록상 점심 전에 무너졌어요.",
+    hlCheck0: "라벨과 실제를 비교하려면 제품마다 정오 기록이 {k}개 이상 필요해요. 제품 페이지에서 오늘 정오에 버텼는지 남겨 주세요." },
+  en: { hlBasis: "Based on users' noon logs. The tags below are the label-based reasons.", hlLabel: "Label estimate", hlUsers: "Users' logs (held at noon)", hlN: "{n} logs", hlNone: "no logs yet",
+    hlAsk: "In {c}, by noon today it", hl_held: "held", hl_partly: "partly broke down", hl_broke: "broke down",
+    hlOff: "Saving logs isn't connected yet.",
+    hlPeriod: "{a} – {b} · held {h} · partly {p} · broke {x}", hlRanked: "enough logs, so it's ranked by users' logs",
+    hlNeed: "after {k} logs it's ranked by users' logs instead of the label", hlByUsers: "users' logs",
+    hlCheck: "In {c}, of {n} label-3 products with enough logs, {b} broke down before lunch according to users.",
+    hlCheck0: "Comparing labels with reality needs at least {k} noon logs per product. Log on a product page whether it held today." },
+  zh: { hlBasis: "依据用户的中午记录。下方标签是根据标签估计的原因。", hlLabel: "标签估计", hlUsers: "用户记录（中午仍持妆的比例）", hlN: "{n} 条记录", hlNone: "暂无记录",
+    hlAsk: "在{c}，到今天中午", hl_held: "依然持妆", hl_partly: "有点脱妆", hl_broke: "脱妆了",
+    hlOff: "记录保存尚未连接。",
+    hlPeriod: "{a} ~ {b} · 持妆 {h} · 有点 {p} · 脱妆 {x}", hlRanked: "记录足够，按用户记录排名",
+    hlNeed: "累计 {k} 条记录后改为按用户记录排名", hlByUsers: "用户记录",
+    hlCheck: "在{c}，记录足够的 {n} 个标签 3 分产品中，按用户记录有 {b} 个在午饭前脱妆。",
+    hlCheck0: "要比较标签与实际，每个产品需要至少 {k} 条中午记录。请在产品页记录今天中午是否持妆。" },
+  ja: { hlBasis: "ユーザーの正午記録に基づいています。下のタグはラベルから推定した理由です。", hlLabel: "ラベル推定", hlUsers: "ユーザー記録（正午に崩れなかった割合）", hlN: "記録 {n}件", hlNone: "記録なし",
+    hlAsk: "{c}で今日の正午まで", hl_held: "崩れなかった", hl_partly: "少し崩れた", hl_broke: "崩れた",
+    hlOff: "記録の保存はまだ接続されていません。",
+    hlPeriod: "{a} ~ {b} · 崩れず {h} · 少し {p} · 崩れた {x}", hlRanked: "記録が十分なのでユーザー記録で順位付け",
+    hlNeed: "記録が {k}件集まるとラベルの代わりにユーザー記録で順位付け", hlByUsers: "ユーザー記録",
+    hlCheck: "{c}で、記録が十分なラベル3点の製品 {n}個のうち {b}個がユーザー記録上お昼前に崩れました。",
+    hlCheck0: "ラベルと実際を比べるには、製品ごとに正午の記録が {k}件以上必要です。製品ページで今日の正午に崩れなかったか記録してください。" },
+};
+for (const k of Object.keys(T_HOLD)) Object.assign(T[k], T_HOLD[k]);

@@ -647,11 +647,66 @@ const climFit = (p, c = S.climate) => (c && p.cl && p.cl.cf && p.cl.cf[c]) || nu
 const climVerdict = (pct) => pct >= D.codebook.climateCut[0] ? "good" : pct >= D.codebook.climateCut[1] ? "ok" : "weak";
 const climChips = () => `<div class="chips">${D.codebook.climates.map((c) => `<button class="chip" data-clim="${c}" aria-pressed="${S.climate === c}">${esc(climName(c))}</button>`).join("")}</div>`;
 function climBadge(p) {
-  const f = climFit(p);
-  if (!f) return "";
-  const v = climVerdict(f[0]);
-  return `<span class="cbadge cb-${v}">${esc(climName(S.climate))} · ${t("cv_" + v)}</span>`;
+  const x = typeof climScore === "function" ? climScore(p) : null;
+  if (!x) return "";
+  const v = climVerdict(x.pct);
+  return `<span class="cbadge cb-${v}">${esc(climName(S.climate))} · ${t("cv_" + v)}${x.src === "users" ? " · " + t("hlByUsers") : ""}</span>`;
 }
+/* ---------------- "did it hold at noon?": users check the estimated label, day by day ---------------- */
+const HOLDS = { status: "loading", stats: {}, mine: {}, sig: "" };
+const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+const hkey = (pid, day) => pid + "|" + day;
+function setHoldStats(rows) {
+  const stats = {};
+  for (const r of rows || []) {
+    if (!r || !D.products[r.product_id] || !D.codebook.climates.includes(r.climate)) continue;
+    (stats[r.product_id] ||= {})[r.climate] = { n: +r.n || 0, held: +r.held || 0, partly: +r.partly || 0, broke: +r.broke || 0, first: String(r.first || "").slice(0, 10), last: String(r.last || "").slice(0, 10) };
+  }
+  const sig = JSON.stringify(stats), changed = sig !== HOLDS.sig || HOLDS.status !== "ready";
+  Object.assign(HOLDS, { status: "ready", stats, sig });
+  if (changed && (S.view === "product" || S.view === "home")) render();
+}
+function setMyHolds(rows) { const m = {}; for (const r of rows || []) if (r && r.product_id) m[hkey(r.product_id, String(r.day).slice(0, 10))] = r.result; HOLDS.mine = m; }
+const holdRow = (pid, c = S.climate) => (HOLDS.stats[pid] || {})[c] || null;
+const userScore = (r) => r && r.n ? (r.held + 0.5 * r.partly) / r.n : null;
+/* the score the site ranks by: users' noon logs once there are enough, otherwise the label estimate */
+function climScore(p, c = S.climate) {
+  const r = holdRow(p.id, c), f = climFit(p, c);
+  if (r && r.n >= D.codebook.holdMin) return { pct: Math.round(userScore(r) * 100), src: "users", n: r.n };
+  return f ? { pct: f[0], src: "label" } : null;
+}
+async function logHold(pid, result) {
+  if (!BACKEND.hold || !LIVE.uid || !S.climate) return;
+  const k = hkey(pid, today()), before = HOLDS.mine[k];
+  const clear = before === result;
+  HOLDS.mine = { ...HOLDS.mine }; if (clear) delete HOLDS.mine[k]; else HOLDS.mine[k] = result;
+  render();
+  try { await BACKEND.hold(pid, S.climate, clear ? null : result, today()); }
+  catch (e) { console.warn("hold log not saved (run supabase/update_2026_10_23.sql)", e); HOLDS.mine = { ...HOLDS.mine }; if (before) HOLDS.mine[k] = before; else delete HOLDS.mine[k]; HOLDS.status = "off"; render(); }
+}
+function holdLogBox(p) {
+  if (!p.cl || p.cl.hold == null || !S.climate) return "";
+  const r = holdRow(p.id), f = climFit(p);
+  const lab = `<div class="stat"><span>${t("hlLabel")}</span><b>${p.cl.hold}/3</b>${f ? `<small>${f[0]}%</small>` : ""}</div>`;
+  const usr = `<div class="stat"><span>${t("hlUsers")}</span><b>${r ? Math.round(userScore(r) * 100) + "%" : "–"}</b><small>${r ? fmt(t("hlN"), { n: r.n }) : t("hlNone")}</small></div>`;
+  const can = BACKEND.hold && LIVE.uid && HOLDS.status !== "off";
+  const mine = HOLDS.mine[hkey(p.id, today())];
+  const btns = can ? `<div class="vote"><span class="vq">${fmt(t("hlAsk"), { c: esc(climName(S.climate)) })}</span>${["held", "partly", "broke"].map((v) => `<button data-hold="${v}" aria-pressed="${mine === v}">${t("hl_" + v)}</button>`).join("")}</div>` : `<p class="note" style="margin:0">${t("hlOff")}</p>`;
+  return `<div class="stats3" style="grid-template-columns:1fr 1fr">${lab}${usr}</div>
+    ${r ? `<p class="note" style="margin:0">${fmt(t("hlPeriod"), { a: dateFmt(r.first), b: dateFmt(r.last), h: r.held, p: r.partly, x: r.broke })}${r.n >= D.codebook.holdMin ? " · " + t("hlRanked") : " · " + fmt(t("hlNeed"), { k: D.codebook.holdMin })}</p>` : ""}
+    ${btns}`;
+}
+/* of the products the label rates 3, how many did users see break down here? (same rule as hold_log.label_vs_users) */
+function holdCheck(c = S.climate) {
+  let checked = 0, broke = 0;
+  for (const [pid, by] of Object.entries(HOLDS.stats)) {
+    const r = by[c], p = P(pid);
+    if (!r || !p.cl || p.cl.hold !== 3 || r.n < D.codebook.holdMin) continue;
+    checked++; if (userScore(r) < D.codebook.holdBroke) broke++;
+  }
+  return { checked, broke };
+}
+
 function climateCard(p) {
   const h = p.cl ? p.cl.hold : null, f = climFit(p);
   const reasons = f ? f[1].slice(0, 3).map((r) => `<span class="tag${r[0] === "+" ? "" : " neg"}">${r[0] === "+" ? "↑" : "↓"} ${esc(t("cr_" + r.slice(1)))}</span>`).join(" ") : "";
@@ -659,18 +714,19 @@ function climateCard(p) {
   if (!S.climate) verdict = `<p class="note" style="margin:0">${t("clPick")}</p>`;
   else if (S.climate === "temperate") verdict = `<p class="note" style="margin:0">${t("clTemperate")}</p>`;
   else if (!f) verdict = `<p class="note" style="margin:0">${t("clNone")}</p>`;
-  else { const v = climVerdict(f[0]); verdict = `<div class="climv cb-${v}"><b>${esc(climName(S.climate))}: ${t("cv_" + v)}</b><span>${f[0]}%</span></div>${reasons ? `<div class="tags">${reasons}</div>` : ""}`; }
+  else { const x = climScore(p), v = climVerdict(x.pct); verdict = `<div class="climv cb-${v}"><b>${esc(climName(S.climate))}: ${t("cv_" + v)}</b><span>${x.pct}%</span></div>${x.src === "users" ? `<p class="note" style="margin:0">${t("hlBasis")}</p>` : ""}${reasons ? `<div class="tags">${reasons}</div>` : ""}`; }
   return `<div class="card"><span class="lbl">${t("clTitle")}</span>
     ${h != null ? `<div class="ints" style="margin-top:0"><span>${t("holdTag")}</span><span class="d" aria-label="${h}/3">${[1, 2, 3].map((i) => `<i class="${i <= h ? "f" : ""}"></i>`).join("")}</span></div>${p.cl.claim ? `<p class="note" style="margin:0">${t("holdClaim")}</p>` : ""}` : ""}
     <div><span class="note">${t("clAsk")}</span>${climChips()}</div>
     ${verdict}
+    ${holdLogBox(p)}
     <p class="note" style="margin:0">${t("clEst")}</p></div>`;
 }
 /* products of the current section that should hold up best in the chosen climate */
 function climIds(n = 10) {
   if (!S.climate) return [];
-  return Object.keys(D.products).filter((id) => inSec(id) && available(P(id)) && climFit(P(id)))
-    .sort((a, b) => climFit(P(b))[0] - climFit(P(a))[0] || a.localeCompare(b)).slice(0, n);
+  return Object.keys(D.products).filter((id) => inSec(id) && available(P(id)) && climScore(P(id)))
+    .sort((a, b) => climScore(P(b)).pct - climScore(P(a)).pct || a.localeCompare(b)).slice(0, n);
 }
 
 /* ---------------- "this product belongs in another category": people correct the classification ---------------- */
@@ -1081,7 +1137,9 @@ function vHome() {
       ${secHead(S.climate && S.climate !== "temperate" ? fmt(t("clHomeH"), { c: `<em>${esc(climName(S.climate))}</em>` }) : t("clHomeH0"))}
       ${climChips()}
       ${(() => { const ids = S.climate && S.climate !== "temperate" ? climIds() : [];
-        return ids.length ? `<div class="hscroll">${ids.map((id) => { const p = P(id); return `<button class="pcard" data-product="${id}"><span class="thumb${p.img ? " photo" : ""}">${pic(p)}</span>${nameLine(p)}${climBadge(p)}</button>`; }).join("")}</div><p class="note" style="margin:0">${t("clEst")}</p>`
+        const hc = holdCheck();
+        return ids.length ? `<div class="hscroll">${ids.map((id) => { const p = P(id); return `<button class="pcard" data-product="${id}"><span class="thumb${p.img ? " photo" : ""}">${pic(p)}</span>${nameLine(p)}${climBadge(p)}</button>`; }).join("")}</div>
+          <p class="note" style="margin:0">${hc.checked ? fmt(t("hlCheck"), { c: esc(climName(S.climate)), n: hc.checked, b: hc.broke }) : fmt(t("hlCheck0"), { k: D.codebook.holdMin })}</p><p class="note" style="margin:0">${t("clEst")}</p>`
           : `<p class="note" style="margin:0">${S.climate === "temperate" ? t("clTemperate") : t("clPick")}</p>`; })()}
     </section>
 
@@ -1253,7 +1311,7 @@ function vProduct() {
   if (S.ptab === "similar" || S.ptab === "cheaper") {
     let list = (D[S.ptab][S.pid][S.market] || []).filter((r) => !S.origin || P(r.id).origin === S.origin).slice(0, 8);
     const canSort = S.climate && S.climate !== "temperate" && list.some((r) => climFit(P(r.id)));
-    if (canSort && S.csort) { const rk = { good: 0, ok: 1, weak: 2 }; const v = (r) => { const f = climFit(P(r.id)); return f ? rk[climVerdict(f[0])] : 1; }; list = list.map((r, i) => [r, i]).sort((a, b) => v(a[0]) - v(b[0]) || a[1] - b[1]).map((x) => x[0]); }
+    if (canSort && S.csort) { const rk = { good: 0, ok: 1, weak: 2 }; const v = (r) => { const x = climScore(P(r.id)); return x ? rk[climVerdict(x.pct)] : 1; }; list = list.map((r, i) => [r, i]).sort((a, b) => v(a[0]) - v(b[0]) || a[1] - b[1]).map((x) => x[0]); }
     body = `<div class="chips"><span class="eyebrow" style="align-self:center;margin-right:4px">${t("madeIn")}</span>${MARKETS.map((o) => `<button class="chip" data-origin="${o}" aria-pressed="${S.origin === o}">${o ? mktName(o) : t("all")}</button>`).join("")}</div>
       ${canSort ? `<div class="chips"><button class="chip" data-csort="1" aria-pressed="${!!S.csort}">${fmt(t("clSort"), { c: esc(climName(S.climate)) })}</button></div>` : ""}
       <div class="note">${S.ptab === "cheaper" ? t("cheapNote") : t("simNote")}${S.market ? " · " + fmt(t("soldIn"), { m: mktName(S.market) }) : ""}</div>
@@ -1399,7 +1457,7 @@ function reviewsBody(p) {
   return `<p class="note"><span class="livedot"></span>${t("live")} · ${t("liveNote")}</p>${summary}${form}${all.length ? simBar : ""}${items ? `<div class="revs">${items}</div>` : ""}`;
 }
 /* The active review storage. Each backend sets LIVE.uid, calls setReviews() and provides save(). */
-const BACKEND = { kind: "", save: null, click: null, vote: null, cat: null };
+const BACKEND = { kind: "", save: null, click: null, vote: null, cat: null, hold: null };
 function setReviews(list) { LIVE.list = list; LIVE.status = "ready"; recompute(); render(); }
 async function saveReview(del = false) {
   if (!BACKEND.save || !LIVE.uid || LIVE.saving) return;
@@ -1468,6 +1526,26 @@ async function initClaude(cl) {
     if (cat) myCats[pid] = { product_id: pid, suggested: cat, note }; else delete myCats[pid];
     await db.doc("catreports/" + LIVE.uid).set({ items: myCats });
   };
+  let myHolds = {};
+  BACKEND.hold = async (pid, climate, result, day) => {
+    myHolds = { ...myHolds }; const k = hkey(pid, day);
+    if (result) myHolds[k] = { product_id: pid, climate, result, day }; else delete myHolds[k];
+    await db.doc("holdlogs/" + LIVE.uid).set({ items: myHolds });
+  };
+  db.collection("holdlogs").onSnapshot((snap) => {
+    const agg = {};
+    for (const doc of snap.docs) {
+      const items = (doc.data() || {}).items;
+      if (!items || typeof items !== "object") continue;
+      if (doc.id === LIVE.uid) { myHolds = items; setMyHolds(Object.values(items)); }
+      for (const g of Object.values(items)) {
+        if (!g || !["held", "partly", "broke"].includes(g.result)) continue;
+        const a = agg[g.product_id + "|" + g.climate] ||= { product_id: g.product_id, climate: g.climate, n: 0, held: 0, partly: 0, broke: 0, first: g.day, last: g.day };
+        a.n += 1; a[g.result] += 1; if (g.day < a.first) a.first = g.day; if (g.day > a.last) a.last = g.day;
+      }
+    }
+    setHoldStats(Object.values(agg));
+  }, () => { HOLDS.status = "off"; });
   db.collection("catreports").onSnapshot((snap) => {
     const agg = {};
     for (const doc of snap.docs) {
@@ -1604,6 +1682,22 @@ async function initSupabase(rc) {
       if (error) throw error;
       await loadCats();
     };
+    const loadHolds = async () => {
+      const { data, error } = await client.from("hold_log_stats").select("product_id,climate,n,held,partly,broke,first,last");
+      if (error) throw error;
+      const mine = await client.from("hold_logs").select("product_id,climate,result,day").eq("logger_id", LIVE.uid);
+      if (mine.error) throw mine.error;
+      setMyHolds(mine.data); setHoldStats(data);
+    };
+    loadHolds().catch((e) => { HOLDS.status = "off"; console.warn("hold logs unavailable (run supabase/update_2026_10_23.sql)", e); render(); });
+    setInterval(() => loadHolds().catch(() => {}), 60000);
+    BACKEND.hold = async (pid, climate, result, day) => {
+      const { error } = result
+        ? await client.from("hold_logs").upsert({ logger_id: LIVE.uid, product_id: pid, climate, result, day }, { onConflict: "logger_id,product_id,day" })
+        : await client.from("hold_logs").delete().eq("logger_id", LIVE.uid).eq("product_id", pid).eq("day", day);
+      if (error) throw error;
+      await loadHolds();
+    };
     BACKEND.kind = "supabase";
     BACKEND.save = async (pid, review) => {
       const row = review ? { reviewer_id: LIVE.uid, product_id: pid, ...review } : null;
@@ -1678,6 +1772,20 @@ async function initApi(rc) {
       if (!r.ok) throw new Error("HTTP " + r.status);
       await loadCats();
     };
+    const loadHolds = async () => {
+      const [a, b] = await Promise.all([fetch(base + "/hold-logs/stats"), fetch(`${base}/hold-logs/mine/${encodeURIComponent(rid)}`)]);
+      if (!a.ok || !b.ok) throw new Error("HTTP " + (a.ok ? b.status : a.status));
+      setMyHolds(await b.json()); setHoldStats(await a.json());
+    };
+    loadHolds().catch(() => { HOLDS.status = "off"; render(); });
+    setInterval(() => loadHolds().catch(() => {}), 20000);
+    BACKEND.hold = async (pid, climate, result, day) => {
+      const r = result
+        ? await fetch(base + "/hold-logs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ logger_id: rid, product_id: pid, climate, result, day }) })
+        : await fetch(`${base}/hold-logs/${encodeURIComponent(rid)}/${encodeURIComponent(pid)}/${day}`, { method: "DELETE" });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      await loadHolds();
+    };
     BACKEND.kind = "api";
     BACKEND.save = async (pid, review) => {
       const res = review
@@ -1699,7 +1807,7 @@ async function initLive() {
   const rc = CFG.reviews || {};
   if (rc.backend === "supabase" && rc.supabaseUrl && rc.supabaseAnonKey && await initSupabase(rc)) return;
   if (rc.backend === "api" && rc.apiUrl && await initApi(rc)) return;
-  LIVE.status = "nodb"; CLICKS.status = "off"; VOTES.status = "off"; CATS.status = "off"; render();
+  LIVE.status = "nodb"; CLICKS.status = "off"; VOTES.status = "off"; CATS.status = "off"; HOLDS.status = "off"; render();
 }
 
 function vGoals() {
@@ -1910,6 +2018,7 @@ document.addEventListener("click", (e) => {
   if (d.catcancel) { S.catOpen = ""; render(); return; }
   if (d.catsend) { if (S.catPick) sendCat(d.catsend, S.catPick, (S.catNote || "").trim().slice(0, 200)); return; }
   if (d.catundo) { sendCat(d.catundo, null, ""); return; }
+  if (d.hold) { logHold(S.pid, d.hold); return; }
   if (d.depth) { S.depth = S.depth === d.depth ? "" : d.depth; S.hosu = ""; if (S.draft && !S.draft.skin_depth) S.draft.skin_depth = S.depth || null; render(); return; }
   if (d.tgrp !== undefined) { S.toneGrp = d.tgrp; render(); return; }
   if (d.torigin !== undefined) { S.toneOrigin = d.torigin; render(); return; }

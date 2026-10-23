@@ -335,6 +335,52 @@ def product_climate(product_id: str):
     return cl.for_site(p)
 
 
+class HoldLogIn(BaseModel):
+    logger_id: str
+    product_id: str
+    climate: str
+    result: str
+    day: str | None = None
+
+
+@app.post("/hold-logs", status_code=201)
+def post_hold_log(body: HoldLogIn):
+    """'Did it hold at noon?' One log per person per product per day (a new one replaces it)."""
+    from . import hold_log as hl
+    try:
+        g = hl.make_log(body.model_dump(), set(engine.ds.products))
+    except (hl.HoldLogError, ValueError) as e:
+        raise HTTPException(status_code=400, detail=str(e)) from None
+    store.upsert_hold_log(g)
+    return {"ok": True}
+
+
+@app.delete("/hold-logs/{logger_id}/{product_id}/{day}", status_code=204)
+def delete_hold_log(logger_id: str, product_id: str, day: str):
+    store.delete_hold_log(logger_id, product_id, day)
+
+
+@app.get("/hold-logs/stats")
+def hold_log_stats():
+    from . import hold_log as hl
+    return hl.stats(store.hold_logs())
+
+
+@app.get("/hold-logs/mine/{logger_id}")
+def my_hold_logs(logger_id: str):
+    return [{k: g[k] for k in ("product_id", "climate", "result", "day")} for g in store.hold_logs(logger_id)]
+
+
+@app.get("/hold-logs/check/{climate}")
+def hold_label_check(climate: str):
+    """Of the products the label rates 3, how many did users see break down in this climate?"""
+    from . import climate as cl, hold_log as hl
+    if climate not in cl.CLIMATES:
+        raise HTTPException(status_code=400, detail="unknown climate")
+    hold_of = {pid: cl.hold(p) for pid, p in engine.ds.products.items()}
+    return hl.label_vs_users(hl.stats(store.hold_logs()), hold_of, climate)
+
+
 @app.get("/market/leaders/{market}")
 def market_leaders(market: str, category: str | None = None):
     """Sourced market leaders (awards, bestseller reports) for one country."""

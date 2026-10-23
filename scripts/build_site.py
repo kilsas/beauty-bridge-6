@@ -26,6 +26,7 @@ sys.path.insert(0, str(ROOT))
 from beautybridge import codebook as cb, load_engine  # noqa: E402
 from beautybridge import climate as climate_mod  # noqa: E402
 from beautybridge import skin_depth as depth_mod  # noqa: E402
+from beautybridge import hold_log as hold_mod  # noqa: E402
 from beautybridge.config import FUSION_MODES, FX_RATES_NOTE, FX_TO_USD, SIMILARITY_WEIGHTS  # noqa: E402
 from beautybridge.db import MARKET_DIR  # noqa: E402
 from beautybridge.goals import score_goal  # noqa: E402
@@ -331,7 +332,7 @@ def build(engine, ds_dir) -> dict:
                    "fx": FX_TO_USD, "fxNote": FX_RATES_NOTE},
         "codebook": {"finish": list(cb.FINISH_SCALE), "coverage": list(cb.COVERAGE_SCALE),
                      "intensity": cb.INTENSITY_FEATURES, "groups": cb.CATEGORY_GROUPS,
-                     "skin": cb.SKIN_TYPES, "climates": cb.CLIMATES, "depths": depth_mod.DEPTHS,
+                     "skin": cb.SKIN_TYPES, "climates": cb.CLIMATES, "depths": depth_mod.DEPTHS, "holdMin": hold_mod.MIN_LOGS, "holdBroke": hold_mod.BROKE_BELOW,
                      "hosu": {n: depth_mod.hosu_to_depth(n) for n in depth_mod.HOSU},
                      "climateCut": [round(climate_mod.GOOD * 100), round(climate_mod.OK * 100)]},
         "query": {"intent": search_mod.INTENT_WORDS, "origin": search_mod.ORIGIN_WORDS,

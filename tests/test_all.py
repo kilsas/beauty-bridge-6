@@ -659,6 +659,37 @@ class TestSkinDepth(unittest.TestCase):
             store.upsert(rs[0])
             self.assertEqual(store.all()[0].skin_depth, "tan")
 
+
+class TestHoldLogs(unittest.TestCase):
+    def test_validate_count_and_compare_with_label(self):
+        from beautybridge import hold_log as hl
+        ids = {"R003", "U034"}
+        g = hl.make_log({"logger_id": "a", "product_id": "R003", "climate": "hot_humid", "result": "broke", "day": "2026-10-21"}, ids)
+        self.assertEqual(g["result"], "broke")
+        for bad in ({"result": "melted"}, {"climate": "rainy"}, {"product_id": "X"}, {"day": "21/10/2026"}, {"logger_id": ""}):
+            with self.assertRaises((hl.HoldLogError, ValueError)):
+                hl.make_log({**g, **bad}, ids)
+        logs = [{**g, "logger_id": f"u{i}", "day": f"2026-10-{20 + i:02d}"} for i in range(5)]
+        logs += [{**g, "product_id": "U034", "result": "held", "logger_id": f"u{i}"} for i in range(5)]
+        rows = hl.stats(logs)
+        r003 = next(r for r in rows if r["product_id"] == "R003")
+        self.assertEqual((r003["n"], r003["broke"], r003["first"], r003["last"]), (5, 5, "2026-10-20", "2026-10-24"))
+        chk = hl.label_vs_users(rows, {"R003": 3, "U034": 3}, "hot_humid")
+        self.assertEqual((chk["checked"], chk["broke"], chk["broke_ids"]), (2, 1, ["R003"]))
+        self.assertEqual(hl.label_vs_users(rows[:1], {"R003": 3}, "cold_dry")["checked"], 0)
+
+    def test_store_one_log_per_person_per_day(self):
+        from beautybridge import reviews as rv
+        g = {"logger_id": "a", "product_id": "R003", "climate": "hot_humid", "result": "held", "day": "2026-10-21"}
+        with tempfile.TemporaryDirectory() as d:
+            store = rv.ReviewStore(Path(d) / "r.sqlite")
+            store.upsert_hold_log(g)
+            store.upsert_hold_log({**g, "result": "broke"})
+            store.upsert_hold_log({**g, "day": "2026-10-22"})
+            self.assertEqual(sorted(x["result"] for x in store.hold_logs("a")), ["broke", "held"])
+            store.delete_hold_log("a", "R003", "2026-10-21")
+            self.assertEqual(len(store.hold_logs()), 1)
+
 class TestExpansionCases(unittest.TestCase):
     def test_cases_are_sourced_and_translated(self):
         sys.path.insert(0, str(ROOT / "scripts"))

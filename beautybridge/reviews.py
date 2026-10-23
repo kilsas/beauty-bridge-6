@@ -292,6 +292,17 @@ class ReviewStore:
         PRIMARY KEY (reporter_id, product_id)
     )"""
 
+    HOLDS = """
+    CREATE TABLE IF NOT EXISTS hold_logs (
+        logger_id   TEXT NOT NULL,
+        product_id  TEXT NOT NULL,
+        climate     TEXT NOT NULL,
+        result      TEXT NOT NULL CHECK (result IN ('held','partly','broke')),
+        day         TEXT NOT NULL,
+        created_at  TEXT NOT NULL,
+        PRIMARY KEY (logger_id, product_id, day)
+    )"""
+
     def __init__(self, path):
         import sqlite3
         from pathlib import Path
@@ -301,6 +312,7 @@ class ReviewStore:
         self.conn.execute(self.CLICKS)
         self.conn.execute(self.VOTES)
         self.conn.execute(self.CATEGORY)
+        self.conn.execute(self.HOLDS)
         cols = {r[1] for r in self.conn.execute("PRAGMA table_info(shade_votes)")}
         if "skin_type" not in cols:      # databases created before skin types were added
             self.conn.execute("ALTER TABLE shade_votes ADD COLUMN skin_type TEXT")
@@ -372,4 +384,21 @@ class ReviewStore:
         cols = ("reporter_id", "product_id", "suggested", "note", "created_at")
         q = "SELECT " + ", ".join(cols) + " FROM category_reports"
         cur = self.conn.execute(q + " WHERE reporter_id=?", (reporter_id,)) if reporter_id else self.conn.execute(q)
+        return [dict(zip(cols, row)) for row in cur]
+
+    # "did it hold at noon?": one log per person per product per day
+    def upsert_hold_log(self, g: dict) -> None:
+        self.conn.execute("INSERT OR REPLACE INTO hold_logs VALUES (?,?,?,?,?,?)",
+                          (g["logger_id"], g["product_id"], g["climate"], g["result"], g["day"],
+                           datetime.now(timezone.utc).isoformat(timespec="seconds")))
+        self.conn.commit()
+
+    def delete_hold_log(self, logger_id: str, product_id: str, day: str) -> None:
+        self.conn.execute("DELETE FROM hold_logs WHERE logger_id=? AND product_id=? AND day=?", (logger_id, product_id, day))
+        self.conn.commit()
+
+    def hold_logs(self, logger_id: str | None = None) -> list[dict]:
+        cols = ("logger_id", "product_id", "climate", "result", "day", "created_at")
+        q = "SELECT " + ", ".join(cols) + " FROM hold_logs"
+        cur = self.conn.execute(q + " WHERE logger_id=?", (logger_id,)) if logger_id else self.conn.execute(q)
         return [dict(zip(cols, row)) for row in cur]

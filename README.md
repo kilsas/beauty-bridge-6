@@ -219,6 +219,12 @@ shades from every country that show up well on a chosen depth, and reviews can r
 reviewer's skin depth so readers can filter to people with similar skin (API `GET /reviews?skin_depth=`).
 Swatches are themselves estimates and base products have no shade data, so this is an estimate.
 
+## "Did it hold at noon?" logs
+`beautybridge/hold_log.py`: people log once a day whether a product held until noon in their
+climate (held / partly / broke). The site shows the label estimate and the users' score side by side,
+ranks by the users' score once a product has 5 logs in a climate, and reports how many label-3
+products users saw break down (`supabase/update_2026_10_23.sql`; API `/hold-logs`).
+
 ## ⚠️ Which data is real
 
 - `data/real/`: **real products** (92, from Korea, the USA, Japan, China and
