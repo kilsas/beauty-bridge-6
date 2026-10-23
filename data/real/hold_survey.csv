@@ -1,361 +1,361 @@
-week,entry,day,participant,region,city,product_id,answer_ko,result,result_if_worse,result_if_better,ambiguous
-1,1,2026-08-26,P01,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-1,1,2026-08-26,P02,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-1,1,2026-08-26,P03,KR,Jeju,R028,지속력 좋음 버팀,held,held,held,
-1,1,2026-08-26,P04,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-1,1,2026-08-26,P05,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-1,1,2026-08-26,P06,KR,Busan,R028,지속력 좋음 버팀,held,held,held,
-1,1,2026-08-26,P07,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-1,1,2026-08-26,P08,KR,Daegu,R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
-1,1,2026-08-26,P09,SG,Singapore,R028,지속력 좋음 버팀,held,held,held,
-1,1,2026-08-26,P10,SG,Singapore,R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
-1,2,2026-08-29,P01,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-1,2,2026-08-29,P02,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-1,2,2026-08-29,P03,KR,Jeju,R028,지속력 좋음 버팀,held,held,held,
-1,2,2026-08-29,P04,KR,Daegu,R028,약간 뜸 그래도 괜찮음,partly,partly,partly,
-1,2,2026-08-29,P05,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-1,2,2026-08-29,P06,KR,Busan,R028,지속력 좋음 버팀,held,held,held,
-1,2,2026-08-29,P07,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-1,2,2026-08-29,P08,KR,Daegu,R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
-1,2,2026-08-29,P09,SG,Singapore,R028,지속력 좋음 버팀,held,held,held,
-1,2,2026-08-29,P10,SG,Singapore,R028,괜찮음,held,partly,held,yes
-1,1,2026-08-26,P01,KR,Daegu,R025,괜찮음,held,partly,held,yes
-1,1,2026-08-26,P02,KR,Seoul,R025,괜찮음,held,partly,held,yes
-1,1,2026-08-26,P03,KR,Jeju,R025,약간 무너짐,partly,partly,partly,
-1,1,2026-08-26,P04,KR,Daegu,R025,약간 무너짐,partly,partly,partly,
-1,1,2026-08-26,P05,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-1,1,2026-08-26,P06,KR,Busan,R025,꽤 버팀,held,held,held,
-1,1,2026-08-26,P07,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-1,1,2026-08-26,P08,KR,Daegu,R025,무너짐,broke,broke,broke,
-1,1,2026-08-26,P09,SG,Singapore,R025,밀착력이 떨어짐,partly,broke,partly,yes
-1,1,2026-08-26,P10,SG,Singapore,R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
-1,2,2026-08-29,P01,KR,Daegu,R025,괜찮음,held,partly,held,yes
-1,2,2026-08-29,P02,KR,Seoul,R025,살짝 무너짐,partly,partly,partly,
-1,2,2026-08-29,P03,KR,Jeju,R025,약간 무너짐,partly,partly,partly,
-1,2,2026-08-29,P04,KR,Daegu,R025,괜찮음,held,partly,held,yes
-1,2,2026-08-29,P05,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-1,2,2026-08-29,P06,KR,Busan,R025,꽤 버팀,held,held,held,
-1,2,2026-08-29,P07,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-1,2,2026-08-29,P08,KR,Daegu,R025,약간 무너짐,partly,partly,partly,
-1,2,2026-08-29,P09,SG,Singapore,R025,밀착력이 떨어짐,partly,broke,partly,yes
-1,2,2026-08-29,P10,SG,Singapore,R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
-1,1,2026-08-26,P01,KR,Daegu,J013,살짝 무너짐,partly,partly,partly,
-1,1,2026-08-26,P02,KR,Seoul,J013,지속력 별로,broke,broke,partly,yes
-1,1,2026-08-26,P03,KR,Jeju,J013,무너짐,broke,broke,broke,
-1,1,2026-08-26,P04,KR,Daegu,J013,지속력 무너짐,broke,broke,broke,
-1,1,2026-08-26,P05,KR,Seoul,J013,잘 찍힘,partly,broke,partly,yes
-1,1,2026-08-26,P06,KR,Busan,J013,파우더 안 하면 무너짐,broke,broke,partly,yes
-1,1,2026-08-26,P07,KR,Seoul,J013,무너짐,broke,broke,broke,
-1,1,2026-08-26,P08,KR,Daegu,J013,무너짐,broke,broke,broke,
-1,1,2026-08-26,P09,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-1,1,2026-08-26,P10,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-1,2,2026-08-29,P01,KR,Daegu,J013,지속력 별로,broke,broke,partly,yes
-1,2,2026-08-29,P02,KR,Seoul,J013,지속력 별로,broke,broke,partly,yes
-1,2,2026-08-29,P03,KR,Jeju,J013,지속력 무너짐,broke,broke,broke,
-1,2,2026-08-29,P04,KR,Daegu,J013,지속력 무너짐,broke,broke,broke,
-1,2,2026-08-29,P05,KR,Seoul,J013,잘 찍힘,partly,broke,partly,yes
-1,2,2026-08-29,P06,KR,Busan,J013,파우더 안 하면 무너짐,broke,broke,partly,yes
-1,2,2026-08-29,P07,KR,Seoul,J013,무너짐,broke,broke,broke,
-1,2,2026-08-29,P08,KR,Daegu,J013,무너짐,broke,broke,broke,
-1,2,2026-08-29,P09,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-1,2,2026-08-29,P10,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-2,1,2026-09-01,P01,KR,Daegu,R028,지속력 뭉침 없이 좋음,held,held,held,
-2,1,2026-09-01,P02,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-2,1,2026-09-01,P03,KR,Jeju,R028,지속력 좋음 버팀,held,held,held,
-2,1,2026-09-01,P04,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-2,1,2026-09-01,P05,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-2,1,2026-09-01,P06,KR,Busan,R028,지속력 좋음 버팀,held,held,held,
-2,1,2026-09-01,P07,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-2,1,2026-09-01,P08,KR,Daegu,R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
-2,1,2026-09-01,P09,SG,Singapore,R028,지속력 좋음 버팀,held,held,held,
-2,1,2026-09-01,P10,SG,Singapore,R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
-2,2,2026-09-04,P01,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-2,2,2026-09-04,P02,KR,Seoul,R028,지속력 뭉침 없이 좋음,held,held,held,
-2,2,2026-09-04,P03,KR,Jeju,R028,지속력 좋음 버팀,held,held,held,
-2,2,2026-09-04,P04,KR,Daegu,R028,약간 뜸 그래도 괜찮음,partly,partly,partly,
-2,2,2026-09-04,P05,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-2,2,2026-09-04,P06,KR,Busan,R028,지속력 좋음 버팀,held,held,held,
-2,2,2026-09-04,P07,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-2,2,2026-09-04,P08,KR,Daegu,R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
-2,2,2026-09-04,P09,SG,Singapore,R028,지속력 좋음 버팀,held,held,held,
-2,2,2026-09-04,P10,SG,Singapore,R028,괜찮음,held,partly,held,yes
-2,1,2026-09-01,P01,KR,Daegu,R025,살짝 무너짐,partly,partly,partly,
-2,1,2026-09-01,P02,KR,Seoul,R025,괜찮음,held,partly,held,yes
-2,1,2026-09-01,P03,KR,Jeju,R025,약간 무너짐,partly,partly,partly,
-2,1,2026-09-01,P04,KR,Daegu,R025,약간 무너짐,partly,partly,partly,
-2,1,2026-09-01,P05,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-2,1,2026-09-01,P06,KR,Busan,R025,꽤 버팀,held,held,held,
-2,1,2026-09-01,P07,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-2,1,2026-09-01,P08,KR,Daegu,R025,무너짐,broke,broke,broke,
-2,1,2026-09-01,P09,SG,Singapore,R025,밀착력이 떨어짐,partly,broke,partly,yes
-2,1,2026-09-01,P10,SG,Singapore,R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
-2,2,2026-09-04,P01,KR,Daegu,R025,괜찮음,held,partly,held,yes
-2,2,2026-09-04,P02,KR,Seoul,R025,살짝 무너짐,partly,partly,partly,
-2,2,2026-09-04,P03,KR,Jeju,R025,약간 무너짐,partly,partly,partly,
-2,2,2026-09-04,P04,KR,Daegu,R025,괜찮음,held,partly,held,yes
-2,2,2026-09-04,P05,KR,Seoul,R025,유분이 많으면 밀착역이 줄어듬,partly,broke,partly,yes
-2,2,2026-09-04,P06,KR,Busan,R025,꽤 버팀,held,held,held,
-2,2,2026-09-04,P07,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-2,2,2026-09-04,P08,KR,Daegu,R025,무너짐,broke,broke,broke,
-2,2,2026-09-04,P09,SG,Singapore,R025,밀착력이 떨어짐,partly,broke,partly,yes
-2,2,2026-09-04,P10,SG,Singapore,R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
-2,1,2026-09-01,P01,KR,Daegu,J013,살짝 무너짐,partly,partly,partly,
-2,1,2026-09-01,P02,KR,Seoul,J013,지속력 별로,broke,broke,partly,yes
-2,1,2026-09-01,P03,KR,Jeju,J013,무너짐,broke,broke,broke,
-2,1,2026-09-01,P04,KR,Daegu,J013,지속력 무너짐,broke,broke,broke,
-2,1,2026-09-01,P05,KR,Seoul,J013,잘 찍힘,partly,broke,partly,yes
-2,1,2026-09-01,P06,KR,Busan,J013,파우더 안 하면 무너짐,broke,broke,partly,yes
-2,1,2026-09-01,P07,KR,Seoul,J013,무너짐,broke,broke,broke,
-2,1,2026-09-01,P08,KR,Daegu,J013,무너짐,broke,broke,broke,
-2,1,2026-09-01,P09,SG,Singapore,J013,밀착력이 안좋음 무너짐,broke,broke,broke,
-2,1,2026-09-01,P10,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-2,2,2026-09-04,P01,KR,Daegu,J013,지속력 별로,broke,broke,partly,yes
-2,2,2026-09-04,P02,KR,Seoul,J013,밀착력이 안좋음 무너짐,broke,broke,broke,
-2,2,2026-09-04,P03,KR,Jeju,J013,지속력 무너짐,broke,broke,broke,
-2,2,2026-09-04,P04,KR,Daegu,J013,지속력 무너짐,broke,broke,broke,
-2,2,2026-09-04,P05,KR,Seoul,J013,밀착력이 안좋음 무너짐,broke,broke,broke,
-2,2,2026-09-04,P06,KR,Busan,J013,파우더 안 하면 무너짐,broke,broke,partly,yes
-2,2,2026-09-04,P07,KR,Seoul,J013,무너짐,broke,broke,broke,
-2,2,2026-09-04,P08,KR,Daegu,J013,무너짐,broke,broke,broke,
-2,2,2026-09-04,P09,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-2,2,2026-09-04,P10,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-3,1,2026-09-10,P01,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-3,1,2026-09-10,P02,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-3,1,2026-09-10,P03,KR,Jeju,R028,지속력 좋음 버팀,held,held,held,
-3,1,2026-09-10,P04,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-3,1,2026-09-10,P05,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-3,1,2026-09-10,P06,KR,Busan,R028,지속력 좋음 버팀,held,held,held,
-3,1,2026-09-10,P07,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-3,1,2026-09-10,P08,KR,Daegu,R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
-3,1,2026-09-10,P09,SG,Singapore,R028,지속력 좋음 버팀,held,held,held,
-3,1,2026-09-10,P10,SG,Singapore,R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
-3,2,2026-09-12,P01,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-3,2,2026-09-12,P02,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-3,2,2026-09-12,P03,KR,Jeju,R028,지속력 좋음 버팀,held,held,held,
-3,2,2026-09-12,P04,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-3,2,2026-09-12,P05,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-3,2,2026-09-12,P06,KR,Busan,R028,지속력 좋음 버팀,held,held,held,
-3,2,2026-09-12,P07,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-3,2,2026-09-12,P08,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-3,2,2026-09-12,P09,SG,Singapore,R028,지속력 좋음 버팀,held,held,held,
-3,2,2026-09-12,P10,SG,Singapore,R028,괜찮음,held,partly,held,yes
-3,1,2026-09-10,P01,KR,Daegu,R025,괜찮음,held,partly,held,yes
-3,1,2026-09-10,P02,KR,Seoul,R025,괜찮음,held,partly,held,yes
-3,1,2026-09-10,P03,KR,Jeju,R025,약간 무너짐,partly,partly,partly,
-3,1,2026-09-10,P04,KR,Daegu,R025,약간 무너짐,partly,partly,partly,
-3,1,2026-09-10,P05,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-3,1,2026-09-10,P06,KR,Busan,R025,꽤 버팀,held,held,held,
-3,1,2026-09-10,P07,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-3,1,2026-09-10,P08,KR,Daegu,R025,무너짐,broke,broke,broke,
-3,1,2026-09-10,P09,SG,Singapore,R025,밀착력이 떨어짐,partly,broke,partly,yes
-3,1,2026-09-10,P10,SG,Singapore,R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
-3,2,2026-09-12,P01,KR,Daegu,R025,약간 무너짐,partly,partly,partly,
-3,2,2026-09-12,P02,KR,Seoul,R025,살짝 무너짐,partly,partly,partly,
-3,2,2026-09-12,P03,KR,Jeju,R025,약간 무너짐,partly,partly,partly,
-3,2,2026-09-12,P04,KR,Daegu,R025,괜찮음,held,partly,held,yes
-3,2,2026-09-12,P05,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-3,2,2026-09-12,P06,KR,Busan,R025,무너짐,broke,broke,broke,
-3,2,2026-09-12,P07,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-3,2,2026-09-12,P08,KR,Daegu,R025,약간 무너짐,partly,partly,partly,
-3,2,2026-09-12,P09,SG,Singapore,R025,밀착력이 떨어짐,partly,broke,partly,yes
-3,2,2026-09-12,P10,SG,Singapore,R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
-3,1,2026-09-10,P01,KR,Daegu,J013,살짝 무너짐,partly,partly,partly,
-3,1,2026-09-10,P02,KR,Seoul,J013,지속력 별로,broke,broke,partly,yes
-3,1,2026-09-10,P03,KR,Jeju,J013,무너짐,broke,broke,broke,
-3,1,2026-09-10,P04,KR,Daegu,J013,지속력 무너짐,broke,broke,broke,
-3,1,2026-09-10,P05,KR,Seoul,J013,잘 찍힘,partly,broke,partly,yes
-3,1,2026-09-10,P06,KR,Busan,J013,파우더 안 하면 무너짐,broke,broke,partly,yes
-3,1,2026-09-10,P07,KR,Seoul,J013,무너짐,broke,broke,broke,
-3,1,2026-09-10,P08,KR,Daegu,J013,무너짐,broke,broke,broke,
-3,1,2026-09-10,P09,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-3,1,2026-09-10,P10,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-3,2,2026-09-12,P01,KR,Daegu,J013,지속력 별로,broke,broke,partly,yes
-3,2,2026-09-12,P02,KR,Seoul,J013,무너짐,broke,broke,broke,
-3,2,2026-09-12,P03,KR,Jeju,J013,지속력 무너짐,broke,broke,broke,
-3,2,2026-09-12,P04,KR,Daegu,J013,지속력 무너짐,broke,broke,broke,
-3,2,2026-09-12,P05,KR,Seoul,J013,잘 찍힘,partly,broke,partly,yes
-3,2,2026-09-12,P06,KR,Busan,J013,무너짐,broke,broke,broke,
-3,2,2026-09-12,P07,KR,Seoul,J013,무너짐,broke,broke,broke,
-3,2,2026-09-12,P08,KR,Daegu,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-3,2,2026-09-12,P09,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-3,2,2026-09-12,P10,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-4,1,2026-09-16,P01,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-4,1,2026-09-16,P02,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-4,1,2026-09-16,P03,KR,Jeju,R028,지속력 좋음 버팀,held,held,held,
-4,1,2026-09-16,P04,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-4,1,2026-09-16,P05,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-4,1,2026-09-16,P06,KR,Busan,R028,지속력 좋음 버팀,held,held,held,
-4,1,2026-09-16,P07,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-4,1,2026-09-16,P08,KR,Daegu,R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
-4,1,2026-09-16,P09,SG,Singapore,R028,지속력 좋음 버팀,held,held,held,
-4,1,2026-09-16,P10,SG,Singapore,R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
-4,2,2026-09-19,P01,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-4,2,2026-09-19,P02,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-4,2,2026-09-19,P03,KR,Jeju,R028,지속력 좋음 버팀,held,held,held,
-4,2,2026-09-19,P04,KR,Daegu,R028,약간 뜸 그래도 괜찮음,partly,partly,partly,
-4,2,2026-09-19,P05,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-4,2,2026-09-19,P06,KR,Busan,R028,지속력 좋음 버팀,held,held,held,
-4,2,2026-09-19,P07,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-4,2,2026-09-19,P08,KR,Daegu,R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
-4,2,2026-09-19,P09,SG,Singapore,R028,지속력 좋음 버팀,held,held,held,
-4,2,2026-09-19,P10,SG,Singapore,R028,괜찮음,held,partly,held,yes
-4,1,2026-09-16,P01,KR,Daegu,R025,괜찮음,held,partly,held,yes
-4,1,2026-09-16,P02,KR,Seoul,R025,괜찮음,held,partly,held,yes
-4,1,2026-09-16,P03,KR,Jeju,R025,약간 무너짐,partly,partly,partly,
-4,1,2026-09-16,P04,KR,Daegu,R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
-4,1,2026-09-16,P05,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-4,1,2026-09-16,P06,KR,Busan,R025,꽤 버팀,held,held,held,
-4,1,2026-09-16,P07,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-4,1,2026-09-16,P08,KR,Daegu,R025,무너짐,broke,broke,broke,
-4,1,2026-09-16,P09,SG,Singapore,R025,밀착력이 떨어짐,partly,broke,partly,yes
-4,1,2026-09-16,P10,SG,Singapore,R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
-4,2,2026-09-19,P01,KR,Daegu,R025,지속력 좋음 버팀,held,held,held,
-4,2,2026-09-19,P02,KR,Seoul,R025,살짝 무너짐,partly,partly,partly,
-4,2,2026-09-19,P03,KR,Jeju,R025,약간 무너짐,partly,partly,partly,
-4,2,2026-09-19,P04,KR,Daegu,R025,괜찮음,held,partly,held,yes
-4,2,2026-09-19,P05,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-4,2,2026-09-19,P06,KR,Busan,R025,꽤 버팀,held,held,held,
-4,2,2026-09-19,P07,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-4,2,2026-09-19,P08,KR,Daegu,R025,약간 무너짐,partly,partly,partly,
-4,2,2026-09-19,P09,SG,Singapore,R025,밀착력이 떨어짐,partly,broke,partly,yes
-4,2,2026-09-19,P10,SG,Singapore,R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
-4,1,2026-09-16,P01,KR,Daegu,J013,살짝 무너짐,partly,partly,partly,
-4,1,2026-09-16,P02,KR,Seoul,J013,지속력 별로,broke,broke,partly,yes
-4,1,2026-09-16,P03,KR,Jeju,J013,무너짐,broke,broke,broke,
-4,1,2026-09-16,P04,KR,Daegu,J013,지속력 무너짐,broke,broke,broke,
-4,1,2026-09-16,P05,KR,Seoul,J013,잘 찍힘,partly,broke,partly,yes
-4,1,2026-09-16,P06,KR,Busan,J013,파우더 안 하면 무너짐,broke,broke,partly,yes
-4,1,2026-09-16,P07,KR,Seoul,J013,무너짐,broke,broke,broke,
-4,1,2026-09-16,P08,KR,Daegu,J013,무너짐,broke,broke,broke,
-4,1,2026-09-16,P09,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-4,1,2026-09-16,P10,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-4,2,2026-09-19,P01,KR,Daegu,J013,지속력 별로,broke,broke,partly,yes
-4,2,2026-09-19,P02,KR,Seoul,J013,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
-4,2,2026-09-19,P03,KR,Jeju,J013,지속력 무너짐,broke,broke,broke,
-4,2,2026-09-19,P04,KR,Daegu,J013,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
-4,2,2026-09-19,P05,KR,Seoul,J013,잘 찍힘,partly,broke,partly,yes
-4,2,2026-09-19,P06,KR,Busan,J013,파우더 안 하면 무너짐,broke,broke,partly,yes
-4,2,2026-09-19,P07,KR,Seoul,J013,무너짐,broke,broke,broke,
-4,2,2026-09-19,P08,KR,Daegu,J013,무너짐,broke,broke,broke,
-4,2,2026-09-19,P09,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-4,2,2026-09-19,P10,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-5,1,2026-09-21,P01,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-5,1,2026-09-21,P02,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-5,1,2026-09-21,P03,KR,Jeju,R028,지속력 좋음 버팀,held,held,held,
-5,1,2026-09-21,P04,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-5,1,2026-09-21,P05,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-5,1,2026-09-21,P06,KR,Busan,R028,지속력 좋음 버팀,held,held,held,
-5,1,2026-09-21,P07,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-5,1,2026-09-21,P08,KR,Daegu,R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
-5,1,2026-09-21,P09,SG,Singapore,R028,지속력 좋음 버팀,held,held,held,
-5,1,2026-09-21,P10,SG,Singapore,R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
-5,2,2026-09-26,P01,KR,Daegu,R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
-5,2,2026-09-26,P02,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-5,2,2026-09-26,P03,KR,Jeju,R028,지속력 좋음 버팀,held,held,held,
-5,2,2026-09-26,P04,KR,Daegu,R028,약간 뜸 그래도 괜찮음,partly,partly,partly,
-5,2,2026-09-26,P05,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-5,2,2026-09-26,P06,KR,Busan,R028,지속력 좋음 버팀,held,held,held,
-5,2,2026-09-26,P07,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-5,2,2026-09-26,P08,KR,Daegu,R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
-5,2,2026-09-26,P09,SG,Singapore,R028,지속력 좋음 버팀,held,held,held,
-5,2,2026-09-26,P10,SG,Singapore,R028,괜찮음,held,partly,held,yes
-5,1,2026-09-21,P01,KR,Daegu,R025,괜찮음,held,partly,held,yes
-5,1,2026-09-21,P02,KR,Seoul,R025,괜찮음,held,partly,held,yes
-5,1,2026-09-21,P03,KR,Jeju,R025,약간 무너짐,partly,partly,partly,
-5,1,2026-09-21,P04,KR,Daegu,R025,약간 무너짐,partly,partly,partly,
-5,1,2026-09-21,P05,KR,Seoul,R025,꽤 버팀,held,held,held,
-5,1,2026-09-21,P06,KR,Busan,R025,약간 무너짐,partly,partly,partly,
-5,1,2026-09-21,P07,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-5,1,2026-09-21,P08,KR,Daegu,R025,무너짐,broke,broke,broke,
-5,1,2026-09-21,P09,SG,Singapore,R025,밀착력이 떨어짐,partly,broke,partly,yes
-5,1,2026-09-21,P10,SG,Singapore,R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
-5,2,2026-09-26,P01,KR,Daegu,R025,괜찮음,held,partly,held,yes
-5,2,2026-09-26,P02,KR,Seoul,R025,살짝 무너짐,partly,partly,partly,
-5,2,2026-09-26,P03,KR,Jeju,R025,약간 무너짐,partly,partly,partly,
-5,2,2026-09-26,P04,KR,Daegu,R025,괜찮음,held,partly,held,yes
-5,2,2026-09-26,P05,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-5,2,2026-09-26,P06,KR,Busan,R025,꽤 버팀,held,held,held,
-5,2,2026-09-26,P07,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-5,2,2026-09-26,P08,KR,Daegu,R025,약간 무너짐,partly,partly,partly,
-5,2,2026-09-26,P09,SG,Singapore,R025,밀착력이 떨어짐,partly,broke,partly,yes
-5,2,2026-09-26,P10,SG,Singapore,R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
-5,1,2026-09-21,P01,KR,Daegu,J013,살짝 무너짐,partly,partly,partly,
-5,1,2026-09-21,P02,KR,Seoul,J013,지속력 별로,broke,broke,partly,yes
-5,1,2026-09-21,P03,KR,Jeju,J013,무너짐,broke,broke,broke,
-5,1,2026-09-21,P04,KR,Daegu,J013,지속력 무너짐,broke,broke,broke,
-5,1,2026-09-21,P05,KR,Seoul,J013,잘 찍힘,partly,broke,partly,yes
-5,1,2026-09-21,P06,KR,Busan,J013,파우더 안 하면 무너짐,broke,broke,partly,yes
-5,1,2026-09-21,P07,KR,Seoul,J013,무너짐,broke,broke,broke,
-5,1,2026-09-21,P08,KR,Daegu,J013,무너짐,broke,broke,broke,
-5,1,2026-09-21,P09,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-5,1,2026-09-21,P10,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-5,2,2026-09-26,P01,KR,Daegu,J013,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
-5,2,2026-09-26,P02,KR,Seoul,J013,지속력 별로,broke,broke,partly,yes
-5,2,2026-09-26,P03,KR,Jeju,J013,지속력 무너짐,broke,broke,broke,
-5,2,2026-09-26,P04,KR,Daegu,J013,지속력 무너짐,broke,broke,broke,
-5,2,2026-09-26,P05,KR,Seoul,J013,잘 찍힘,partly,broke,partly,yes
-5,2,2026-09-26,P06,KR,Busan,J013,파우더 안 하면 무너짐,broke,broke,partly,yes
-5,2,2026-09-26,P07,KR,Seoul,J013,무너짐,broke,broke,broke,
-5,2,2026-09-26,P08,KR,Daegu,J013,무너짐,broke,broke,broke,
-5,2,2026-09-26,P09,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-5,2,2026-09-26,P10,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-6,1,2026-09-30,P01,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-6,1,2026-09-30,P02,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-6,1,2026-09-30,P03,KR,Jeju,R028,지속력 좋음 버팀,held,held,held,
-6,1,2026-09-30,P04,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-6,1,2026-09-30,P05,KR,Seoul,R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
-6,1,2026-09-30,P06,KR,Busan,R028,지속력 좋음 버팀,held,held,held,
-6,1,2026-09-30,P07,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-6,1,2026-09-30,P08,KR,Daegu,R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
-6,1,2026-09-30,P09,SG,Singapore,R028,지속력 좋음 버팀,held,held,held,
-6,1,2026-09-30,P10,SG,Singapore,R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
-6,2,2026-10-03,P01,KR,Daegu,R028,지속력 좋음 버팀,held,held,held,
-6,2,2026-10-03,P02,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-6,2,2026-10-03,P03,KR,Jeju,R028,지속력 좋음 버팀,held,held,held,
-6,2,2026-10-03,P04,KR,Daegu,R028,약간 뜸 그래도 괜찮음,partly,partly,partly,
-6,2,2026-10-03,P05,KR,Seoul,R028,지속력 좋음 버팀,held,held,held,
-6,2,2026-10-03,P06,KR,Busan,R028,지속력 좋음 버팀,held,held,held,
-6,2,2026-10-03,P07,KR,Seoul,R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
-6,2,2026-10-03,P08,KR,Daegu,R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
-6,2,2026-10-03,P09,SG,Singapore,R028,지속력 좋음 버팀,held,held,held,
-6,2,2026-10-03,P10,SG,Singapore,R028,괜찮음,held,partly,held,yes
-6,1,2026-09-30,P01,KR,Daegu,R025,살짝 무너짐,partly,partly,partly,
-6,1,2026-09-30,P02,KR,Seoul,R025,괜찮음,held,partly,held,yes
-6,1,2026-09-30,P03,KR,Jeju,R025,약간 무너짐,partly,partly,partly,
-6,1,2026-09-30,P04,KR,Daegu,R025,약간 무너짐,partly,partly,partly,
-6,1,2026-09-30,P05,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-6,1,2026-09-30,P06,KR,Busan,R025,살짝 무너짐,partly,partly,partly,
-6,1,2026-09-30,P07,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-6,1,2026-09-30,P08,KR,Daegu,R025,무너짐,broke,broke,broke,
-6,1,2026-09-30,P09,SG,Singapore,R025,밀착력이 떨어짐,partly,broke,partly,yes
-6,1,2026-09-30,P10,SG,Singapore,R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
-6,2,2026-10-03,P01,KR,Daegu,R025,괜찮음,held,partly,held,yes
-6,2,2026-10-03,P02,KR,Seoul,R025,살짝 무너짐,partly,partly,partly,
-6,2,2026-10-03,P03,KR,Jeju,R025,약간 무너짐,partly,partly,partly,
-6,2,2026-10-03,P04,KR,Daegu,R025,괜찮음,held,partly,held,yes
-6,2,2026-10-03,P05,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-6,2,2026-10-03,P06,KR,Busan,R025,꽤 버팀,held,held,held,
-6,2,2026-10-03,P07,KR,Seoul,R025,약간 무너짐,partly,partly,partly,
-6,2,2026-10-03,P08,KR,Daegu,R025,약간 무너짐,partly,partly,partly,
-6,2,2026-10-03,P09,SG,Singapore,R025,밀착력이 떨어짐,partly,broke,partly,yes
-6,2,2026-10-03,P10,SG,Singapore,R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
-6,1,2026-09-30,P01,KR,Daegu,J013,살짝 무너짐,partly,partly,partly,
-6,1,2026-09-30,P02,KR,Seoul,J013,지속력 별로,broke,broke,partly,yes
-6,1,2026-09-30,P03,KR,Jeju,J013,무너짐,broke,broke,broke,
-6,1,2026-09-30,P04,KR,Daegu,J013,약간 무너짐,partly,partly,partly,
-6,1,2026-09-30,P05,KR,Seoul,J013,약간 무너짐,partly,partly,partly,
-6,1,2026-09-30,P06,KR,Busan,J013,파우더 안 하면 무너짐,broke,broke,partly,yes
-6,1,2026-09-30,P07,KR,Seoul,J013,약간 무너짐,partly,partly,partly,
-6,1,2026-09-30,P08,KR,Daegu,J013,무너짐,broke,broke,broke,
-6,1,2026-09-30,P09,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-6,1,2026-09-30,P10,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-6,2,2026-10-03,P01,KR,Daegu,J013,지속력 별로,broke,broke,partly,yes
-6,2,2026-10-03,P02,KR,Seoul,J013,지속력 별로,broke,broke,partly,yes
-6,2,2026-10-03,P03,KR,Jeju,J013,지속력 무너짐,broke,broke,broke,
-6,2,2026-10-03,P04,KR,Daegu,J013,지속력 무너짐,broke,broke,broke,
-6,2,2026-10-03,P05,KR,Seoul,J013,약간 무너짐,partly,partly,partly,
-6,2,2026-10-03,P06,KR,Busan,J013,파우더 안 하면 무너짐,broke,broke,partly,yes
-6,2,2026-10-03,P07,KR,Seoul,J013,무너짐,broke,broke,broke,
-6,2,2026-10-03,P08,KR,Daegu,J013,약간 무너짐,partly,partly,partly,
-6,2,2026-10-03,P09,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
-6,2,2026-10-03,P10,SG,Singapore,J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+week,entry,day,participant,region,city,skin,product_id,answer_ko,result,result_if_worse,result_if_better,ambiguous
+1,1,2026-08-26,P01,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+1,1,2026-08-26,P02,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+1,1,2026-08-26,P03,KR,Jeju,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+1,1,2026-08-26,P04,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+1,1,2026-08-26,P05,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+1,1,2026-08-26,P06,KR,Busan,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+1,1,2026-08-26,P07,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+1,1,2026-08-26,P08,KR,Daegu,dehydrated oily (수부지),R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
+1,1,2026-08-26,P09,SG,Singapore,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+1,1,2026-08-26,P10,SG,Singapore,dehydrated oily (수부지),R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
+1,2,2026-08-29,P01,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+1,2,2026-08-29,P02,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+1,2,2026-08-29,P03,KR,Jeju,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+1,2,2026-08-29,P04,KR,Daegu,dehydrated oily (수부지),R028,약간 뜸 그래도 괜찮음,partly,partly,partly,
+1,2,2026-08-29,P05,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+1,2,2026-08-29,P06,KR,Busan,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+1,2,2026-08-29,P07,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+1,2,2026-08-29,P08,KR,Daegu,dehydrated oily (수부지),R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
+1,2,2026-08-29,P09,SG,Singapore,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+1,2,2026-08-29,P10,SG,Singapore,dehydrated oily (수부지),R028,괜찮음,held,partly,held,yes
+1,1,2026-08-26,P01,KR,Daegu,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+1,1,2026-08-26,P02,KR,Seoul,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+1,1,2026-08-26,P03,KR,Jeju,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+1,1,2026-08-26,P04,KR,Daegu,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+1,1,2026-08-26,P05,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+1,1,2026-08-26,P06,KR,Busan,dehydrated oily (수부지),R025,꽤 버팀,held,held,held,
+1,1,2026-08-26,P07,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+1,1,2026-08-26,P08,KR,Daegu,dehydrated oily (수부지),R025,무너짐,broke,broke,broke,
+1,1,2026-08-26,P09,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어짐,partly,broke,partly,yes
+1,1,2026-08-26,P10,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
+1,2,2026-08-29,P01,KR,Daegu,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+1,2,2026-08-29,P02,KR,Seoul,dehydrated oily (수부지),R025,살짝 무너짐,partly,partly,partly,
+1,2,2026-08-29,P03,KR,Jeju,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+1,2,2026-08-29,P04,KR,Daegu,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+1,2,2026-08-29,P05,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+1,2,2026-08-29,P06,KR,Busan,dehydrated oily (수부지),R025,꽤 버팀,held,held,held,
+1,2,2026-08-29,P07,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+1,2,2026-08-29,P08,KR,Daegu,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+1,2,2026-08-29,P09,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어짐,partly,broke,partly,yes
+1,2,2026-08-29,P10,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
+1,1,2026-08-26,P01,KR,Daegu,dehydrated oily (수부지),J013,살짝 무너짐,partly,partly,partly,
+1,1,2026-08-26,P02,KR,Seoul,dehydrated oily (수부지),J013,지속력 별로,broke,broke,partly,yes
+1,1,2026-08-26,P03,KR,Jeju,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+1,1,2026-08-26,P04,KR,Daegu,dehydrated oily (수부지),J013,지속력 무너짐,broke,broke,broke,
+1,1,2026-08-26,P05,KR,Seoul,dehydrated oily (수부지),J013,잘 찍힘,partly,broke,partly,yes
+1,1,2026-08-26,P06,KR,Busan,dehydrated oily (수부지),J013,파우더 안 하면 무너짐,broke,broke,partly,yes
+1,1,2026-08-26,P07,KR,Seoul,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+1,1,2026-08-26,P08,KR,Daegu,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+1,1,2026-08-26,P09,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+1,1,2026-08-26,P10,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+1,2,2026-08-29,P01,KR,Daegu,dehydrated oily (수부지),J013,지속력 별로,broke,broke,partly,yes
+1,2,2026-08-29,P02,KR,Seoul,dehydrated oily (수부지),J013,지속력 별로,broke,broke,partly,yes
+1,2,2026-08-29,P03,KR,Jeju,dehydrated oily (수부지),J013,지속력 무너짐,broke,broke,broke,
+1,2,2026-08-29,P04,KR,Daegu,dehydrated oily (수부지),J013,지속력 무너짐,broke,broke,broke,
+1,2,2026-08-29,P05,KR,Seoul,dehydrated oily (수부지),J013,잘 찍힘,partly,broke,partly,yes
+1,2,2026-08-29,P06,KR,Busan,dehydrated oily (수부지),J013,파우더 안 하면 무너짐,broke,broke,partly,yes
+1,2,2026-08-29,P07,KR,Seoul,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+1,2,2026-08-29,P08,KR,Daegu,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+1,2,2026-08-29,P09,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+1,2,2026-08-29,P10,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+2,1,2026-09-01,P01,KR,Daegu,dehydrated oily (수부지),R028,지속력 뭉침 없이 좋음,held,held,held,
+2,1,2026-09-01,P02,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+2,1,2026-09-01,P03,KR,Jeju,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+2,1,2026-09-01,P04,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+2,1,2026-09-01,P05,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+2,1,2026-09-01,P06,KR,Busan,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+2,1,2026-09-01,P07,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+2,1,2026-09-01,P08,KR,Daegu,dehydrated oily (수부지),R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
+2,1,2026-09-01,P09,SG,Singapore,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+2,1,2026-09-01,P10,SG,Singapore,dehydrated oily (수부지),R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
+2,2,2026-09-04,P01,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+2,2,2026-09-04,P02,KR,Seoul,dehydrated oily (수부지),R028,지속력 뭉침 없이 좋음,held,held,held,
+2,2,2026-09-04,P03,KR,Jeju,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+2,2,2026-09-04,P04,KR,Daegu,dehydrated oily (수부지),R028,약간 뜸 그래도 괜찮음,partly,partly,partly,
+2,2,2026-09-04,P05,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+2,2,2026-09-04,P06,KR,Busan,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+2,2,2026-09-04,P07,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+2,2,2026-09-04,P08,KR,Daegu,dehydrated oily (수부지),R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
+2,2,2026-09-04,P09,SG,Singapore,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+2,2,2026-09-04,P10,SG,Singapore,dehydrated oily (수부지),R028,괜찮음,held,partly,held,yes
+2,1,2026-09-01,P01,KR,Daegu,dehydrated oily (수부지),R025,살짝 무너짐,partly,partly,partly,
+2,1,2026-09-01,P02,KR,Seoul,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+2,1,2026-09-01,P03,KR,Jeju,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+2,1,2026-09-01,P04,KR,Daegu,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+2,1,2026-09-01,P05,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+2,1,2026-09-01,P06,KR,Busan,dehydrated oily (수부지),R025,꽤 버팀,held,held,held,
+2,1,2026-09-01,P07,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+2,1,2026-09-01,P08,KR,Daegu,dehydrated oily (수부지),R025,무너짐,broke,broke,broke,
+2,1,2026-09-01,P09,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어짐,partly,broke,partly,yes
+2,1,2026-09-01,P10,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
+2,2,2026-09-04,P01,KR,Daegu,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+2,2,2026-09-04,P02,KR,Seoul,dehydrated oily (수부지),R025,살짝 무너짐,partly,partly,partly,
+2,2,2026-09-04,P03,KR,Jeju,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+2,2,2026-09-04,P04,KR,Daegu,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+2,2,2026-09-04,P05,KR,Seoul,dehydrated oily (수부지),R025,유분이 많으면 밀착역이 줄어듬,partly,broke,partly,yes
+2,2,2026-09-04,P06,KR,Busan,dehydrated oily (수부지),R025,꽤 버팀,held,held,held,
+2,2,2026-09-04,P07,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+2,2,2026-09-04,P08,KR,Daegu,dehydrated oily (수부지),R025,무너짐,broke,broke,broke,
+2,2,2026-09-04,P09,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어짐,partly,broke,partly,yes
+2,2,2026-09-04,P10,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
+2,1,2026-09-01,P01,KR,Daegu,dehydrated oily (수부지),J013,살짝 무너짐,partly,partly,partly,
+2,1,2026-09-01,P02,KR,Seoul,dehydrated oily (수부지),J013,지속력 별로,broke,broke,partly,yes
+2,1,2026-09-01,P03,KR,Jeju,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+2,1,2026-09-01,P04,KR,Daegu,dehydrated oily (수부지),J013,지속력 무너짐,broke,broke,broke,
+2,1,2026-09-01,P05,KR,Seoul,dehydrated oily (수부지),J013,잘 찍힘,partly,broke,partly,yes
+2,1,2026-09-01,P06,KR,Busan,dehydrated oily (수부지),J013,파우더 안 하면 무너짐,broke,broke,partly,yes
+2,1,2026-09-01,P07,KR,Seoul,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+2,1,2026-09-01,P08,KR,Daegu,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+2,1,2026-09-01,P09,SG,Singapore,dehydrated oily (수부지),J013,밀착력이 안좋음 무너짐,broke,broke,broke,
+2,1,2026-09-01,P10,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+2,2,2026-09-04,P01,KR,Daegu,dehydrated oily (수부지),J013,지속력 별로,broke,broke,partly,yes
+2,2,2026-09-04,P02,KR,Seoul,dehydrated oily (수부지),J013,밀착력이 안좋음 무너짐,broke,broke,broke,
+2,2,2026-09-04,P03,KR,Jeju,dehydrated oily (수부지),J013,지속력 무너짐,broke,broke,broke,
+2,2,2026-09-04,P04,KR,Daegu,dehydrated oily (수부지),J013,지속력 무너짐,broke,broke,broke,
+2,2,2026-09-04,P05,KR,Seoul,dehydrated oily (수부지),J013,밀착력이 안좋음 무너짐,broke,broke,broke,
+2,2,2026-09-04,P06,KR,Busan,dehydrated oily (수부지),J013,파우더 안 하면 무너짐,broke,broke,partly,yes
+2,2,2026-09-04,P07,KR,Seoul,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+2,2,2026-09-04,P08,KR,Daegu,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+2,2,2026-09-04,P09,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+2,2,2026-09-04,P10,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+3,1,2026-09-10,P01,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,1,2026-09-10,P02,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,1,2026-09-10,P03,KR,Jeju,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,1,2026-09-10,P04,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,1,2026-09-10,P05,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,1,2026-09-10,P06,KR,Busan,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,1,2026-09-10,P07,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,1,2026-09-10,P08,KR,Daegu,dehydrated oily (수부지),R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
+3,1,2026-09-10,P09,SG,Singapore,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,1,2026-09-10,P10,SG,Singapore,dehydrated oily (수부지),R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
+3,2,2026-09-12,P01,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,2,2026-09-12,P02,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,2,2026-09-12,P03,KR,Jeju,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,2,2026-09-12,P04,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,2,2026-09-12,P05,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,2,2026-09-12,P06,KR,Busan,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,2,2026-09-12,P07,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,2,2026-09-12,P08,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,2,2026-09-12,P09,SG,Singapore,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+3,2,2026-09-12,P10,SG,Singapore,dehydrated oily (수부지),R028,괜찮음,held,partly,held,yes
+3,1,2026-09-10,P01,KR,Daegu,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+3,1,2026-09-10,P02,KR,Seoul,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+3,1,2026-09-10,P03,KR,Jeju,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+3,1,2026-09-10,P04,KR,Daegu,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+3,1,2026-09-10,P05,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+3,1,2026-09-10,P06,KR,Busan,dehydrated oily (수부지),R025,꽤 버팀,held,held,held,
+3,1,2026-09-10,P07,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+3,1,2026-09-10,P08,KR,Daegu,dehydrated oily (수부지),R025,무너짐,broke,broke,broke,
+3,1,2026-09-10,P09,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어짐,partly,broke,partly,yes
+3,1,2026-09-10,P10,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
+3,2,2026-09-12,P01,KR,Daegu,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+3,2,2026-09-12,P02,KR,Seoul,dehydrated oily (수부지),R025,살짝 무너짐,partly,partly,partly,
+3,2,2026-09-12,P03,KR,Jeju,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+3,2,2026-09-12,P04,KR,Daegu,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+3,2,2026-09-12,P05,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+3,2,2026-09-12,P06,KR,Busan,dehydrated oily (수부지),R025,무너짐,broke,broke,broke,
+3,2,2026-09-12,P07,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+3,2,2026-09-12,P08,KR,Daegu,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+3,2,2026-09-12,P09,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어짐,partly,broke,partly,yes
+3,2,2026-09-12,P10,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
+3,1,2026-09-10,P01,KR,Daegu,dehydrated oily (수부지),J013,살짝 무너짐,partly,partly,partly,
+3,1,2026-09-10,P02,KR,Seoul,dehydrated oily (수부지),J013,지속력 별로,broke,broke,partly,yes
+3,1,2026-09-10,P03,KR,Jeju,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+3,1,2026-09-10,P04,KR,Daegu,dehydrated oily (수부지),J013,지속력 무너짐,broke,broke,broke,
+3,1,2026-09-10,P05,KR,Seoul,dehydrated oily (수부지),J013,잘 찍힘,partly,broke,partly,yes
+3,1,2026-09-10,P06,KR,Busan,dehydrated oily (수부지),J013,파우더 안 하면 무너짐,broke,broke,partly,yes
+3,1,2026-09-10,P07,KR,Seoul,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+3,1,2026-09-10,P08,KR,Daegu,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+3,1,2026-09-10,P09,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+3,1,2026-09-10,P10,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+3,2,2026-09-12,P01,KR,Daegu,dehydrated oily (수부지),J013,지속력 별로,broke,broke,partly,yes
+3,2,2026-09-12,P02,KR,Seoul,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+3,2,2026-09-12,P03,KR,Jeju,dehydrated oily (수부지),J013,지속력 무너짐,broke,broke,broke,
+3,2,2026-09-12,P04,KR,Daegu,dehydrated oily (수부지),J013,지속력 무너짐,broke,broke,broke,
+3,2,2026-09-12,P05,KR,Seoul,dehydrated oily (수부지),J013,잘 찍힘,partly,broke,partly,yes
+3,2,2026-09-12,P06,KR,Busan,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+3,2,2026-09-12,P07,KR,Seoul,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+3,2,2026-09-12,P08,KR,Daegu,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+3,2,2026-09-12,P09,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+3,2,2026-09-12,P10,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+4,1,2026-09-16,P01,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+4,1,2026-09-16,P02,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+4,1,2026-09-16,P03,KR,Jeju,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+4,1,2026-09-16,P04,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+4,1,2026-09-16,P05,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+4,1,2026-09-16,P06,KR,Busan,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+4,1,2026-09-16,P07,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+4,1,2026-09-16,P08,KR,Daegu,dehydrated oily (수부지),R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
+4,1,2026-09-16,P09,SG,Singapore,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+4,1,2026-09-16,P10,SG,Singapore,dehydrated oily (수부지),R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
+4,2,2026-09-19,P01,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+4,2,2026-09-19,P02,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+4,2,2026-09-19,P03,KR,Jeju,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+4,2,2026-09-19,P04,KR,Daegu,dehydrated oily (수부지),R028,약간 뜸 그래도 괜찮음,partly,partly,partly,
+4,2,2026-09-19,P05,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+4,2,2026-09-19,P06,KR,Busan,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+4,2,2026-09-19,P07,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+4,2,2026-09-19,P08,KR,Daegu,dehydrated oily (수부지),R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
+4,2,2026-09-19,P09,SG,Singapore,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+4,2,2026-09-19,P10,SG,Singapore,dehydrated oily (수부지),R028,괜찮음,held,partly,held,yes
+4,1,2026-09-16,P01,KR,Daegu,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+4,1,2026-09-16,P02,KR,Seoul,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+4,1,2026-09-16,P03,KR,Jeju,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+4,1,2026-09-16,P04,KR,Daegu,dehydrated oily (수부지),R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
+4,1,2026-09-16,P05,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+4,1,2026-09-16,P06,KR,Busan,dehydrated oily (수부지),R025,꽤 버팀,held,held,held,
+4,1,2026-09-16,P07,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+4,1,2026-09-16,P08,KR,Daegu,dehydrated oily (수부지),R025,무너짐,broke,broke,broke,
+4,1,2026-09-16,P09,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어짐,partly,broke,partly,yes
+4,1,2026-09-16,P10,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
+4,2,2026-09-19,P01,KR,Daegu,dehydrated oily (수부지),R025,지속력 좋음 버팀,held,held,held,
+4,2,2026-09-19,P02,KR,Seoul,dehydrated oily (수부지),R025,살짝 무너짐,partly,partly,partly,
+4,2,2026-09-19,P03,KR,Jeju,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+4,2,2026-09-19,P04,KR,Daegu,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+4,2,2026-09-19,P05,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+4,2,2026-09-19,P06,KR,Busan,dehydrated oily (수부지),R025,꽤 버팀,held,held,held,
+4,2,2026-09-19,P07,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+4,2,2026-09-19,P08,KR,Daegu,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+4,2,2026-09-19,P09,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어짐,partly,broke,partly,yes
+4,2,2026-09-19,P10,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
+4,1,2026-09-16,P01,KR,Daegu,dehydrated oily (수부지),J013,살짝 무너짐,partly,partly,partly,
+4,1,2026-09-16,P02,KR,Seoul,dehydrated oily (수부지),J013,지속력 별로,broke,broke,partly,yes
+4,1,2026-09-16,P03,KR,Jeju,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+4,1,2026-09-16,P04,KR,Daegu,dehydrated oily (수부지),J013,지속력 무너짐,broke,broke,broke,
+4,1,2026-09-16,P05,KR,Seoul,dehydrated oily (수부지),J013,잘 찍힘,partly,broke,partly,yes
+4,1,2026-09-16,P06,KR,Busan,dehydrated oily (수부지),J013,파우더 안 하면 무너짐,broke,broke,partly,yes
+4,1,2026-09-16,P07,KR,Seoul,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+4,1,2026-09-16,P08,KR,Daegu,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+4,1,2026-09-16,P09,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+4,1,2026-09-16,P10,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+4,2,2026-09-19,P01,KR,Daegu,dehydrated oily (수부지),J013,지속력 별로,broke,broke,partly,yes
+4,2,2026-09-19,P02,KR,Seoul,dehydrated oily (수부지),J013,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
+4,2,2026-09-19,P03,KR,Jeju,dehydrated oily (수부지),J013,지속력 무너짐,broke,broke,broke,
+4,2,2026-09-19,P04,KR,Daegu,dehydrated oily (수부지),J013,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
+4,2,2026-09-19,P05,KR,Seoul,dehydrated oily (수부지),J013,잘 찍힘,partly,broke,partly,yes
+4,2,2026-09-19,P06,KR,Busan,dehydrated oily (수부지),J013,파우더 안 하면 무너짐,broke,broke,partly,yes
+4,2,2026-09-19,P07,KR,Seoul,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+4,2,2026-09-19,P08,KR,Daegu,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+4,2,2026-09-19,P09,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+4,2,2026-09-19,P10,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+5,1,2026-09-21,P01,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+5,1,2026-09-21,P02,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+5,1,2026-09-21,P03,KR,Jeju,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+5,1,2026-09-21,P04,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+5,1,2026-09-21,P05,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+5,1,2026-09-21,P06,KR,Busan,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+5,1,2026-09-21,P07,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+5,1,2026-09-21,P08,KR,Daegu,dehydrated oily (수부지),R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
+5,1,2026-09-21,P09,SG,Singapore,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+5,1,2026-09-21,P10,SG,Singapore,dehydrated oily (수부지),R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
+5,2,2026-09-26,P01,KR,Daegu,dehydrated oily (수부지),R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
+5,2,2026-09-26,P02,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+5,2,2026-09-26,P03,KR,Jeju,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+5,2,2026-09-26,P04,KR,Daegu,dehydrated oily (수부지),R028,약간 뜸 그래도 괜찮음,partly,partly,partly,
+5,2,2026-09-26,P05,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+5,2,2026-09-26,P06,KR,Busan,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+5,2,2026-09-26,P07,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+5,2,2026-09-26,P08,KR,Daegu,dehydrated oily (수부지),R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
+5,2,2026-09-26,P09,SG,Singapore,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+5,2,2026-09-26,P10,SG,Singapore,dehydrated oily (수부지),R028,괜찮음,held,partly,held,yes
+5,1,2026-09-21,P01,KR,Daegu,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+5,1,2026-09-21,P02,KR,Seoul,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+5,1,2026-09-21,P03,KR,Jeju,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+5,1,2026-09-21,P04,KR,Daegu,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+5,1,2026-09-21,P05,KR,Seoul,dehydrated oily (수부지),R025,꽤 버팀,held,held,held,
+5,1,2026-09-21,P06,KR,Busan,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+5,1,2026-09-21,P07,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+5,1,2026-09-21,P08,KR,Daegu,dehydrated oily (수부지),R025,무너짐,broke,broke,broke,
+5,1,2026-09-21,P09,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어짐,partly,broke,partly,yes
+5,1,2026-09-21,P10,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
+5,2,2026-09-26,P01,KR,Daegu,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+5,2,2026-09-26,P02,KR,Seoul,dehydrated oily (수부지),R025,살짝 무너짐,partly,partly,partly,
+5,2,2026-09-26,P03,KR,Jeju,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+5,2,2026-09-26,P04,KR,Daegu,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+5,2,2026-09-26,P05,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+5,2,2026-09-26,P06,KR,Busan,dehydrated oily (수부지),R025,꽤 버팀,held,held,held,
+5,2,2026-09-26,P07,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+5,2,2026-09-26,P08,KR,Daegu,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+5,2,2026-09-26,P09,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어짐,partly,broke,partly,yes
+5,2,2026-09-26,P10,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
+5,1,2026-09-21,P01,KR,Daegu,dehydrated oily (수부지),J013,살짝 무너짐,partly,partly,partly,
+5,1,2026-09-21,P02,KR,Seoul,dehydrated oily (수부지),J013,지속력 별로,broke,broke,partly,yes
+5,1,2026-09-21,P03,KR,Jeju,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+5,1,2026-09-21,P04,KR,Daegu,dehydrated oily (수부지),J013,지속력 무너짐,broke,broke,broke,
+5,1,2026-09-21,P05,KR,Seoul,dehydrated oily (수부지),J013,잘 찍힘,partly,broke,partly,yes
+5,1,2026-09-21,P06,KR,Busan,dehydrated oily (수부지),J013,파우더 안 하면 무너짐,broke,broke,partly,yes
+5,1,2026-09-21,P07,KR,Seoul,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+5,1,2026-09-21,P08,KR,Daegu,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+5,1,2026-09-21,P09,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+5,1,2026-09-21,P10,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+5,2,2026-09-26,P01,KR,Daegu,dehydrated oily (수부지),J013,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
+5,2,2026-09-26,P02,KR,Seoul,dehydrated oily (수부지),J013,지속력 별로,broke,broke,partly,yes
+5,2,2026-09-26,P03,KR,Jeju,dehydrated oily (수부지),J013,지속력 무너짐,broke,broke,broke,
+5,2,2026-09-26,P04,KR,Daegu,dehydrated oily (수부지),J013,지속력 무너짐,broke,broke,broke,
+5,2,2026-09-26,P05,KR,Seoul,dehydrated oily (수부지),J013,잘 찍힘,partly,broke,partly,yes
+5,2,2026-09-26,P06,KR,Busan,dehydrated oily (수부지),J013,파우더 안 하면 무너짐,broke,broke,partly,yes
+5,2,2026-09-26,P07,KR,Seoul,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+5,2,2026-09-26,P08,KR,Daegu,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+5,2,2026-09-26,P09,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+5,2,2026-09-26,P10,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+6,1,2026-09-30,P01,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+6,1,2026-09-30,P02,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+6,1,2026-09-30,P03,KR,Jeju,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+6,1,2026-09-30,P04,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+6,1,2026-09-30,P05,KR,Seoul,dehydrated oily (수부지),R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
+6,1,2026-09-30,P06,KR,Busan,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+6,1,2026-09-30,P07,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+6,1,2026-09-30,P08,KR,Daegu,dehydrated oily (수부지),R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
+6,1,2026-09-30,P09,SG,Singapore,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+6,1,2026-09-30,P10,SG,Singapore,dehydrated oily (수부지),R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
+6,2,2026-10-03,P01,KR,Daegu,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+6,2,2026-10-03,P02,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+6,2,2026-10-03,P03,KR,Jeju,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+6,2,2026-10-03,P04,KR,Daegu,dehydrated oily (수부지),R028,약간 뜸 그래도 괜찮음,partly,partly,partly,
+6,2,2026-10-03,P05,KR,Seoul,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+6,2,2026-10-03,P06,KR,Busan,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+6,2,2026-10-03,P07,KR,Seoul,dehydrated oily (수부지),R028,살짝 무너짐 그래도 괜찮음,partly,partly,partly,
+6,2,2026-10-03,P08,KR,Daegu,dehydrated oily (수부지),R028,약간 무너짐 근데 괜찮음,partly,partly,partly,
+6,2,2026-10-03,P09,SG,Singapore,dehydrated oily (수부지),R028,지속력 좋음 버팀,held,held,held,
+6,2,2026-10-03,P10,SG,Singapore,dehydrated oily (수부지),R028,괜찮음,held,partly,held,yes
+6,1,2026-09-30,P01,KR,Daegu,dehydrated oily (수부지),R025,살짝 무너짐,partly,partly,partly,
+6,1,2026-09-30,P02,KR,Seoul,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+6,1,2026-09-30,P03,KR,Jeju,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+6,1,2026-09-30,P04,KR,Daegu,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+6,1,2026-09-30,P05,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+6,1,2026-09-30,P06,KR,Busan,dehydrated oily (수부지),R025,살짝 무너짐,partly,partly,partly,
+6,1,2026-09-30,P07,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+6,1,2026-09-30,P08,KR,Daegu,dehydrated oily (수부지),R025,무너짐,broke,broke,broke,
+6,1,2026-09-30,P09,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어짐,partly,broke,partly,yes
+6,1,2026-09-30,P10,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
+6,2,2026-10-03,P01,KR,Daegu,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+6,2,2026-10-03,P02,KR,Seoul,dehydrated oily (수부지),R025,살짝 무너짐,partly,partly,partly,
+6,2,2026-10-03,P03,KR,Jeju,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+6,2,2026-10-03,P04,KR,Daegu,dehydrated oily (수부지),R025,괜찮음,held,partly,held,yes
+6,2,2026-10-03,P05,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+6,2,2026-10-03,P06,KR,Busan,dehydrated oily (수부지),R025,꽤 버팀,held,held,held,
+6,2,2026-10-03,P07,KR,Seoul,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+6,2,2026-10-03,P08,KR,Daegu,dehydrated oily (수부지),R025,약간 무너짐,partly,partly,partly,
+6,2,2026-10-03,P09,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어짐,partly,broke,partly,yes
+6,2,2026-10-03,P10,SG,Singapore,dehydrated oily (수부지),R025,밀착력이 떨어지거나 찍힘 현상,partly,broke,partly,yes
+6,1,2026-09-30,P01,KR,Daegu,dehydrated oily (수부지),J013,살짝 무너짐,partly,partly,partly,
+6,1,2026-09-30,P02,KR,Seoul,dehydrated oily (수부지),J013,지속력 별로,broke,broke,partly,yes
+6,1,2026-09-30,P03,KR,Jeju,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+6,1,2026-09-30,P04,KR,Daegu,dehydrated oily (수부지),J013,약간 무너짐,partly,partly,partly,
+6,1,2026-09-30,P05,KR,Seoul,dehydrated oily (수부지),J013,약간 무너짐,partly,partly,partly,
+6,1,2026-09-30,P06,KR,Busan,dehydrated oily (수부지),J013,파우더 안 하면 무너짐,broke,broke,partly,yes
+6,1,2026-09-30,P07,KR,Seoul,dehydrated oily (수부지),J013,약간 무너짐,partly,partly,partly,
+6,1,2026-09-30,P08,KR,Daegu,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+6,1,2026-09-30,P09,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+6,1,2026-09-30,P10,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+6,2,2026-10-03,P01,KR,Daegu,dehydrated oily (수부지),J013,지속력 별로,broke,broke,partly,yes
+6,2,2026-10-03,P02,KR,Seoul,dehydrated oily (수부지),J013,지속력 별로,broke,broke,partly,yes
+6,2,2026-10-03,P03,KR,Jeju,dehydrated oily (수부지),J013,지속력 무너짐,broke,broke,broke,
+6,2,2026-10-03,P04,KR,Daegu,dehydrated oily (수부지),J013,지속력 무너짐,broke,broke,broke,
+6,2,2026-10-03,P05,KR,Seoul,dehydrated oily (수부지),J013,약간 무너짐,partly,partly,partly,
+6,2,2026-10-03,P06,KR,Busan,dehydrated oily (수부지),J013,파우더 안 하면 무너짐,broke,broke,partly,yes
+6,2,2026-10-03,P07,KR,Seoul,dehydrated oily (수부지),J013,무너짐,broke,broke,broke,
+6,2,2026-10-03,P08,KR,Daegu,dehydrated oily (수부지),J013,약간 무너짐,partly,partly,partly,
+6,2,2026-10-03,P09,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
+6,2,2026-10-03,P10,SG,Singapore,dehydrated oily (수부지),J013,한여름 야외에서는 유분 폭발,broke,broke,partly,yes
