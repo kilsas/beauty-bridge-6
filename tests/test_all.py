@@ -707,3 +707,28 @@ class TestExpansionCases(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestHoldSurvey(unittest.TestCase):
+    def test_summary_and_real_file(self):
+        import csv as _csv
+        from beautybridge.hold_log import survey_summary, HoldLogError
+        rows = [
+            {"product_id": "X", "region": "KR", "result": "held", "result_if_worse": "held", "result_if_better": "held", "ambiguous": ""},
+            {"product_id": "X", "region": "SG", "result": "partly", "result_if_worse": "broke", "result_if_better": "partly", "ambiguous": "yes"},
+        ]
+        s = survey_summary(rows)["X"]
+        self.assertEqual(s["ALL"]["n"], 2)
+        self.assertAlmostEqual(s["ALL"]["score"], 0.75)
+        self.assertAlmostEqual(s["ALL"]["low"], 0.5)
+        self.assertEqual(s["SG"]["ambiguous"], 1)
+        with self.assertRaises(HoldLogError):
+            survey_summary([{**rows[0], "result": "fine"}])
+        real = list(_csv.DictReader(open(ROOT / "data" / "real" / "hold_survey.csv", encoding="utf-8")))
+        self.assertEqual(len(real), 360)
+        ids = set(load_folder(ROOT / "data" / "real").products)
+        self.assertTrue({r["product_id"] for r in real} <= ids)
+        self.assertTrue(all(r["participant"].startswith("P") for r in real))   # no names
+        out = survey_summary(real)
+        self.assertGreater(out["R028"]["ALL"]["score"], out["R025"]["ALL"]["score"])
+        self.assertGreater(out["R025"]["ALL"]["score"], out["J013"]["ALL"]["score"])

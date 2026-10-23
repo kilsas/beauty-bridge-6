@@ -71,3 +71,48 @@ def label_vs_users(rows: list[dict], hold_of: dict[str, int | None], climate: st
         if user_score(r) < BROKE_BELOW:
             broke.append(r["product_id"])
     return {"climate": climate, "checked": len(checked), "broke": len(broke), "broke_ids": sorted(broke)}
+
+
+# ---------------------------------------------------------------------------
+# The survey that came before the site's logging feature: 10 people (8 in Korea,
+# 2 in Singapore) answered twice a week for 6 weeks between August and October (Singapore
+# hot and humid throughout; Korea going from midsummer into early autumn) about 3 base products, in their
+# own words. Each answer was sorted into held / partly / broke by the project author;
+# answers that could go either way carry a worse and a better reading, so every
+# score comes with a range. The survey has no dates, so it is shown next to the
+# site's logs and never mixed into them.
+# ---------------------------------------------------------------------------
+SURVEY_REGIONS = ("KR", "SG")
+
+
+def _score(rows: list[dict], key: str) -> float:
+    held = sum(r[key] == "held" for r in rows)
+    partly = sum(r[key] == "partly" for r in rows)
+    return (held + 0.5 * partly) / len(rows)
+
+
+def survey_summary(rows: list[dict]) -> dict[str, dict[str, dict]]:
+    """{product_id: {"ALL"|region: {n, held, partly, broke, score, low, high, ambiguous}}}"""
+    for r in rows:
+        for k in ("result", "result_if_worse", "result_if_better"):
+            if r[k] not in RESULTS:
+                raise HoldLogError(f"bad survey result '{r[k]}'")
+    out: dict[str, dict[str, dict]] = {}
+    for pid in sorted({r["product_id"] for r in rows}):
+        mine = [r for r in rows if r["product_id"] == pid]
+        groups = {"ALL": mine, **{g: [r for r in mine if r["region"] == g] for g in SURVEY_REGIONS}}
+        out[pid] = {}
+        for g, rs in groups.items():
+            if not rs:
+                continue
+            out[pid][g] = {
+                "n": len(rs),
+                "held": sum(r["result"] == "held" for r in rs),
+                "partly": sum(r["result"] == "partly" for r in rs),
+                "broke": sum(r["result"] == "broke" for r in rs),
+                "score": round(_score(rs, "result"), 3),
+                "low": round(_score(rs, "result_if_worse"), 3),
+                "high": round(_score(rs, "result_if_better"), 3),
+                "ambiguous": sum(bool(r.get("ambiguous")) for r in rs),
+            }
+    return out

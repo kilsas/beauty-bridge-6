@@ -195,6 +195,8 @@ def build(engine, ds_dir) -> dict:
     P = ds.products
 
     data_dir = Path(ds_dir)
+    survey_csv = data_dir / "hold_survey.csv"
+    survey = hold_mod.survey_summary(list(csv.DictReader(open(survey_csv, encoding="utf-8")))) if survey_csv.exists() else {}
     brands = {r["brand"]: r for r in (read_csv(data_dir / "brands.csv") or read_csv(ROOT / "data" / "demo" / "brands.csv"))}
     images = {r["product_id"]: r for r in read_csv(ROOT / "data" / "images.csv")}
     products = {}
@@ -216,6 +218,7 @@ def build(engine, ds_dir) -> dict:
             if r is not None:
                 fits.append([g.goal_id, round(r.score * 100)])
         fits.sort(key=lambda x: -x[1])
+        sv = survey.get(p.product_id)
         products[p.product_id] = {
             "brand": d["brand"], "name": d["name"], "ko": d["name_ko"], "al": list(p.aliases),
             "cat": d["category"], "grp": d["category_group"], "shade": d["shade_family"],
@@ -225,6 +228,8 @@ def build(engine, ds_dir) -> dict:
             "list": listings, "fits": fits[:4], "cl": climate_mod.for_site(p),
             "bko": brands.get(p.brand, {}).get("brand_ko", p.brand),
             "bcol": brands.get(p.brand, {}).get("color", "#6c6676"),
+            **({"sv": {g: [x["n"], x["held"], x["partly"], x["broke"], round(x["score"] * 100), round(x["low"] * 100), round(x["high"] * 100)]
+                       for g, x in sv.items()}} if sv else {}),
         }
         sig = {}
         for row in ds.signals:
