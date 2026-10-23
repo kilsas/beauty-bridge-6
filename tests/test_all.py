@@ -269,8 +269,9 @@ class TestRealData(unittest.TestCase):
     def test_real_dataset_valid_and_flagged(self):
         ds = load_folder(ROOT / "data" / "real")
         self.assertGreaterEqual(len(ds.products), 60)
+        # every real product is either flagged unverified or was checked against its source page
         for p in ds.products.values():
-            self.assertIn("unverified", p.source)
+            self.assertTrue("unverified" in p.source or "reviewed by" in p.source, p.product_id)
         # no invented ratings or review counts on real products
         for l in ds.listings.values():
             self.assertIsNone(l.rating)
