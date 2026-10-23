@@ -196,7 +196,9 @@ def build(engine, ds_dir) -> dict:
 
     data_dir = Path(ds_dir)
     survey_csv = data_dir / "hold_survey.csv"
-    survey = hold_mod.survey_summary(list(csv.DictReader(open(survey_csv, encoding="utf-8")))) if survey_csv.exists() else {}
+    survey_rows = list(csv.DictReader(open(survey_csv, encoding="utf-8"))) if survey_csv.exists() else []
+    survey = hold_mod.survey_summary(survey_rows) if survey_rows else {}
+    survey_days = [min(r["day"] for r in survey_rows), max(r["day"] for r in survey_rows)] if survey_rows else None
     brands = {r["brand"]: r for r in (read_csv(data_dir / "brands.csv") or read_csv(ROOT / "data" / "demo" / "brands.csv"))}
     images = {r["product_id"]: r for r in read_csv(ROOT / "data" / "images.csv")}
     products = {}
@@ -337,7 +339,7 @@ def build(engine, ds_dir) -> dict:
                    "fx": FX_TO_USD, "fxNote": FX_RATES_NOTE},
         "codebook": {"finish": list(cb.FINISH_SCALE), "coverage": list(cb.COVERAGE_SCALE),
                      "intensity": cb.INTENSITY_FEATURES, "groups": cb.CATEGORY_GROUPS,
-                     "skin": cb.SKIN_TYPES, "climates": cb.CLIMATES, "depths": depth_mod.DEPTHS, "holdMin": hold_mod.MIN_LOGS, "holdBroke": hold_mod.BROKE_BELOW,
+                     "skin": cb.SKIN_TYPES, "climates": cb.CLIMATES, "depths": depth_mod.DEPTHS, "holdMin": hold_mod.MIN_LOGS, "holdBroke": hold_mod.BROKE_BELOW, "svDays": survey_days,
                      "hosu": {n: depth_mod.hosu_to_depth(n) for n in depth_mod.HOSU},
                      "climateCut": [round(climate_mod.GOOD * 100), round(climate_mod.OK * 100)]},
         "query": {"intent": search_mod.INTENT_WORDS, "origin": search_mod.ORIGIN_WORDS,

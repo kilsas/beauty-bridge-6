@@ -712,7 +712,7 @@ function surveyBox(p) {
   if (!p.sv) return "";
   const cell = (g) => { const x = p.sv[g]; return x ? `<div class="stat"><span>${t("sv" + g)}</span><b>${x[4]}%</b><small style="display:block">${fmt(t("svCounts"), { n: x[0], h: x[1], p: x[2], x: x[3] })}</small>${x[5] !== x[6] ? `<small style="display:block;margin-top:4px">${fmt(t("svRange"), { lo: x[5], hi: x[6] })}</small>` : ""}</div>` : ""; };
   const gs = ["ALL", "KR", "SG"].filter((g) => p.sv[g]);
-  return `<div><span class="lbl">${t("svTitle")}</span><div class="stats3" style="grid-template-columns:repeat(${gs.length},1fr)">${gs.map(cell).join("")}</div>
+  return `<div><span class="lbl">${fmt(t("svTitle"), { a: D.codebook.svDays ? dateFmt(D.codebook.svDays[0]) : "", b: D.codebook.svDays ? dateFmt(D.codebook.svDays[1]) : "" })}</span><div class="stats3" style="grid-template-columns:repeat(${gs.length},1fr)">${gs.map(cell).join("")}</div>
     <p class="note" style="margin:0">${t("svNote")}</p></div>`;
 }
 

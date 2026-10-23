@@ -76,11 +76,11 @@ def label_vs_users(rows: list[dict], hold_of: dict[str, int | None], climate: st
 # ---------------------------------------------------------------------------
 # The survey that came before the site's logging feature: 10 people (8 in Korea,
 # 2 in Singapore) answered twice a week for 6 weeks between August and October (Singapore
-# hot and humid throughout; Korea going from midsummer into early autumn) about 3 base products, in their
+# hot and humid throughout; Korea warmer than usual but very dry in September) about 3 base products, in their
 # own words. Each answer was sorted into held / partly / broke by the project author;
 # answers that could go either way carry a worse and a better reading, so every
-# score comes with a range. The survey has no dates, so it is shown next to the
-# site's logs and never mixed into them.
+# score comes with a range. Because the results are the author's reading and Korea's
+# weather doesn't fit one climate type, it is shown next to the site's logs, never mixed in.
 # ---------------------------------------------------------------------------
 SURVEY_REGIONS = ("KR", "SG")
 
