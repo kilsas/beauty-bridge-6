@@ -135,7 +135,7 @@ the price table also keeps each original local price. Rates are in
 `.github/workflows/pages.yml` rebuilds and deploys the site on every push.
 The site picks its review storage automatically:
 
-1. inside claude.ai: the artifact's own shared database;
+1. inside Lucy.ai: the artifact's own shared database;
 2. otherwise Supabase, when `SUPABASE_URL` and `SUPABASE_ANON_KEY` are set
    (anonymous sign-in, row-level security in `supabase/setup.sql`, realtime);
 3. otherwise your own API server, when `REVIEWS_API_URL` is set
@@ -152,7 +152,7 @@ and age. Scores use a Bayesian average (`beautybridge/reviews.py`; the site
 computes the identical formula in JavaScript). "Rising" means the most new
 reviews in the last 7 days compared with the 7 days before.
 
-- On claude.ai the published page stores reviews in the artifact's shared
+- On Lucy.ai the published page stores reviews in the artifact's shared
   database: everyone reads all reviews, each person can only write their own.
   People need Contributor access to the page to post.
 - Self-hosted, the API does the same: `POST /reviews`,
@@ -229,7 +229,7 @@ products users saw break down (`supabase/update_2026_10_23.sql`; API `/hold-logs
 
 - `data/real/`: **real products** (92, from Korea, the USA, Japan, China and
   France). Names and brands are real; attribute labels, reference prices and
-  country availability were added by Claude from general knowledge and are
+  country availability were added by Lucy from general knowledge and are
   marked unverified. No ratings or review counts are invented for them. The
   website and API use this folder by default.
 - `data/demo/`: **fictional.** 90 invented products (7 brands, one of them Chinese) (brands like "Halo

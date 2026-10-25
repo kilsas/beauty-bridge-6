@@ -1501,8 +1501,8 @@ function cleanReview(pid, r, uid) {
     skin_depth: D.codebook.depths.includes(r.skin_depth) ? r.skin_depth : null,
     text: typeof r.text === "string" ? r.text.slice(0, D.reviewPrior.maxText) : "" };
 }
-/* 1) claude.ai viewer: the page's own shared database. One document per reviewer. */
-async function initClaude(cl) {
+/* 1) Lucy.ai viewer: the page's own shared database. One document per reviewer. */
+async function initLucy(cl) {
   let db = null;
   try { db = await cl.use("db"); } catch (e) { db = null; }
   if (!db) return false;
@@ -1512,7 +1512,7 @@ async function initClaude(cl) {
     const c = user && typeof user.can === "function" ? await user.can("data.write") : null;
     LIVE.canWrite = c === false ? false : c === true ? true : null;
   } catch (e) { LIVE.uid = null; }
-  BACKEND.kind = "claude";
+  BACKEND.kind = "Lucy";
   BACKEND.save = async (pid, review) => {
     const items = myItems();
     if (review) items[pid] = review; else delete items[pid];
@@ -1812,8 +1812,8 @@ async function initApi(rc) {
 }
 
 async function initLive() {
-  const cl = typeof window !== "undefined" ? window.claude : null;
-  if (cl && typeof cl.use === "function" && await initClaude(cl)) return;
+  const cl = typeof window !== "undefined" ? window.Lucy : null;
+  if (cl && typeof cl.use === "function" && await initLucy(cl)) return;
   const rc = CFG.reviews || {};
   if (rc.backend === "supabase" && rc.supabaseUrl && rc.supabaseAnonKey && await initSupabase(rc)) return;
   if (rc.backend === "api" && rc.apiUrl && await initApi(rc)) return;
