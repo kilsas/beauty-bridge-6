@@ -88,3 +88,8 @@ GitHub 저장소 **Settings → Secrets and variables → Actions → Variables*
 - `kind`: shop(브랜드 자체 몰), mall(그룹 공식몰, 예: 아모레몰), flagship(티몰·네이버 공식 스토어),
   info(직접 판매하지 않는 브랜드 사이트 — CANMAKE, KATE, CEZANNE, 하다라보, 3CE, 메이블린 미국 등).
 - 주소는 2026-10-03에 확인했어요. 몰 주소가 바뀌면 이 CSV의 해당 줄만 고치면 돼요.
+
+
+**2026-10-27 업데이트 (무너짐 유형)**: 이미 `setup.sql`을 실행한 프로젝트라면 Supabase **SQL Editor → New query**에
+`supabase/update_2026_10_27.sql`을 붙여 넣고 **Run** (한 번만, 다시 실행해도 안전). `update_2026_10_23.sql`이 먼저 실행돼 있어야 해요.
+실행 전에도 사이트는 작동하지만, 무너짐 유형 선택은 저장되지 않아요.

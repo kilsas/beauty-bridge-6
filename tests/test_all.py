@@ -732,3 +732,38 @@ class TestHoldSurvey(unittest.TestCase):
         out = survey_summary(real)
         self.assertGreater(out["R028"]["ALL"]["score"], out["R025"]["ALL"]["score"])
         self.assertGreater(out["R025"]["ALL"]["score"], out["J013"]["ALL"]["score"])
+
+
+class TestBreakdowns(unittest.TestCase):
+    def test_types_goals_and_logs(self):
+        import json as _json
+        import tempfile
+        from beautybridge import codebook as cb
+        from beautybridge.hold_log import make_log, stats, HoldLogError, breakdown_side
+        from beautybridge.reviews import ReviewStore as SQLiteReviewStore
+        goals = {g["goal_id"] for g in _json.load(open(ROOT / "data" / "beauty_goals.json"))["goals"]}
+        for k, v in cb.BREAKDOWNS.items():
+            self.assertIn(v["group"], cb.BREAKDOWN_GROUPS)
+            self.assertIn(v["on"], ("face", "eye"))
+            self.assertTrue(v["goals"] and set(v["goals"]) <= goals, k)
+        self.assertEqual(breakdown_side("eye"), "eye")
+        self.assertIsNone(breakdown_side("lip"))
+        prods, grp = {"F", "E", "L"}, {"F": "face_base", "E": "eye", "L": "lip"}
+        base = {"logger_id": "u", "climate": "hot_humid", "day": "2026-10-27"}
+        g = make_log({**base, "product_id": "F", "result": "broke", "breakdown": ["wear_off", "shine"]}, prods, grp)
+        self.assertEqual(g["breakdown"], ["shine", "wear_off"])
+        with self.assertRaises(HoldLogError):      # panda is for eye makeup
+            make_log({**base, "product_id": "F", "result": "broke", "breakdown": ["panda"]}, prods, grp)
+        with self.assertRaises(HoldLogError):      # lips have no types
+            make_log({**base, "product_id": "L", "result": "partly", "breakdown": ["shine"]}, prods, grp)
+        with self.assertRaises(HoldLogError):      # held means nothing broke down
+            make_log({**base, "product_id": "E", "result": "held", "breakdown": ["panda"]}, prods, grp)
+        with self.assertRaises(HoldLogError):
+            make_log({**base, "product_id": "F", "result": "broke", "breakdown": ["melted"]}, prods, grp)
+        e = make_log({**base, "logger_id": "v", "product_id": "F", "result": "partly", "breakdown": "shine"}, prods, grp)
+        row = stats([g, e])[0]
+        self.assertEqual(row["types"], {"shine": 2, "wear_off": 1})
+        with tempfile.TemporaryDirectory() as d:
+            st = SQLiteReviewStore(__import__("pathlib").Path(d) / "r.sqlite")
+            st.upsert_hold_log(g)
+            self.assertEqual(st.hold_logs("u")[0]["breakdown"], ["shine", "wear_off"])

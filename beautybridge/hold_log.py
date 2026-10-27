@@ -11,7 +11,7 @@ from __future__ import annotations
 import re
 from datetime import date
 
-from .codebook import CLIMATES
+from .codebook import BREAKDOWNS, CLIMATES
 
 RESULTS = ("held", "partly", "broke")
 MIN_LOGS = 5           # logs needed before the user score replaces the label estimate
@@ -22,7 +22,17 @@ class HoldLogError(ValueError):
     pass
 
 
-def make_log(data: dict, products: set[str]) -> dict:
+def breakdown_side(category_group: str | None) -> str | None:
+    """Which breakdown types a product can show: eye makeup -> "eye", other worn-on-face
+    products (base, cheek, sunscreen) -> "face", lips -> none."""
+    if category_group == "eye":
+        return "eye"
+    if category_group == "lip":
+        return None
+    return "face"
+
+
+def make_log(data: dict, products: set[str], group_of: dict[str, str] | None = None) -> dict:
     lid = str(data.get("logger_id", "")).strip()
     if not lid or len(lid) > 128:
         raise HoldLogError("logger_id is required")
@@ -39,17 +49,34 @@ def make_log(data: dict, products: set[str]) -> dict:
     if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", day):
         raise HoldLogError("day must be YYYY-MM-DD")
     date.fromisoformat(day)
-    return {"logger_id": lid, "product_id": pid, "climate": climate, "result": result, "day": day}
+    raw = data.get("breakdown") or []
+    if isinstance(raw, str):
+        raw = [x for x in raw.split(",") if x]
+    kinds = sorted({str(x).strip() for x in raw})
+    if kinds and result == "held":
+        raise HoldLogError("a product that held has no breakdown type")
+    side = breakdown_side(group_of.get(pid)) if group_of is not None else None
+    for k in kinds:
+        if k not in BREAKDOWNS:
+            raise HoldLogError(f"unknown breakdown type '{k}'")
+        if group_of is not None and BREAKDOWNS[k]["on"] != side:
+            raise HoldLogError(f"'{k}' doesn't apply to this product")
+    return {"logger_id": lid, "product_id": pid, "climate": climate, "result": result, "day": day,
+            "breakdown": kinds}
 
 
 def stats(logs: list[dict]) -> list[dict]:
-    """Counts per (product, climate) with first/last day. No logger ids."""
+    """Counts per (product, climate) with first/last day and how often each breakdown
+    type was reported. No logger ids."""
     agg: dict[tuple, dict] = {}
     for g in logs:
         key = (g["product_id"], g["climate"])
         row = agg.setdefault(key, {"product_id": key[0], "climate": key[1], "n": 0,
-                                   "held": 0, "partly": 0, "broke": 0, "first": g["day"], "last": g["day"]})
+                                   "held": 0, "partly": 0, "broke": 0, "first": g["day"], "last": g["day"],
+                                   "types": {}})
         row["n"] += 1
+        for k in g.get("breakdown") or []:
+            row["types"][k] = row["types"].get(k, 0) + 1
         row[g["result"]] += 1
         row["first"] = min(row["first"], g["day"])
         row["last"] = max(row["last"], g["day"])

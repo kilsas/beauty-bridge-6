@@ -127,3 +127,18 @@ PRODUCT_COLUMNS: list[str] = [
 ]
 
 MULTI_VALUE_SEPARATOR = "|"
+
+
+# How makeup breaks down by noon. Grouped by the skin problem behind it; each type
+# applies to face makeup ("face") or eye makeup ("eye") and points to goals that help.
+BREAKDOWN_GROUPS: list[str] = ["oily", "dry", "pore"]
+BREAKDOWNS: dict[str, dict] = {
+    "shine":       {"group": "oily", "on": "face", "goals": ["oily_skin_care", "matte_skin"]},
+    "wear_off":    {"group": "oily", "on": "face", "goals": ["long_lasting_base"]},
+    "panda":       {"group": "oily", "on": "eye",  "goals": ["smudgeproof_eye"]},
+    "flaking":     {"group": "dry",  "on": "face", "goals": ["deep_hydration", "dewy_skin"]},
+    "creasing":    {"group": "dry",  "on": "face", "goals": ["natural_base", "deep_hydration"]},
+    "cracking":    {"group": "dry",  "on": "face", "goals": ["dewy_skin", "deep_hydration"]},
+    "pore_settle": {"group": "pore", "on": "face", "goals": ["pore_blurring"]},
+    "texture":     {"group": "pore", "on": "face", "goals": ["pore_blurring", "gentle_exfoliation"]},
+}

@@ -317,6 +317,9 @@ class ReviewStore:
         if "skin_type" not in cols:      # databases created before skin types were added
             self.conn.execute("ALTER TABLE shade_votes ADD COLUMN skin_type TEXT")
         rcols = {r[1] for r in self.conn.execute("PRAGMA table_info(reviews)")}
+        hcols = {r[1] for r in self.conn.execute("PRAGMA table_info(hold_logs)")}
+        if "breakdown" not in hcols:     # databases created before breakdown types were added
+            self.conn.execute("ALTER TABLE hold_logs ADD COLUMN breakdown TEXT")
         for col in ("climate", "skin_depth"):          # databases created before these were added
             if col not in rcols:
                 self.conn.execute(f"ALTER TABLE reviews ADD COLUMN {col} TEXT")
@@ -388,9 +391,10 @@ class ReviewStore:
 
     # "did it hold at noon?": one log per person per product per day
     def upsert_hold_log(self, g: dict) -> None:
-        self.conn.execute("INSERT OR REPLACE INTO hold_logs VALUES (?,?,?,?,?,?)",
+        self.conn.execute("INSERT OR REPLACE INTO hold_logs (logger_id, product_id, climate, result, day, created_at, breakdown)"
+                          " VALUES (?,?,?,?,?,?,?)",
                           (g["logger_id"], g["product_id"], g["climate"], g["result"], g["day"],
-                           datetime.now(timezone.utc).isoformat(timespec="seconds")))
+                           datetime.now(timezone.utc).isoformat(timespec="seconds"), ",".join(g.get("breakdown") or [])))
         self.conn.commit()
 
     def delete_hold_log(self, logger_id: str, product_id: str, day: str) -> None:
@@ -398,7 +402,10 @@ class ReviewStore:
         self.conn.commit()
 
     def hold_logs(self, logger_id: str | None = None) -> list[dict]:
-        cols = ("logger_id", "product_id", "climate", "result", "day", "created_at")
+        cols = ("logger_id", "product_id", "climate", "result", "day", "created_at", "breakdown")
         q = "SELECT " + ", ".join(cols) + " FROM hold_logs"
         cur = self.conn.execute(q + " WHERE logger_id=?", (logger_id,)) if logger_id else self.conn.execute(q)
-        return [dict(zip(cols, row)) for row in cur]
+        out = [dict(zip(cols, row)) for row in cur]
+        for g in out:
+            g["breakdown"] = [x for x in (g["breakdown"] or "").split(",") if x]
+        return out

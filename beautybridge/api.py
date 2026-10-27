@@ -341,6 +341,7 @@ class HoldLogIn(BaseModel):
     climate: str
     result: str
     day: str | None = None
+    breakdown: list[str] = []
 
 
 @app.post("/hold-logs", status_code=201)
@@ -348,7 +349,8 @@ def post_hold_log(body: HoldLogIn):
     """'Did it hold at noon?' One log per person per product per day (a new one replaces it)."""
     from . import hold_log as hl
     try:
-        g = hl.make_log(body.model_dump(), set(engine.ds.products))
+        g = hl.make_log(body.model_dump(), set(engine.ds.products),
+                        {pid: p.category_group for pid, p in engine.ds.products.items()})
     except (hl.HoldLogError, ValueError) as e:
         raise HTTPException(status_code=400, detail=str(e)) from None
     store.upsert_hold_log(g)
@@ -360,6 +362,13 @@ def delete_hold_log(logger_id: str, product_id: str, day: str):
     store.delete_hold_log(logger_id, product_id, day)
 
 
+@app.get("/breakdowns")
+def breakdown_types():
+    """How makeup breaks down by noon: the types users can report, grouped by skin problem."""
+    from . import codebook as cb
+    return {"groups": cb.BREAKDOWN_GROUPS, "types": cb.BREAKDOWNS}
+
+
 @app.get("/hold-logs/stats")
 def hold_log_stats():
     from . import hold_log as hl
@@ -368,7 +377,7 @@ def hold_log_stats():
 
 @app.get("/hold-logs/mine/{logger_id}")
 def my_hold_logs(logger_id: str):
-    return [{k: g[k] for k in ("product_id", "climate", "result", "day")} for g in store.hold_logs(logger_id)]
+    return [{k: g[k] for k in ("product_id", "climate", "result", "day", "breakdown")} for g in store.hold_logs(logger_id)]
 
 
 @app.get("/hold-logs/check/{climate}")

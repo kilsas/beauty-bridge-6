@@ -135,10 +135,9 @@ the price table also keeps each original local price. Rates are in
 `.github/workflows/pages.yml` rebuilds and deploys the site on every push.
 The site picks its review storage automatically:
 
-1. inside Lucy.ai: the artifact's own shared database;
-2. otherwise Supabase, when `SUPABASE_URL` and `SUPABASE_ANON_KEY` are set
+1. Supabase, when `SUPABASE_URL` and `SUPABASE_ANON_KEY` are set
    (anonymous sign-in, row-level security in `supabase/setup.sql`, realtime);
-3. otherwise your own API server, when `REVIEWS_API_URL` is set
+2. otherwise your own API server, when `REVIEWS_API_URL` is set
    (`GET /reviews` returns one-way reviewer keys, never raw ids).
 
 With none configured, everything except posting reviews still works.
@@ -152,9 +151,6 @@ and age. Scores use a Bayesian average (`beautybridge/reviews.py`; the site
 computes the identical formula in JavaScript). "Rising" means the most new
 reviews in the last 7 days compared with the 7 days before.
 
-- On Lucy.ai the published page stores reviews in the artifact's shared
-  database: everyone reads all reviews, each person can only write their own.
-  People need Contributor access to the page to post.
 - Self-hosted, the API does the same: `POST /reviews`,
   `GET /products/{id}/reviews`, `GET /rankings/reviews?category=&skin_type=&age_band=`,
   `GET /rankings/rising` (SQLite at `db/reviews.sqlite`).
@@ -225,11 +221,20 @@ climate (held / partly / broke). The site shows the label estimate and the users
 ranks by the users' score once a product has 5 logs in a climate, and reports how many label-3
 products users saw break down (`supabase/update_2026_10_23.sql`; API `/hold-logs`).
 
+When a product partly or fully broke down, users can also say how (`codebook.BREAKDOWNS`): shine,
+wearing off or panda eyes (oily skin); flaking, creasing or cracking (dry skin); settling into pores or
+texture showing (pores). Each type links to goals that help (a new goal, `smudgeproof_eye`, covers
+panda eyes), the home page explains the types, and product pages show the most reported ones
+(`supabase/update_2026_10_27.sql`; API `/breakdowns`).
+
+The survey that came before this feature (10 people, 26 Aug - 3 Oct 2026, 3 base products) is in
+`data/real/hold_survey.csv` and is shown beside the logs, never mixed in.
+
 ## ⚠️ Which data is real
 
 - `data/real/`: **real products** (92, from Korea, the USA, Japan, China and
   France). Names and brands are real; attribute labels, reference prices and
-  country availability were added by Lucy from general knowledge and are
+  country availability were estimated from product descriptions and are
   marked unverified. No ratings or review counts are invented for them. The
   website and API use this folder by default.
 - `data/demo/`: **fictional.** 90 invented products (7 brands, one of them Chinese) (brands like "Halo

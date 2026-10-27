@@ -540,6 +540,32 @@
    ]
   },
   {
+   "goal_id": "smudgeproof_eye",
+   "area": "eye",
+   "name": "Smudge-proof eyes",
+   "name_ko": "번짐 없는 눈화장",
+   "aliases": [
+    "번짐",
+    "판다눈",
+    "팬더",
+    "smudge proof",
+    "waterproof"
+   ],
+   "description": "Eyeliner and mascara that don't melt into dark smudges under the eyes.",
+   "eligible_categories": [
+    "eyeliner",
+    "mascara"
+   ],
+   "criteria": [
+    {
+     "type": "level",
+     "feature": "longevity",
+     "target": 1.0,
+     "weight": 1.0
+    }
+   ]
+  },
+  {
    "goal_id": "eyeshadow",
    "area": "eye",
    "name": "Everyday eyeshadow",

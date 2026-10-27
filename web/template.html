@@ -653,7 +653,10 @@ function climBadge(p) {
   return `<span class="cbadge cb-${v}">${esc(climName(S.climate))} · ${t("cv_" + v)}${x.src === "users" ? " · " + t("hlByUsers") : ""}</span>`;
 }
 /* ---------------- "did it hold at noon?": users check the estimated label, day by day ---------------- */
-const HOLDS = { status: "loading", stats: {}, mine: {}, sig: "" };
+const HOLDS = { status: "loading", stats: {}, mine: {}, kinds: {}, types: {}, sig: "" };
+/* how makeup breaks down: eye makeup can show "panda", other face products the face types, lips none */
+const bkSide = (p) => p.grp === "eye" ? "eye" : p.grp === "lip" ? null : "face";
+const bkKinds = (p) => { const side = bkSide(p); return side ? Object.keys(D.codebook.breakdowns).filter((k) => D.codebook.breakdowns[k].on === side) : []; };
 const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
 const hkey = (pid, day) => pid + "|" + day;
 function setHoldStats(rows) {
@@ -661,12 +664,28 @@ function setHoldStats(rows) {
   for (const r of rows || []) {
     if (!r || !D.products[r.product_id] || !D.codebook.climates.includes(r.climate)) continue;
     (stats[r.product_id] ||= {})[r.climate] = { n: +r.n || 0, held: +r.held || 0, partly: +r.partly || 0, broke: +r.broke || 0, first: String(r.first || "").slice(0, 10), last: String(r.last || "").slice(0, 10) };
+    if (r.types && typeof r.types === "object") setTypes(HOLDS.types, r.product_id, r.climate, r.types);
   }
   const sig = JSON.stringify(stats), changed = sig !== HOLDS.sig || HOLDS.status !== "ready";
   Object.assign(HOLDS, { status: "ready", stats, sig });
   if (changed && (S.view === "product" || S.view === "home")) render();
 }
-function setMyHolds(rows) { const m = {}; for (const r of rows || []) if (r && r.product_id) m[hkey(r.product_id, String(r.day).slice(0, 10))] = r.result; HOLDS.mine = m; }
+function setMyHolds(rows) {
+  const m = {}, k = {};
+  for (const r of rows || []) if (r && r.product_id) { const key = hkey(r.product_id, String(r.day).slice(0, 10)); m[key] = r.result; k[key] = Array.isArray(r.breakdown) ? r.breakdown.filter((x) => D.codebook.breakdowns[x]) : []; }
+  HOLDS.mine = m; HOLDS.kinds = k;
+}
+function setTypes(into, pid, climate, counts) {
+  const ok = Object.fromEntries(Object.entries(counts).filter(([k, n]) => D.codebook.breakdowns[k] && +n > 0).map(([k, n]) => [k, +n]));
+  if (Object.keys(ok).length) (into[pid] ||= {})[climate] = ok;
+}
+/* supabase keeps the type counts in their own view: rows of (product_id, climate, kind, n) */
+function setHoldTypes(rows) {
+  const by = {};
+  for (const r of rows || []) if (r && D.products[r.product_id]) ((by[r.product_id + "|" + r.climate] ||= { pid: r.product_id, c: r.climate, t: {} }).t[r.kind] = +r.n || 0);
+  const types = {}; for (const x of Object.values(by)) setTypes(types, x.pid, x.c, x.t);
+  HOLDS.types = types;
+}
 const holdRow = (pid, c = S.climate) => (HOLDS.stats[pid] || {})[c] || null;
 const userScore = (r) => r && r.n ? (r.held + 0.5 * r.partly) / r.n : null;
 /* the score the site ranks by: users' noon logs once there are enough, otherwise the label estimate */
@@ -675,15 +694,25 @@ function climScore(p, c = S.climate) {
   if (r && r.n >= D.codebook.holdMin) return { pct: Math.round(userScore(r) * 100), src: "users", n: r.n };
   return f ? { pct: f[0], src: "label" } : null;
 }
-async function logHold(pid, result) {
+async function logHold(pid, result, kinds) {
   if (!BACKEND.hold || !LIVE.uid || !S.climate) return;
-  const k = hkey(pid, today()), before = HOLDS.mine[k];
-  const clear = before === result;
-  HOLDS.mine = { ...HOLDS.mine }; if (clear) delete HOLDS.mine[k]; else HOLDS.mine[k] = result;
+  const k = hkey(pid, today()), before = HOLDS.mine[k], beforeK = HOLDS.kinds[k] || [];
+  const clear = kinds === undefined && before === result;
+  const nextK = clear || result === "held" ? [] : (kinds || beforeK);
+  HOLDS.mine = { ...HOLDS.mine }; HOLDS.kinds = { ...HOLDS.kinds };
+  if (clear) { delete HOLDS.mine[k]; delete HOLDS.kinds[k]; } else { HOLDS.mine[k] = result; HOLDS.kinds[k] = nextK; }
   render();
-  try { await BACKEND.hold(pid, S.climate, clear ? null : result, today()); }
-  catch (e) { console.warn("hold log not saved (run supabase/update_2026_10_23.sql)", e); HOLDS.mine = { ...HOLDS.mine }; if (before) HOLDS.mine[k] = before; else delete HOLDS.mine[k]; HOLDS.status = "off"; render(); }
+  try { await BACKEND.hold(pid, S.climate, clear ? null : result, today(), nextK); }
+  catch (e) { console.warn("hold log not saved (run supabase/update_2026_10_23.sql)", e); HOLDS.mine = { ...HOLDS.mine }; HOLDS.kinds = { ...HOLDS.kinds }; if (before) { HOLDS.mine[k] = before; HOLDS.kinds[k] = beforeK; } else { delete HOLDS.mine[k]; delete HOLDS.kinds[k]; } HOLDS.status = "off"; render(); }
 }
+function toggleKind(pid, kind) {
+  const k = hkey(pid, today()), r = HOLDS.mine[k];
+  if (r !== "partly" && r !== "broke") return;
+  const cur = HOLDS.kinds[k] || [];
+  logHold(pid, r, cur.includes(kind) ? cur.filter((x) => x !== kind) : [...cur, kind].sort());
+}
+/* most reported breakdown types for a product in a climate: [[kind, n], ...] */
+const topKinds = (pid, c = S.climate) => Object.entries((HOLDS.types[pid] || {})[c] || {}).sort((a, b) => b[1] - a[1]);
 function holdLogBox(p) {
   if (!p.cl || p.cl.hold == null || !S.climate) return "";
   const r = holdRow(p.id), f = climFit(p);
@@ -692,9 +721,15 @@ function holdLogBox(p) {
   const can = BACKEND.hold && LIVE.uid && HOLDS.status !== "off";
   const mine = HOLDS.mine[hkey(p.id, today())];
   const btns = can ? `<div class="vote"><span class="vq">${fmt(t("hlAsk"), { c: esc(climName(S.climate)) })}</span>${["held", "partly", "broke"].map((v) => `<button data-hold="${v}" aria-pressed="${mine === v}">${t("hl_" + v)}</button>`).join("")}</div>` : `<p class="note" style="margin:0">${t("hlOff")}</p>`;
+  const kinds = bkKinds(p), myK = HOLDS.kinds[hkey(p.id, today())] || [];
+  const ask = can && kinds.length && (mine === "partly" || mine === "broke")
+    ? `<div><span class="note">${t("bkAsk")}</span><div class="chips" style="margin-top:6px;flex-wrap:wrap">${kinds.map((k) => `<button class="chip" data-hkind="${k}" aria-pressed="${myK.includes(k)}" title="${esc(t("bkd_" + k))}">${esc(t("bk_" + k))}</button>`).join("")}</div></div>` : "";
+  const top = topKinds(p.id);
+  const seen = top.length ? `<p class="note" style="margin:0">${t("bkTop")}: ${top.slice(0, 3).map(([k, n]) => `${esc(t("bk_" + k))} ${n}`).join(" · ")}</p>` : "";
   return `<div class="stats3" style="grid-template-columns:1fr 1fr">${lab}${usr}</div>
     ${r ? `<p class="note" style="margin:0">${fmt(t("hlPeriod"), { a: dateFmt(r.first), b: dateFmt(r.last), h: r.held, p: r.partly, x: r.broke })}${r.n >= D.codebook.holdMin ? " · " + t("hlRanked") : " · " + fmt(t("hlNeed"), { k: D.codebook.holdMin })}</p>` : ""}
-    ${btns}`;
+    ${seen}
+    ${btns}${ask}`;
 }
 /* of the products the label rates 3, how many did users see break down here? (same rule as hold_log.label_vs_users) */
 function holdCheck(c = S.climate) {
@@ -1082,6 +1117,20 @@ function header() {
 
 /* ---------------- views ---------------- */
 const secHead = (title, go) => `<div class="sec-h"><h2>${title}</h2>${go ? `<button class="go" ${go} aria-label="${t("seeAll")}">${I.right}</button>` : ""}</div>`;
+/* "how does your makeup break down by noon?": types grouped by the skin problem behind them, each linked to goals that help */
+function bkSection() {
+  const groups = D.codebook.bkGroups, g = groups.includes(S.bkGrp) ? S.bkGrp : groups[0];
+  const kinds = Object.keys(D.codebook.breakdowns).filter((k) => D.codebook.breakdowns[k].group === g);
+  return `<section class="sec">
+      ${secHead(t("bkHomeH"))}
+      <div class="chips">${groups.map((x) => `<button class="chip" data-bkgrp="${x}" aria-pressed="${x === g}">${esc(t("bkg_" + x))}</button>`).join("")}</div>
+      <p class="note" style="margin:0">${esc(t("bkgd_" + g))}</p>
+      <div style="display:grid;gap:10px">${kinds.map((k) => `<div class="card" style="gap:6px"><b>${esc(t("bk_" + k))}</b><span class="note">${esc(t("bkd_" + k))}</span>
+        <div class="chips">${D.codebook.breakdowns[k].goals.filter((gid) => D.goals[gid]).map((gid) => `<button class="chip" data-goal="${gid}">${esc(goalName(gid))} ›</button>`).join("")}</div></div>`).join("")}</div>
+      <p class="note" style="margin:0">${t("bkHomeNote")}</p>
+    </section>`;
+}
+
 function vHome() {
   const feat = secFeatured(), f0 = feat[0], p1 = P(f0);
   const r1 = D.similar[f0][""].find((x) => P(x.id).origin !== p1.origin) || D.similar[f0][""][0];
@@ -1152,6 +1201,8 @@ function vHome() {
           <p class="note" style="margin:0">${hc.checked ? fmt(t("hlCheck"), { c: esc(climName(S.climate)), n: hc.checked, b: hc.broke }) : fmt(t("hlCheck0"), { k: D.codebook.holdMin })}</p><p class="note" style="margin:0">${t("clEst")}</p>`
           : `<p class="note" style="margin:0">${S.climate === "temperate" ? t("clTemperate") : t("clPick")}</p>`; })()}
     </section>
+
+    ${S.sec === "makeup" ? bkSection() : ""}
 
     <section class="sec">
       ${secHead(t("dupes"))}
@@ -1501,112 +1552,6 @@ function cleanReview(pid, r, uid) {
     skin_depth: D.codebook.depths.includes(r.skin_depth) ? r.skin_depth : null,
     text: typeof r.text === "string" ? r.text.slice(0, D.reviewPrior.maxText) : "" };
 }
-/* 1) Lucy.ai viewer: the page's own shared database. One document per reviewer. */
-async function initLucy(cl) {
-  let db = null;
-  try { db = await cl.use("db"); } catch (e) { db = null; }
-  if (!db) return false;
-  try {
-    const user = await cl.use("user");
-    LIVE.uid = user ? await user.id() : null;
-    const c = user && typeof user.can === "function" ? await user.can("data.write") : null;
-    LIVE.canWrite = c === false ? false : c === true ? true : null;
-  } catch (e) { LIVE.uid = null; }
-  BACKEND.kind = "Lucy";
-  BACKEND.save = async (pid, review) => {
-    const items = myItems();
-    if (review) items[pid] = review; else delete items[pid];
-    await db.doc("reviews/" + LIVE.uid).set({ items });
-  };
-  let myClicks = {};
-  BACKEND.click = async (pid, store, market) => {
-    const now = new Date().toISOString(), c = myClicks[pid] || { n: 0, first: now };
-    myClicks = { ...myClicks, [pid]: { n: c.n + 1, first: c.first, last: now } };
-    await db.doc("clicks/" + LIVE.uid).set({ items: myClicks });
-  };
-  let myVotes = {};
-  BACKEND.vote = async (pid, shade, pc, verdict, skin) => {
-    myVotes = { ...myVotes }; const k = vkey(pid, shade);
-    if (verdict) myVotes[k] = { product_id: pid, shade, pc_type: pc, verdict, skin_type: skin || null }; else delete myVotes[k];
-    await db.doc("shadevotes/" + LIVE.uid).set({ items: myVotes });
-  };
-  let myCats = {};
-  BACKEND.cat = async (pid, cat, note) => {
-    myCats = { ...myCats };
-    if (cat) myCats[pid] = { product_id: pid, suggested: cat, note }; else delete myCats[pid];
-    await db.doc("catreports/" + LIVE.uid).set({ items: myCats });
-  };
-  let myHolds = {};
-  BACKEND.hold = async (pid, climate, result, day) => {
-    myHolds = { ...myHolds }; const k = hkey(pid, day);
-    if (result) myHolds[k] = { product_id: pid, climate, result, day }; else delete myHolds[k];
-    await db.doc("holdlogs/" + LIVE.uid).set({ items: myHolds });
-  };
-  db.collection("holdlogs").onSnapshot((snap) => {
-    const agg = {};
-    for (const doc of snap.docs) {
-      const items = (doc.data() || {}).items;
-      if (!items || typeof items !== "object") continue;
-      if (doc.id === LIVE.uid) { myHolds = items; setMyHolds(Object.values(items)); }
-      for (const g of Object.values(items)) {
-        if (!g || !["held", "partly", "broke"].includes(g.result)) continue;
-        const a = agg[g.product_id + "|" + g.climate] ||= { product_id: g.product_id, climate: g.climate, n: 0, held: 0, partly: 0, broke: 0, first: g.day, last: g.day };
-        a.n += 1; a[g.result] += 1; if (g.day < a.first) a.first = g.day; if (g.day > a.last) a.last = g.day;
-      }
-    }
-    setHoldStats(Object.values(agg));
-  }, () => { HOLDS.status = "off"; });
-  db.collection("catreports").onSnapshot((snap) => {
-    const agg = {};
-    for (const doc of snap.docs) {
-      const items = (doc.data() || {}).items;
-      if (!items || typeof items !== "object") continue;
-      if (doc.id === LIVE.uid) { myCats = items; setMyCats(Object.values(items)); }
-      for (const r of Object.values(items)) { if (!r || !r.suggested) continue; const a = agg[r.product_id + "|" + r.suggested] ||= { product_id: r.product_id, suggested: r.suggested, n: 0 }; a.n += 1; }
-    }
-    setCatStats(Object.values(agg));
-  }, () => { CATS.status = "off"; });
-  db.collection("shadevotes").onSnapshot((snap) => {
-    const agg = {};
-    for (const doc of snap.docs) {
-      const items = (doc.data() || {}).items;
-      if (!items || typeof items !== "object") continue;
-      if (doc.id === LIVE.uid) { myVotes = items; setMyVotes(Object.values(items)); }
-      for (const v of Object.values(items)) {
-        if (!v || !["suits", "okay", "not"].includes(v.verdict)) continue;
-        const a = agg[vkey(v.product_id, v.shade) + "|" + v.pc_type + "|" + (v.skin_type || "")] ||= { product_id: v.product_id, shade: v.shade, pc_type: v.pc_type, skin_type: v.skin_type || null, n: 0, suits: 0, okay: 0, not: 0 };
-        a.n += 1; a[v.verdict] += 1;
-      }
-    }
-    setVoteStats(Object.values(agg));
-  }, () => { VOTES.status = "off"; });
-  db.collection("clicks").onSnapshot((snap) => {
-    const agg = {}, since = Date.now() - D.reviewPrior.window * 864e5;
-    for (const doc of snap.docs) {
-      const items = (doc.data() || {}).items;
-      if (!items || typeof items !== "object") continue;
-      if (doc.id === LIVE.uid) myClicks = items;
-      for (const [pid, c] of Object.entries(items)) {
-        if (!D.products[pid] || !c) continue;
-        const a = agg[pid] ||= { product_id: pid, people: 0, people_7d: 0, clicks: 0 };
-        a.people += 1; a.clicks += Math.max(1, +c.n || 1);
-        if (Date.parse(c.last) >= since) a.people_7d += 1;
-      }
-    }
-    setClicks(Object.values(agg));
-  }, () => { CLICKS.status = "off"; });
-  db.collection("reviews").onSnapshot((snap) => {
-    const out = [];
-    for (const doc of snap.docs) {
-      const items = (doc.data() || {}).items;
-      if (!items || typeof items !== "object") continue;
-      for (const [pid, r] of Object.entries(items)) { const c = cleanReview(pid, r, doc.id); if (c) out.push(c); }
-    }
-    setReviews(out);
-  }, () => { LIVE.status = LIVE.list.length ? "ready" : "nodb"; render(); });
-  return true;
-}
-
 /* 2) Supabase (for GitHub Pages or any static host): anonymous sign-in, row-level security, realtime. */
 const SUPABASE_JS = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js";
 function loadScript(src) {
@@ -1695,15 +1640,18 @@ async function initSupabase(rc) {
     const loadHolds = async () => {
       const { data, error } = await client.from("hold_log_stats").select("product_id,climate,n,held,partly,broke,first,last");
       if (error) throw error;
-      const mine = await client.from("hold_logs").select("product_id,climate,result,day").eq("logger_id", LIVE.uid);
+      let mine = await client.from("hold_logs").select("product_id,climate,result,day,breakdown").eq("logger_id", LIVE.uid);
+      if (mine.error) { HOLDS.noKinds = true; mine = await client.from("hold_logs").select("product_id,climate,result,day").eq("logger_id", LIVE.uid); }   // before update_2026_10_27.sql
       if (mine.error) throw mine.error;
-      setMyHolds(mine.data); setHoldStats(data);
+      const kinds = HOLDS.noKinds ? { data: [] } : await client.from("hold_breakdown_stats").select("product_id,climate,kind,n");
+      setMyHolds(mine.data); setHoldTypes(kinds.error ? [] : kinds.data); setHoldStats(data);
     };
     loadHolds().catch((e) => { HOLDS.status = "off"; console.warn("hold logs unavailable (run supabase/update_2026_10_23.sql)", e); render(); });
     setInterval(() => loadHolds().catch(() => {}), 60000);
-    BACKEND.hold = async (pid, climate, result, day) => {
+    BACKEND.hold = async (pid, climate, result, day, kinds) => {
+      const row = { logger_id: LIVE.uid, product_id: pid, climate, result, day, ...(HOLDS.noKinds ? {} : { breakdown: kinds || [] }) };
       const { error } = result
-        ? await client.from("hold_logs").upsert({ logger_id: LIVE.uid, product_id: pid, climate, result, day }, { onConflict: "logger_id,product_id,day" })
+        ? await client.from("hold_logs").upsert(row, { onConflict: "logger_id,product_id,day" })
         : await client.from("hold_logs").delete().eq("logger_id", LIVE.uid).eq("product_id", pid).eq("day", day);
       if (error) throw error;
       await loadHolds();
@@ -1789,9 +1737,9 @@ async function initApi(rc) {
     };
     loadHolds().catch(() => { HOLDS.status = "off"; render(); });
     setInterval(() => loadHolds().catch(() => {}), 20000);
-    BACKEND.hold = async (pid, climate, result, day) => {
+    BACKEND.hold = async (pid, climate, result, day, kinds) => {
       const r = result
-        ? await fetch(base + "/hold-logs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ logger_id: rid, product_id: pid, climate, result, day }) })
+        ? await fetch(base + "/hold-logs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ logger_id: rid, product_id: pid, climate, result, day, breakdown: kinds || [] }) })
         : await fetch(`${base}/hold-logs/${encodeURIComponent(rid)}/${encodeURIComponent(pid)}/${day}`, { method: "DELETE" });
       if (!r.ok) throw new Error("HTTP " + r.status);
       await loadHolds();
@@ -1812,8 +1760,6 @@ async function initApi(rc) {
 }
 
 async function initLive() {
-  const cl = typeof window !== "undefined" ? window.Lucy : null;
-  if (cl && typeof cl.use === "function" && await initLucy(cl)) return;
   const rc = CFG.reviews || {};
   if (rc.backend === "supabase" && rc.supabaseUrl && rc.supabaseAnonKey && await initSupabase(rc)) return;
   if (rc.backend === "api" && rc.apiUrl && await initApi(rc)) return;
@@ -2029,6 +1975,8 @@ document.addEventListener("click", (e) => {
   if (d.catsend) { if (S.catPick) sendCat(d.catsend, S.catPick, (S.catNote || "").trim().slice(0, 200)); return; }
   if (d.catundo) { sendCat(d.catundo, null, ""); return; }
   if (d.hold) { logHold(S.pid, d.hold); return; }
+  if (d.hkind) { toggleKind(S.pid, d.hkind); return; }
+  if (d.bkgrp) { S.bkGrp = d.bkgrp; render(); return; }
   if (d.depth) { S.depth = S.depth === d.depth ? "" : d.depth; S.hosu = ""; if (S.draft && !S.draft.skin_depth) S.draft.skin_depth = S.depth || null; render(); return; }
   if (d.tgrp !== undefined) { S.toneGrp = d.tgrp; render(); return; }
   if (d.torigin !== undefined) { S.toneOrigin = d.torigin; render(); return; }
